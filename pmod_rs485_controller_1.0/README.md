@@ -2,6 +2,7 @@ Digilent PMOD RS485 UART IP Core for ZedBoard configuration
 ===========================================================
 
 [Digilent PmodRS485 Reference Manual](https://reference.digilentinc.com/_media/pmod:pmod:pmodrs485_rm.pdf)
+[485DRCI Industrial RS-232 to RS-422/485 Converter](http://www.bb-elec.com/Products/Datasheets/pn_7207R5_485DRCI-2212ds.pdf)
 
 Vivado Setup
 ------------
