@@ -3,9 +3,9 @@ Digilent PMOD RS485 UART IP Core for ZedBoard configuration
 
 [Digilent PmodRS485 Reference Manual](https://reference.digilentinc.com/_media/pmod:pmod:pmodrs485_rm.pdf)
 
-**also confirmed to work with this project as an interface to PC**
-
 [485DRCI Industrial RS-232 to RS-422/485 Converter](http://www.bb-elec.com/Products/Datasheets/pn_7207R5_485DRCI-2212ds.pdf)
+
+> also confirmed to work with this device as an interface to PC
 
 Vivado Setup
 ------------
@@ -44,3 +44,5 @@ XSDK Verification
 -----------------
 
 1. Create new empty project application and generate BSP
+
+
