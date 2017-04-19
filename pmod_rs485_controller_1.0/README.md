@@ -25,6 +25,8 @@ Vivado Setup
 	| PMOD_TXD                   | create port : pmod_rs485_TXD type OUT|
 	| DE                         | create port : pmod_rs485_DE  type OUT|
 	| RE                         | create port : pmod_rs485_RE  type OUT|
+	
+	**NOTE** if using Vivado 2015.4 xparameters.h will not import the proper axi interface address from user created IP. Make sure to note the *offset address* being used by the core in the *address editor* tab of vivado
 
 1. Use the JA1 top row Pmod ports to attach the Digilent PMOD RS485 UART device
 
