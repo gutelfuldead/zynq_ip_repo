@@ -26,6 +26,10 @@ Vivado Setup
 	| DE                         | create port : pmod_rs485_DE  type OUT|
 	| RE                         | create port : pmod_rs485_RE  type OUT|
 
+1. Use the JA1 top row Pmod ports to attach the Digilent PMOD RS485 UART device
+
+1. Import the provided *zedboard_pmod_rs485.xdc* constraints file to map the pins
+
 1. Generate Bit Stream and export Bit Stream and HDL to XSDK
 
 XSDK Verification
