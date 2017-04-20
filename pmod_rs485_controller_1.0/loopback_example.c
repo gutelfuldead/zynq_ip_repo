@@ -6,7 +6,6 @@
 
 #include "xparameters.h"
 #include "xuartps.h"
-#include "platform.h"
 #include "pmod_rs485_controller.h"
 
 /*
@@ -75,12 +74,12 @@ int pmod_rs485_ps_uart_example(u16 DeviceId)
 						   &recv_buf[i],1);
 		}
 		/* view results */
-		xil_printf("UART1: SentCount = %d, RecvCount = %d, Received on UART0 = %s\n\r",
+		xil_printf("UART1: SentCount = %d B, RecvCount = %d B, Received on UART0 = %s\n\r",
 				(int)SentCount,(int)RecvCount,recv_buf);
 		/* reset values */
 		SentCount = 0;
 		RecvCount = 0;
-		memset(recv_buf,0, len);
+		memset(recv_buf,0,len);
 	}
 	return SentCount;
 }
