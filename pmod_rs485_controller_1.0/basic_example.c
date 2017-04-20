@@ -1,3 +1,9 @@
+/*
+ * Make sure to set the proper address range in xparameters.h for the
+ * STDIN_BASEADDRESSES and STDOUT_BASEADDRESSES
+ * They should reflect the XPAR_PS7_UART_1_BASEADDR value
+ */
+
 #include "xparameters.h"
 #include "xuartps.h"
 #include "platform.h"
@@ -9,6 +15,7 @@
  * change all the needed parameters in one place.
  */
 #define UART_DEVICE_ID                  XPAR_XUARTPS_0_DEVICE_ID
+
 /* problem in vivado 2015.4 does not map user ip in xparameters.h */
 /* must verify base address for PMOD_RS485 in vivado address editor tab */
 #define PMOD_RS485_BASE_ADDR			0x43C00000
@@ -36,18 +43,13 @@ int main(void)
  */
 int pmod_rs485_ps_uart_example(u16 DeviceId)
 {
-	int len = 10;
-	u8 send_buf[len];
+	u8 send_buf[]="hello world";
+	u8 len = sizeof(send_buf);
 	u8 recv_buf[len];
 	int SentCount = 0;
 	int RecvCount = 0;
 	int Status;
 	XUartPs_Config *Config;
-
-	/* fill send_buf */
-	int i = 0;
-	for(i = 0 ; i < len ; i++)
-		send_buf[i] = i;
 
 	/*
 	 * Initialize the UART driver so that it's ready to use
@@ -64,13 +66,21 @@ int pmod_rs485_ps_uart_example(u16 DeviceId)
 	}
 
 	XUartPs_SetBaudRate(&Uart_Ps, 115200);
-
-	for(i = 0; i < len; i++){
-		SentCount += XUartPs_Send(&Uart_Ps,
-					   &send_buf[i], 1);
-		RecvCount += XUartPs_Recv(&Uart_Ps,
-					   &recv_buf[i],1);
+	int i;
+	for(;;){
+		for(i = 0; i < len; i++){
+			SentCount += XUartPs_Send(&Uart_Ps,
+						   &send_buf[i], 1);
+			RecvCount += XUartPs_Recv(&Uart_Ps,
+						   &recv_buf[i],1);
+		}
+		/* view results */
+		xil_printf("UART1: SentCount = %d, RecvCount = %d, Received on UART0 = %s\n\r",
+				(int)SentCount,(int)RecvCount,recv_buf);
+		/* reset values */
+		SentCount = 0;
+		RecvCount = 0;
+		memset(recv_buf,0, len);
 	}
-
 	return SentCount;
 }
