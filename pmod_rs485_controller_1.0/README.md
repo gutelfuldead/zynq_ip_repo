@@ -45,11 +45,11 @@ XSDK Verification
 
 1. Create new empty project application and generate BSP
 
-1. In the BSP must hand alter the xparameters.h file to set the STDIN/STDOUT_BASEADDRESS to be that of the UART1 device if it is desirable to view debug messages via the USB UART connection. Via xparameters.h :
+1. In the BSP must hand alter the xparameters.h file to set the STDIN/STDOUT_BASEADDRESS to be that of the UART1 device if it is desirable to view debug messages via the USB UART connection. Via `xparameters.h` :
 
 ```
 #define STDIN_BASEADDRESS 0xE0001000  // XPAR_PS7_UART_1_BASEADDR
 #define STDOUT_BASEADDRESS 0xE0001000 // XPAR_PS7_UART_1_BASEADDR
 ```
-1. Example program provided to flood UART0 with "hello world" and recieve it back in loopback mode. The USB UART1 will print results to a teleterminal session. 
+1. Example program `loopback_example.c` provided to flood UART0 with "hello world" and recieve it back in loopback mode. The USB UART1 will print results to a teleterminal session. 
 
