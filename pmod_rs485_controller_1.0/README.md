@@ -53,3 +53,5 @@ XSDK Verification
 ```
 1. Example program `loopback_example.c` provided to flood UART0 with "hello world" and recieve it back in loopback mode. The USB UART1 will print results to a teleterminal session. 
 
+1. Example program `interrupt_loopback_test.c` sends data when an RX flag is high, recieves the data via an interrupt handler and turns the flag low, rinse and repeat.
+
