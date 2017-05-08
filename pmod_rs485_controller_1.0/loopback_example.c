@@ -1,7 +1,15 @@
-/*
+/**
+ * This example will flood the UART0_TX line with hello world one byte at a time and then
+ * read out the same number of bytes on the UART0_RX line then print out the results.
+ *
  * Make sure to set the proper address range in xparameters.h for the
  * STDIN_BASEADDRESSES and STDOUT_BASEADDRESSES
  * They should reflect the XPAR_PS7_UART_1_BASEADDR value
+ *
+ * Expected output (prints via usb/uart with UART1 controller):
+ * ```
+ * UART0: SentCount = 12 B, RecvCount = 12 B, Received = "hello world"
+ *```
  */
 
 #include "xparameters.h"
@@ -74,8 +82,8 @@ int pmod_rs485_ps_uart_example(u16 DeviceId)
 						   &recv_buf[i],1);
 		}
 		/* view results */
-		xil_printf("UART1: SentCount = %d B, RecvCount = %d B, Received on UART0 = %s\n\r",
-				(int)SentCount,(int)RecvCount,recv_buf);
+		xil_printf("UART%d: SentCount = %d B, RecvCount = %d B, Received = \"%s\"\n\r",
+				(int)Config->DeviceId, (int)SentCount,(int)RecvCount,recv_buf);
 		/* reset values */
 		SentCount = 0;
 		RecvCount = 0;
