@@ -1,3 +1,19 @@
+/**
+ * This example will send data on the UART0 device and then wait for rx flag to be asserted by
+ * the interrupt controller. The data will then be printed out and a new packet will be sent.
+ * Forever, and ever, and ever.
+ *
+ * Make sure to set the proper address range in xparameters.h for the
+ * STDIN_BASEADDRESSES and STDOUT_BASEADDRESSES
+ * They should reflect the XPAR_PS7_UART_1_BASEADDR value
+ *
+ * Expected output (prints via usb/uart with UART1 controller):
+ * ```
+ * Data Sent
+ * 		Data Received: "ABCDEFGHIJ"
+ * ```
+ */
+
 #include "xparameters.h"
 #include "xplatform_info.h"
 #include "xuartps.h"
@@ -12,55 +28,26 @@
 #define PMOD_RS485_BASE_ADDR			0x43C00000
 #define TEST_BUFFER_SIZE	10
 
-/**************************** Type Definitions ******************************/
-
-
-/************************** Function Prototypes *****************************/
 
 int UartPsIntrExample(XScuGic *IntcInstPtr, XUartPs *UartInstPtr,
 			u16 DeviceId, u16 UartIntrId);
-
 static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
 				XUartPs *UartInstancePtr,
 				u16 UartIntrId);
-
 void Handler(void *CallBackRef, u32 Event, unsigned int EventData);
-
-
-/************************** Variable Definitions ***************************/
 
 XUartPs UartPs	;		/* Instance of the UART Device */
 XScuGic InterruptController;	/* Instance of the Interrupt Controller */
 
-/*
- * The following buffers are used in this example to send and receive data
- * with the UART.
- */
 static u8 SendBuffer[TEST_BUFFER_SIZE];	/* Buffer for Transmitting Data */
 static u8 RecvBuffer[TEST_BUFFER_SIZE];	/* Buffer for Receiving Data */
 
-/*
- * The following counters are used to determine when the entire buffer has
- * been sent and received.
- */
 volatile int TotalReceivedCount;
 volatile int TotalSentCount;
 volatile int RX_FLAG = 1;
 
 int TotalErrorCount;
 
-/**************************************************************************/
-/**
-*
-* Main function to call the Uart interrupt example.
-*
-* @param	None
-*
-* @return	XST_SUCCESS if successful, XST_FAILURE if unsuccessful
-*
-* @note		None
-*
-**************************************************************************/
 int main(void)
 {
 	int Status;
@@ -68,6 +55,10 @@ int main(void)
 	pmod_rs485_controller_enable(PMOD_RS485_BASE_ADDR);
 	pmod_rs485_controller_enable_wr(PMOD_RS485_BASE_ADDR);
 	pmod_rs485_controller_enable_rd(PMOD_RS485_BASE_ADDR);
+
+	printf("\n\r------------------------------------\n\r");
+	printf("PMOD RS485 Interrupt Controller Test\n\r");
+	printf("------------------------------------\n\r");
 
 	/* Run the UartPs Interrupt example, specify the the Device ID */
 	Status = UartPsIntrExample(&InterruptController, &UartPs,
@@ -203,59 +194,14 @@ int UartPsIntrExample(XScuGic *IntcInstPtr, XUartPs *UartInstPtr,
 	 */
 	for(;;){
 		if(RX_FLAG == 1){
-		XUartPs_Send(UartInstPtr, SendBuffer, TEST_BUFFER_SIZE);
-		RX_FLAG = 0;
+			RX_FLAG = 0;
+			XUartPs_Send(UartInstPtr, SendBuffer, TEST_BUFFER_SIZE);
 		}
-	}
-	/*
-	 * Wait for the entire buffer to be received, letting the interrupt
-	 * processing work in the background, this function may get locked
-	 * up in this loop if the interrupts are not working correctly.
-	 */
-	while (1) {
-		if ((TotalSentCount == TEST_BUFFER_SIZE) &&
-		    (TotalReceivedCount == TEST_BUFFER_SIZE)) {
-			break;
-		}
-	}
-
-	/* Verify the entire receive buffer was successfully received */
-	for (i = 0; i < TEST_BUFFER_SIZE; i++) {
-		if (RecvBuffer[i] != SendBuffer[i]) {
-			BadByteCount++;
-		}
-	}
-
-
-	/* If any bytes were not correct, return an error */
-	if (BadByteCount != 0) {
-		return XST_FAILURE;
 	}
 
 	return XST_SUCCESS;
 }
 
-/**************************************************************************/
-/**
-*
-* This function is the handler which performs processing to handle data events
-* from the device.  It is called from an interrupt context. so the amount of
-* processing should be minimal.
-*
-* This handler provides an example of how to handle data for the device and
-* is application specific.
-*
-* @param	CallBackRef contains a callback reference from the driver,
-*		in this case it is the instance pointer for the XUartPs driver.
-* @param	Event contains the specific kind of event that has occurred.
-* @param	EventData contains the number of bytes sent or received for sent
-*		and receive events.
-*
-* @return	None.
-*
-* @note		None.
-*
-***************************************************************************/
 void Handler(void *CallBackRef, u32 Event, unsigned int EventData)
 {
 //	static int i = 0;
@@ -268,9 +214,9 @@ void Handler(void *CallBackRef, u32 Event, unsigned int EventData)
 
 	/* All of the data has been received */
 	if (Event == XUARTPS_EVENT_RECV_DATA) {
-		xil_printf("Data Received: ");
+		xil_printf("\tData Received: ");
 		XUartPs_Recv(&UartPs, RecvBuffer, TEST_BUFFER_SIZE);
-		xil_printf("%s\n\r",RecvBuffer);
+		xil_printf("\"%s\"\n\r",RecvBuffer);
 		TotalReceivedCount = EventData;
 		RX_FLAG = 1;
 	}
