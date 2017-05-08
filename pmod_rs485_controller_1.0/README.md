@@ -45,7 +45,7 @@ XSDK Verification
 
 1. Create new empty project application and generate BSP
 
-1. In the BSP must hand alter the xparameters.h file to set the STDIN/STDOUT_BASEADDRESS to be that of the UART1 device if it is desirable to view debug messages via the USB UART connection. Via `xparameters.h` :
+1. In the BSP must hand alter the xparameters.h file to set the STDIN/STDOUT_BASEADDRESS to be that of the UART1 device if it is desirable to view debug messages via the USB UART connection. Essentially using UART1 via the UART/USB port and UART0 for the pmod device. Via `xparameters.h` :
 
 ```
 #define STDIN_BASEADDRESS 0xE0001000  // XPAR_PS7_UART_1_BASEADDR
