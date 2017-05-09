@@ -24,7 +24,7 @@ void pmod_rs485_controller_enable(const int baseaddr)
 void pmod_rs485_controller_disable(const int baseaddr)
 {
 	u32 reg = pmod_rs485_controller_get_control_reg(baseaddr);
-	PMOD_RS485_CONTROLLER_mWriteReg((u32)baseaddr, PMOD_RS485_CONTROLLER_CONTROL_REGISTER_OFFSET, ~(reg & EN));
+	PMOD_RS485_CONTROLLER_mWriteReg((u32)baseaddr, PMOD_RS485_CONTROLLER_CONTROL_REGISTER_OFFSET, reg & ~EN);
 	return;
 }
 
@@ -46,7 +46,7 @@ void pmod_rs485_controller_enable_rd(const int baseaddr)
 void pmod_rs485_controller_disable_rd(const int baseaddr)
 {
 	u32 reg = pmod_rs485_controller_get_control_reg(baseaddr);
-	PMOD_RS485_CONTROLLER_mWriteReg((u32)baseaddr, PMOD_RS485_CONTROLLER_CONTROL_REGISTER_OFFSET, ~(reg & RE));
+	PMOD_RS485_CONTROLLER_mWriteReg((u32)baseaddr, PMOD_RS485_CONTROLLER_CONTROL_REGISTER_OFFSET, reg & ~RE);
 	return;
 }
 
@@ -68,7 +68,7 @@ void pmod_rs485_controller_enable_wr(const int baseaddr)
 void pmod_rs485_controller_disable_wr(const int baseaddr)
 {
 	u32 reg = pmod_rs485_controller_get_control_reg(baseaddr);
-	PMOD_RS485_CONTROLLER_mWriteReg((u32)baseaddr, PMOD_RS485_CONTROLLER_CONTROL_REGISTER_OFFSET, ~(reg & DE));
+	PMOD_RS485_CONTROLLER_mWriteReg((u32)baseaddr, PMOD_RS485_CONTROLLER_CONTROL_REGISTER_OFFSET, reg & ~DE);
 	return;
 }
 
