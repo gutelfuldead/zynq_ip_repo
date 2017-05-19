@@ -8,24 +8,24 @@
 #include <xtime_l.h>
 #include "xstatus.h"
 
-enum SLV_REGISTERS{
+enum _SLV_REGISTERS{
 	ABFC_CTRL_REG                = 0,
 	ABFC_DOUT_REG           = 4,
 	ABFC_STATUS_REG         = 8,
 	ABFC_DIN_REG            = 12
 };
 
-enum FIFO_CONTROL_REG_BITS{
-	WRITE_EN = (1 << 0),
-	READ_EN  = (1 << 1),
-	RESET    = (1 << 2),
-	CLKEN    = (1 << 3)
+enum _ABFC_CTRL_REG_BITS{
+	ABFC_WRITE_EN = (1 << 0),
+	ABFC_READ_EN  = (1 << 1),
+	ABFC_RESET    = (1 << 2),
+	ABFC_CLKEN    = (1 << 3)
 };
 
-enum FIFO_OUTPUT_CONTROL_REG_BITS{
-	DOUT_VALID = (1 << 0),
-	BRAM_FULL  = (1 << 1),
-	BRAM_EMPTY = (1 << 2)
+enum _ABFC_STATUS_REG_BITS{
+	ABFC_DOUT_VALID = (1 << 0),
+	ABFC_BRAM_FULL  = (1 << 1),
+	ABFC_BRAM_EMPTY = (1 << 2)
 };
 
 /* error defines */
@@ -80,18 +80,18 @@ enum FIFO_OUTPUT_CONTROL_REG_BITS{
     Xil_In32((BaseAddress) + (RegOffset))
 
 extern u32  ABFC_get_ctrl_reg(const u32 baseaddr);
-extern void ABFC_en_write_en(const u32 baseaddr);
-extern void ABFC_den_write_en(const u32 baseaddr);
-extern void ABFC_en_clken(const u32 baseaddr);
-extern void ABFC_den_clken(const u32 baseaddr);
-extern void ABFC_en_read_en(const u32 baseaddr);
-extern void ABFC_den_read_en(const u32 baseaddr);
-extern void ABFC_en_reset(const u32 baseaddr);
-extern void ABFC_den_reset(const u32 baseaddr);
+extern void ABFC_en_ABFC_WRITE_EN(const u32 baseaddr);
+extern void ABFC_den_ABFC_WRITE_EN(const u32 baseaddr);
+extern void ABFC_en_ABFC_CLKEN(const u32 baseaddr);
+extern void ABFC_den_ABFC_CLKEN(const u32 baseaddr);
+extern void ABFC_en_ABFC_READ_EN(const u32 baseaddr);
+extern void ABFC_den_ABFC_READ_EN(const u32 baseaddr);
+extern void ABFC_en_ABFC_RESET(const u32 baseaddr);
+extern void ABFC_den_ABFC_RESET(const u32 baseaddr);
 
-extern u8 ABFC_poll_dout_valid(const u32 baseaddr);
-extern u8 ABFC_poll_bram_full(const u32 baseaddr);
-extern u8 ABFC_poll_bram_empty(const u32 baseaddr);
+extern u8 ABFC_poll_ABFC_DOUT_VALID(const u32 baseaddr);
+extern u8 ABFC_poll_ABFC_BRAM_FULL(const u32 baseaddr);
+extern u8 ABFC_poll_ABFC_BRAM_EMPTY(const u32 baseaddr);
 
 extern u32  ABFC_write_data(const u32 baseaddr, const u32 dat);
 extern u32  ABFC_read_data(const u32 baseaddr, u32 *datout);
