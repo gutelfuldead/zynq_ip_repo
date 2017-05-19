@@ -83,14 +83,19 @@ u32 AXI_BRAM_FIFO_CONTROLLER_write_data(const u32 baseaddr, const u32 dat)
 	return XST_SUCCESS;
 }
 
+void AXI_BRAM_FIFO_CONTROLLER_read_prep(const u32 baseaddr)
+{
+	AXI_BRAM_FIFO_CONTROLLER_en_read_en(baseaddr);
+	AXI_BRAM_FIFO_CONTROLLER_den_read_en(baseaddr);
+}
+
 u32 AXI_BRAM_FIFO_CONTROLLER_read_data(const u32 baseaddr, u32 *datout)
 {
 	if(AXI_BRAM_FIFO_CONTROLLER_poll_bram_empty(baseaddr))
 		return XST_FAILURE;
-	AXI_BRAM_FIFO_CONTROLLER_den_read_en(baseaddr);
+	AXI_BRAM_FIFO_CONTROLLER_en_read_en(baseaddr);
+	while(AXI_BRAM_FIFO_CONTROLLER_poll_dout_valid(baseaddr) == 0){}
 	*datout = AXI_BRAM_FIFO_CONTROLLER_mReadReg(baseaddr, AXI_BRAM_FIFO_CONTROLLER_DOUT_REG);
 	AXI_BRAM_FIFO_CONTROLLER_den_read_en(baseaddr);
 	return XST_SUCCESS;
 }
-
-

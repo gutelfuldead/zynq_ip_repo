@@ -65,7 +65,7 @@ architecture Behavioral of FIFO_Controller is
     constant count_down : std_logic := '0';
     constant count_up   : std_logic := '1';
     signal s_addr, s_addr_delay : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
-    signal rdwr_hist, goread : std_logic := '0';
+    signal rdwr_hist : std_logic := '0';
     
     -- signals for control logic
 
@@ -74,15 +74,7 @@ begin
     clka <= clk;
     bram_full <= addr_full;
     bram_empty <= addr_empty;
-    addra <= s_addr;  
-    
---    dff_s_addr : process(clk)
---    begin
---    if(rising_edge(clk)) then
---        s_addr_delay <= s_addr;
---    end if;
---    end process;
---    addra <= s_addr_delay;  
+    addra <= s_addr;   
         
     address_generator : addr_gen
     generic map( BRAM_ADDR_WIDTH => BRAM_ADDR_WIDTH )
@@ -102,39 +94,40 @@ begin
         if(reset = '1') then
             addr_rst <= '1';
             dout_valid <= '0';
-            goread <= '0';
             rdwr_hist <= '0';
         elsif(clkEn = '1') then
             ena <= '1';
             addr_rst <= '0';
-            if(write_en = '1' and read_en = '0' and addr_full = '0') then
-                addr_dir <= count_up;
-                addr_en  <= '1';
-                dina <= din;
-                wea <= '1';
-                dout_valid <= '0';
-                rdwr_hist <= '1';
-            elsif(write_en = '0' and read_en = '1' and rdwr_hist = '1' and addr_empty = '0') then
-                addr_dir <= count_down;
-                addr_en <= '1';
-                rdwr_hist <= '0';
-                goread <= '1';
-            elsif(goread = '1' or (write_en = '0' and read_en = '1' and addr_empty = '0')) then
+            if(write_en = '1' and read_en = '0') then
+                if(addr_full = '0') then
+                    addr_dir <= count_up;
+                    addr_en  <= '1';
+                    dina <= din;
+                    wea <= '1';
+                    dout_valid <= '0';
+                    rdwr_hist <= '1';           
+                else
+                    wea <= '0';
+                end if;
+            elsif(read_en = '1' and write_en = '0') then
                 addr_dir <= count_down;
                 addr_en <= '1';
                 wea <= '0';
-                dout <= douta;
-                dout_valid <= '1';
-                goread <= '0';
-            else -- no op
+                if(rdwr_hist = '1') then
+                   rdwr_hist <= '0';
+                   dout_valid <= '0';
+                elsif(addr_empty = '0') then
+                   dout <= douta;
+                   dout_valid <= '1';
+                end if;
+            else
+                wea <= '0';
                 addr_en <= '0';
-                wea <= '0';
             end if;
         else
             ena <= '0';
         end if;
     end if;
     end process;
-
 
 end Behavioral;

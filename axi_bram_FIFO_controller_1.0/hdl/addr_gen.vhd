@@ -55,11 +55,11 @@ begin
             s_addr <= (others => '0');
         elsif(en = '1') then
             if(direction = count_down) then
-               if(s_empty = '0') then
+               if(s_addr > unsigned(c_empty)) then
                   s_addr <= s_addr - 1;
                end if;
-            else -- count_up
-                if(s_full = '0') then
+            elsif(direction = count_up) then -- count_up
+                if(s_addr < unsigned(c_full)) then
                     s_addr <= s_addr + 1;   
                 end if;
             end if;

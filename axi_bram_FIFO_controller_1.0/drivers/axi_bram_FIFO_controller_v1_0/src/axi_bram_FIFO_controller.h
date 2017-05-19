@@ -108,5 +108,7 @@ extern u8 AXI_BRAM_FIFO_CONTROLLER_poll_bram_empty(const u32 baseaddr);
 
 extern u32 AXI_BRAM_FIFO_CONTROLLER_write_data(const u32 baseaddr, const u32 dat);
 extern u32 AXI_BRAM_FIFO_CONTROLLER_read_data(const u32 baseaddr, u32 *datout);
+extern void AXI_BRAM_FIFO_CONTROLLER_read_prep(const u32 baseaddr);
+
 
 #endif // AXI_BRAM_FIFO_CONTROLLER_H
