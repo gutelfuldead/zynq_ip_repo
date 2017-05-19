@@ -17,7 +17,7 @@ int main()
     printf("\n\r==============\n\r");
     printf("BRAM FIFO TEST\n\r");
     printf("==============\n\r");
-    printf("bram empty : %d, full : %d\n\r",ABFC_poll_bram_empty(ABFC_ADDR),
+    printf("bram status bits empty : %d, full : %d\n\r",ABFC_poll_bram_empty(ABFC_ADDR),
             ABFC_poll_bram_full(ABFC_ADDR));
 
 
@@ -46,7 +46,7 @@ int main()
     	}
     }
 
-    printf("bram empty : %d, full : %d\n\r",ABFC_poll_bram_empty(ABFC_ADDR),
+    printf("bram status bits empty : %d, full : %d\n\r",ABFC_poll_bram_empty(ABFC_ADDR),
             ABFC_poll_bram_full(ABFC_ADDR));
     printf("ttl num errors : %d\n\r",cnt);
     printf("Done\n\r");
