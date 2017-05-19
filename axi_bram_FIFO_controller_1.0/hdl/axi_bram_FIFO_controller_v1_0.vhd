@@ -1,6 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+library UNISIM;
+use UNISIM.Vcomponents.all;
 
 entity axi_bram_FIFO_controller_v1_0 is
 	generic (
@@ -9,7 +11,6 @@ entity axi_bram_FIFO_controller_v1_0 is
         BRAM_DATA_WIDTH  : integer := 32;
 		-- User parameters ends
 		-- Do not modify the parameters beyond this line
-
 
 		-- Parameters of Axi Slave Bus Interface S00_AXI
 		C_S00_AXI_DATA_WIDTH	: integer	:= 32;
@@ -23,6 +24,8 @@ entity axi_bram_FIFO_controller_v1_0 is
         douta : in  std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
         ena   : out std_logic;
         wea   : out std_logic;
+        -- reset line not used in designed; only included to use
+        -- BRAM interface specification
         rsta  : out std_logic;
         
 		-- User ports ends
@@ -130,6 +133,7 @@ architecture arch_imp of axi_bram_FIFO_controller_v1_0 is
         signal bram_dout_valid : std_logic := '0';
         signal bram_full  : std_logic := '0';
         signal bram_empty : std_logic := '0';
+        signal s_clk : std_logic := '0';
 
 begin
 
@@ -172,7 +176,6 @@ axi_bram_FIFO_controller_v1_0_S00_AXI_inst : axi_bram_FIFO_controller_v1_0_S00_A
 		S_AXI_RREADY	=> s00_axi_rready
 	);
 
-rsta <= '0';
 BRAM_CONTROLLER : FIFO_Controller
   generic map(
       BRAM_ADDR_WIDTH  => BRAM_ADDR_WIDTH,
@@ -184,7 +187,7 @@ BRAM_CONTROLLER : FIFO_Controller
       douta => douta,
       ena   => ena,
       wea   => wea,
-      clka  => clka,
+      clka  => open,
       -- Core logic
       clk        => s00_axi_aclk,  
       clkEn      => bram_clkEn,
@@ -197,5 +200,24 @@ BRAM_CONTROLLER : FIFO_Controller
       bram_full  => bram_full,
       bram_empty => bram_empty
     );
+    
+        -- create safe buffer for the bram clock
+BUFR_inst : BUFR
+    generic map(
+        BUFR_DIVIDE => "BYPASS",
+        SIM_DEVICE => "7SERIES"
+    )
+    port map(
+        I => s00_axi_aclk,
+        CE => '1',
+        CLR => '0',
+        O => s_clk
+    );
+    
+    clka <= s_clk;
+    -- reset line not used in designed; only included to use
+    -- BRAM interface specification
+    rsta <= '0';
+
 
 end arch_imp;

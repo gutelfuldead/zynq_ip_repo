@@ -5,13 +5,14 @@
 
 /****************** Include Files ********************/
 #include "xil_types.h"
+#include <xtime_l.h>
 #include "xstatus.h"
 
 enum SLV_REGISTERS{
-	AXI_BRAM_FIFO_CONTROLLER_REG                = 0,
-	AXI_BRAM_FIFO_CONTROLLER_DOUT_REG           = 4,
-	AXI_BRAM_FIFO_CONTROLLER_OUTPUT_CONTROL_REG = 8,
-	AXI_BRAM_FIFO_CONTROLLER_DIN_REG            = 12
+	ABFC_REG                = 0,
+	ABFC_DOUT_REG           = 4,
+	ABFC_OUTPUT_CONTROL_REG = 8,
+	ABFC_DIN_REG            = 12
 };
 
 enum FIFO_CONTROL_REG_BITS{
@@ -27,6 +28,14 @@ enum FIFO_OUTPUT_CONTROL_REG_BITS{
 	BRAM_EMPTY = (1 << 2)
 };
 
+/* error defines */
+#define EABFC_FIFO_FULL -1
+#define EABFC_FIFO_EMPTY -2
+#define EABFC_VALID_NOT_ASSERTED -3
+
+/* max wait time in microseconds to check for data */
+#define MAX_US_WAIT 5
+#define MAX_WAIT_POLL_VALID_US MAX_US_WAIT / ((COUNTS_PER_SECOND) / 1000000UL)
 
 
 /**************************** Type Definitions *****************************/
@@ -36,7 +45,7 @@ enum FIFO_OUTPUT_CONTROL_REG_BITS{
  * If the component is implemented in a smaller width, only the least
  * significant data is written.
  *
- * @param   BaseAddress is the base address of the AXI_BRAM_FIFO_CONTROLLERdevice.
+ * @param   BaseAddress is the base address of the AXI_BRAM_FIFO_CONTROLLER device.
  * @param   RegOffset is the register offset from the base to write to.
  * @param   Data is the data written to the register.
  *
@@ -44,10 +53,10 @@ enum FIFO_OUTPUT_CONTROL_REG_BITS{
  *
  * @note
  * C-style signature:
- * 	void AXI_BRAM_FIFO_CONTROLLER_mWriteReg(u32 BaseAddress, unsigned RegOffset, u32 Data)
+ * 	void ABFC_mWriteReg(u32 BaseAddress, unsigned RegOffset, u32 Data)
  *
  */
-#define AXI_BRAM_FIFO_CONTROLLER_mWriteReg(BaseAddress, RegOffset, Data) \
+#define ABFC_mWriteReg(BaseAddress, RegOffset, Data) \
   	Xil_Out32((BaseAddress) + (RegOffset), (u32)(Data))
 
 /**
@@ -64,51 +73,35 @@ enum FIFO_OUTPUT_CONTROL_REG_BITS{
  *
  * @note
  * C-style signature:
- * 	u32 AXI_BRAM_FIFO_CONTROLLER_mReadReg(u32 BaseAddress, unsigned RegOffset)
+ * 	u32 ABFC_mReadReg(u32 BaseAddress, unsigned RegOffset)
  *
  */
-#define AXI_BRAM_FIFO_CONTROLLER_mReadReg(BaseAddress, RegOffset) \
+#define ABFC_mReadReg(BaseAddress, RegOffset) \
     Xil_In32((BaseAddress) + (RegOffset))
 
-/************************** Function Prototypes ****************************/
-/**
- *
- * Run a self-test on the driver/device. Note this may be a destructive test if
- * resets of the device are performed.
- *
- * If the hardware system is not built correctly, this function may never
- * return to the caller.
- *
- * @param   baseaddr_p is the base address of the AXI_BRAM_FIFO_CONTROLLER instance to be worked on.
- *
- * @return
- *
- *    - XST_SUCCESS   if all self-test code passed
- *    - XST_FAILURE   if any self-test code failed
- *
- * @note    Caching must be turned off for this function to work.
- * @note    Self test may fail if data memory and device are not on the same bus.
- *
- */
-XStatus AXI_BRAM_FIFO_CONTROLLER_Reg_SelfTest(void * baseaddr_p);
+extern u32  ABFC_get_ctrl_reg(const u32 baseaddr);
+extern void ABFC_en_write_en(const u32 baseaddr);
+extern void ABFC_den_write_en(const u32 baseaddr);
+extern void ABFC_en_clken(const u32 baseaddr);
+extern void ABFC_den_clken(const u32 baseaddr);
+extern void ABFC_en_read_en(const u32 baseaddr);
+extern void ABFC_den_read_en(const u32 baseaddr);
+extern void ABFC_en_reset(const u32 baseaddr);
+extern void ABFC_den_reset(const u32 baseaddr);
 
-extern u32 AXI_BRAM_FIFO_CONTROLLER_get_ctrl_reg(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_en_write_en(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_den_write_en(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_en_clken(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_den_clken(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_en_read_en(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_den_read_en(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_en_reset(const u32 baseaddr);
-extern void AXI_BRAM_FIFO_CONTROLLER_den_reset(const u32 baseaddr);
+extern u8 ABFC_poll_dout_valid(const u32 baseaddr);
+extern u8 ABFC_poll_bram_full(const u32 baseaddr);
+extern u8 ABFC_poll_bram_empty(const u32 baseaddr);
 
-extern u8 AXI_BRAM_FIFO_CONTROLLER_poll_dout_valid(const u32 baseaddr);
-extern u8 AXI_BRAM_FIFO_CONTROLLER_poll_bram_full(const u32 baseaddr);
-extern u8 AXI_BRAM_FIFO_CONTROLLER_poll_bram_empty(const u32 baseaddr);
+extern u32  ABFC_write_data(const u32 baseaddr, const u32 dat);
+extern u32  ABFC_read_data(const u32 baseaddr, u32 *datout);
+extern void ABFC_read_prep(const u32 baseaddr);
+extern void ABFC_print_error(const int err);
+extern void ABFC_disable_core(const u32 baseaddr);
+extern void ABFC_init_core(const u32 baseaddr);
 
-extern u32 AXI_BRAM_FIFO_CONTROLLER_write_data(const u32 baseaddr, const u32 dat);
-extern u32 AXI_BRAM_FIFO_CONTROLLER_read_data(const u32 baseaddr, u32 *datout);
-extern void AXI_BRAM_FIFO_CONTROLLER_read_prep(const u32 baseaddr);
+extern XTime ABFC_get_time(void);
+extern XTime ABFC_elapsed_time_us(const XTime startTime);
 
 
 #endif // AXI_BRAM_FIFO_CONTROLLER_H

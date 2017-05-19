@@ -6,7 +6,13 @@
 -- Module Name: FIFO_Controller - Behavioral
 -- Target Devices: CSP -- Zynq7020
 -- Tool Versions: Vivado 2015.4
--- Description:   Controller interface for BRAM block_memory_generator core
+-- Description:   Controller interface for BRAM block_memory_generator core. 
+--
+--     When issuing the first read command after a series of writes must toggle the
+--     read_en bit high then low one time before valid data is placed on the line
+--     this is to set the address pointer to the correct location in the FIFO
+--
+--     When reading check the dout_valid signal to be high before pulling the data.
 -- 
 -- Dependencies: 
 -- 
@@ -15,7 +21,6 @@
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
-
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -60,18 +65,17 @@ architecture Behavioral of FIFO_Controller is
            full  : out std_logic);
     end component addr_gen;
 
-    -- signals for addr_gen core
     signal addr_en, addr_rst, addr_dir, addr_empty, addr_full : std_logic := '0';
+    signal s_addr : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
     constant count_down : std_logic := '0';
     constant count_up   : std_logic := '1';
-    signal s_addr, s_addr_delay : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
     signal rdwr_hist : std_logic := '0';
     
-    -- signals for control logic
-
 begin
+
     
-    clka <= clk;
+    -- instantiate clock at top level with BUFR
+    clka <=clk;
     bram_full <= addr_full;
     bram_empty <= addr_empty;
     addra <= s_addr;   
@@ -114,6 +118,8 @@ begin
                 addr_en <= '1';
                 wea <= '0';
                 if(rdwr_hist = '1') then
+                   -- issue a noop delaying by one cycle to get the 
+                   -- address pointer to the correct index
                    rdwr_hist <= '0';
                    dout_valid <= '0';
                 elsif(addr_empty = '0') then
