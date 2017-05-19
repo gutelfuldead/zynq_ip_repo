@@ -9,9 +9,9 @@
 #include "xstatus.h"
 
 enum SLV_REGISTERS{
-	ABFC_REG                = 0,
+	ABFC_CTRL_REG                = 0,
 	ABFC_DOUT_REG           = 4,
-	ABFC_OUTPUT_CONTROL_REG = 8,
+	ABFC_STATUS_REG         = 8,
 	ABFC_DIN_REG            = 12
 };
 

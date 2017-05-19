@@ -7,55 +7,55 @@
 
 u32 ABFC_get_ctrl_reg(const u32 baseaddr)
 {
-	return ABFC_mReadReg(baseaddr, ABFC_REG);
+	return ABFC_mReadReg(baseaddr, ABFC_CTRL_REG);
 }
 
 void ABFC_en_write_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg | WRITE_EN);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | WRITE_EN);
 }
 
 void ABFC_den_write_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg & ~WRITE_EN);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~WRITE_EN);
 }
 
 void ABFC_en_clken(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg | CLKEN);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | CLKEN);
 }
 
 void ABFC_den_clken(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg & ~CLKEN);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~CLKEN);
 }
 
 void ABFC_en_read_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg | READ_EN);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | READ_EN);
 }
 
 void ABFC_den_read_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg & ~READ_EN);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~READ_EN);
 }
 
 void ABFC_en_reset(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg | RESET);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | RESET);
 }
 
 void ABFC_den_reset(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
-	ABFC_mWriteReg(baseaddr,ABFC_REG, reg & ~RESET);
+	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~RESET);
 }
 
 /**
@@ -65,7 +65,7 @@ void ABFC_den_reset(const u32 baseaddr)
  */
 u8 ABFC_poll_dout_valid(const u32 baseaddr)
 {
-	return !!(ABFC_mReadReg(baseaddr, ABFC_OUTPUT_CONTROL_REG) & DOUT_VALID);
+	return !!(ABFC_mReadReg(baseaddr, ABFC_STATUS_REG) & DOUT_VALID);
 }
 
 /**
@@ -75,7 +75,7 @@ u8 ABFC_poll_dout_valid(const u32 baseaddr)
  */
 u8 ABFC_poll_bram_full(const u32 baseaddr)
 {
-	return !!(ABFC_mReadReg(baseaddr, ABFC_OUTPUT_CONTROL_REG) & BRAM_FULL);	
+	return !!(ABFC_mReadReg(baseaddr, ABFC_STATUS_REG) & BRAM_FULL);	
 }
 
 /**
@@ -85,7 +85,7 @@ u8 ABFC_poll_bram_full(const u32 baseaddr)
  */
 u8 ABFC_poll_bram_empty(const u32 baseaddr)
 {
-	return !!(ABFC_mReadReg(baseaddr, ABFC_OUTPUT_CONTROL_REG) & BRAM_EMPTY);	
+	return !!(ABFC_mReadReg(baseaddr, ABFC_STATUS_REG) & BRAM_EMPTY);	
 }
 
 /**
