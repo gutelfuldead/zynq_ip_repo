@@ -2,7 +2,6 @@
 
 /***************************** Include Files *******************************/
 #include "AXI_BRAM_FIFO_CONTROLLER.h"
-#include "xil_types.h"
 /************************** Function Definitions ***************************/
 
 u32 ABFC_get_ctrl_reg(const u32 baseaddr)
@@ -10,49 +9,49 @@ u32 ABFC_get_ctrl_reg(const u32 baseaddr)
 	return ABFC_mReadReg(baseaddr, ABFC_CTRL_REG);
 }
 
-void ABFC_en_ABFC_WRITE_EN(const u32 baseaddr)
+void ABFC_en_write_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | ABFC_WRITE_EN);
 }
 
-void ABFC_den_ABFC_WRITE_EN(const u32 baseaddr)
+void ABFC_den_write_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~ABFC_WRITE_EN);
 }
 
-void ABFC_en_ABFC_CLKEN(const u32 baseaddr)
+void ABFC_en_clken(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | ABFC_CLKEN);
 }
 
-void ABFC_den_ABFC_CLKEN(const u32 baseaddr)
+void ABFC_den_clken(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~ABFC_CLKEN);
 }
 
-void ABFC_en_ABFC_READ_EN(const u32 baseaddr)
+void ABFC_en_read_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | ABFC_READ_EN);
 }
 
-void ABFC_den_ABFC_READ_EN(const u32 baseaddr)
+void ABFC_den_read_en(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~ABFC_READ_EN);
 }
 
-void ABFC_en_ABFC_RESET(const u32 baseaddr)
+void ABFC_en_reset(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg | ABFC_RESET);
 }
 
-void ABFC_den_ABFC_RESET(const u32 baseaddr)
+void ABFC_den_reset(const u32 baseaddr)
 {
 	const u32 reg = ABFC_get_ctrl_reg(baseaddr);
 	ABFC_mWriteReg(baseaddr,ABFC_CTRL_REG, reg & ~ABFC_RESET);
@@ -63,7 +62,7 @@ void ABFC_den_ABFC_RESET(const u32 baseaddr)
  * @param[in]  baseaddr  The baseaddr
  * @return     1 for valid, 0 otherwise
  */
-u8 ABFC_poll_ABFC_DOUT_VALID(const u32 baseaddr)
+u8 ABFC_poll_dout_valid(const u32 baseaddr)
 {
 	return !!(ABFC_mReadReg(baseaddr, ABFC_STATUS_REG) & ABFC_DOUT_VALID);
 }
@@ -73,7 +72,7 @@ u8 ABFC_poll_ABFC_DOUT_VALID(const u32 baseaddr)
  * @param[in]  baseaddr  The baseaddr
  * @return     1 for full, 0 otherwise
  */
-u8 ABFC_poll_ABFC_BRAM_FULL(const u32 baseaddr)
+u8 ABFC_poll_bram_full(const u32 baseaddr)
 {
 	return !!(ABFC_mReadReg(baseaddr, ABFC_STATUS_REG) & ABFC_BRAM_FULL);	
 }
@@ -83,7 +82,7 @@ u8 ABFC_poll_ABFC_BRAM_FULL(const u32 baseaddr)
  * @param[in]  baseaddr  The baseaddr
  * @return     1 for empty, 0 otherwise
  */
-u8 ABFC_poll_ABFC_BRAM_EMPTY(const u32 baseaddr)
+u8 ABFC_poll_bram_empty(const u32 baseaddr)
 {
 	return !!(ABFC_mReadReg(baseaddr, ABFC_STATUS_REG) & ABFC_BRAM_EMPTY);	
 }
@@ -91,16 +90,16 @@ u8 ABFC_poll_ABFC_BRAM_EMPTY(const u32 baseaddr)
 /**
  * @brief      write to the FIFO
  * @param[in]  baseaddr  The baseaddr
- * @param[in]  dat       The dat
+ * @param[in]  datin     The input dat
  * @return     EABFC_FIFO_FULL if FIFO is full, otherwise XST_SUCCESS
  */
-u32 ABFC_write_data(const u32 baseaddr, const u32 dat)
+u32 ABFC_write_data(const u32 baseaddr, const u32 datin)
 {
-	if(ABFC_poll_ABFC_BRAM_FULL(baseaddr))
+	if(ABFC_poll_bram_full(baseaddr))
 		return EABFC_FIFO_FULL;
 	ABFC_mWriteReg(baseaddr, ABFC_DIN_REG, dat);
-	ABFC_en_ABFC_WRITE_EN(baseaddr);
-	ABFC_den_ABFC_WRITE_EN(baseaddr);
+	ABFC_en_write_en(baseaddr);
+	ABFC_den_write_en(baseaddr);
 	return XST_SUCCESS;
 }
 
@@ -111,13 +110,13 @@ u32 ABFC_write_data(const u32 baseaddr, const u32 dat)
  */
 void ABFC_read_prep(const u32 baseaddr)
 {
-	ABFC_en_ABFC_READ_EN(baseaddr);
-	ABFC_den_ABFC_READ_EN(baseaddr);
+	ABFC_en_read_en(baseaddr);
+	ABFC_den_read_en(baseaddr);
 }
 
 /**
  * @brief      read from fifo; uses a timer to send a failure return if the ABFC_DOUT_VALID signal
- *             doesn't go high after a time specified by MAX_WAIT_POLL_VALID_US define in header.
+ *             doesn't go high after a time specified by ABFC_POLL_VALID_MAX define in header.
  *             Failure will also occur as a result of the FIFO being empty
  * @param[in]  baseaddr  The baseaddr
  * @param      datout    The datout
@@ -125,18 +124,18 @@ void ABFC_read_prep(const u32 baseaddr)
  */
 u32 ABFC_read_data(const u32 baseaddr, u32 *datout)
 {
-	if(ABFC_poll_ABFC_BRAM_EMPTY(baseaddr))
+	if(ABFC_poll_bram_empty(baseaddr))
 		return EABFC_FIFO_EMPTY;
-	ABFC_en_ABFC_READ_EN(baseaddr);
+	ABFC_en_read_en(baseaddr);
 	XTime start = ABFC_get_time();
-	while(ABFC_poll_ABFC_DOUT_VALID(baseaddr) == 0){
-		if(ABFC_elapsed_time_us(start) > MAX_WAIT_POLL_VALID_US){
-			ABFC_den_ABFC_READ_EN(baseaddr);		
+	while(ABFC_poll_dout_valid(baseaddr) == 0){
+		if(ABFC_elapsed_time_us(start) > ABFC_POLL_VALID_MAX){
+			ABFC_den_read_en(baseaddr);		
 			return EABFC_VALID_NOT_ASSERTED;
 		}
 	}
 	*datout = ABFC_mReadReg(baseaddr, ABFC_DOUT_REG);
-	ABFC_den_ABFC_READ_EN(baseaddr);
+	ABFC_den_read_en(baseaddr);
 	return XST_SUCCESS;
 }
 
@@ -175,19 +174,19 @@ void ABFC_print_error(const int err)
             printf("Error reading FIFO empty\n\r");
             break;
         case EABFC_VALID_NOT_ASSERTED :
-            printf("Valid not asserted within %d us\n\r",MAX_US_WAIT);
+            printf("Valid not asserted within %d us\n\r",ABFC_MAX_US_WAIT);
             break;
     }       
 }
 
 void ABFC_disable_core(const u32 baseaddr)
 {
-    ABFC_den_ABFC_CLKEN(baseaddr);
+    ABFC_den_clken(baseaddr);
 }
 
 void ABFC_init_core(const u32 baseaddr)
 {
-    ABFC_en_ABFC_RESET(baseaddr);
-    ABFC_den_ABFC_RESET(baseaddr);
-    ABFC_en_ABFC_CLKEN(baseaddr);
+    ABFC_en_reset(baseaddr);
+    ABFC_den_reset(baseaddr);
+    ABFC_en_clken(baseaddr);
 }
