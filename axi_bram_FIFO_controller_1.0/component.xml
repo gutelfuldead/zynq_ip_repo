@@ -330,7 +330,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>f6d5072f</spirit:value>
+            <spirit:value>88a4c392</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -346,7 +346,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>f6d5072f</spirit:value>
+            <spirit:value>88a4c392</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -360,7 +360,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>516d9993</spirit:value>
+            <spirit:value>54028e6c</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -396,6 +396,7 @@
         <spirit:name>xilinx_testbench</spirit:name>
         <spirit:displayName>Test Bench</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:simulation.testbench</spirit:envIdentifier>
+        <spirit:modelName>axi_bram_FIFO_controller_v1_0</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_testbench_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -878,7 +879,7 @@
       <spirit:file>
         <spirit:name>hdl/axi_bram_FIFO_controller_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_46302209</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_3e579091</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -1036,8 +1037,8 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axi_bram_FIFO_controller_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>17</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-05-19T18:43:25Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>19</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2017-05-20T00:00:46Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="user.org:user:axi_bram_FIFO_controller:1.0_ARCHIVE_LOCATION">/home/labuser/gits/zynq_ip_repo/axi_bram_FIFO_controller_1.0</xilinx:tag>
       </xilinx:tags>
@@ -1046,7 +1047,7 @@
       <xilinx:xilinxVersion>2015.4</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="066b74f1"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="ca22a6c3"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="0e9a3b39"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="bee94478"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="9f1db5d5"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="b8ce995b"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="1636093e"/>

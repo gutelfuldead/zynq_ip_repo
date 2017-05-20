@@ -78,6 +78,7 @@ enum _ABFC_STATUS_REG_BITS{
  */
 #define ABFC_mReadReg(BaseAddress, RegOffset) \
     Xil_In32((BaseAddress) + (RegOffset))
+XStatus AXI_BRAM_FIFO_CONTROLLER_Reg_SelfTest(void * baseaddr_p);
 
 extern u32  ABFC_get_ctrl_reg(const u32 baseaddr);
 extern void ABFC_en_write_en(const u32 baseaddr);
