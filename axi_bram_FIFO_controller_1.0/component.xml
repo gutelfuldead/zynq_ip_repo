@@ -1037,8 +1037,8 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axi_bram_FIFO_controller_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>19</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-05-20T00:00:46Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>20</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2017-05-22T16:34:20Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="user.org:user:axi_bram_FIFO_controller:1.0_ARCHIVE_LOCATION">/home/labuser/gits/zynq_ip_repo/axi_bram_FIFO_controller_1.0</xilinx:tag>
       </xilinx:tags>

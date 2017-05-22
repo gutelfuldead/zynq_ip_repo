@@ -1,7 +1,7 @@
 
 
 /***************************** Include Files *******************************/
-#include "AXI_BRAM_FIFO_CONTROLLER.h"
+#include "axi_bram_FIFO_controller.h"
 /************************** Function Definitions ***************************/
 
 u32 ABFC_get_ctrl_reg(const u32 baseaddr)
@@ -97,7 +97,7 @@ u32 ABFC_write_data(const u32 baseaddr, const u32 datin)
 {
 	if(ABFC_poll_bram_full(baseaddr))
 		return EABFC_FIFO_FULL;
-	ABFC_mWriteReg(baseaddr, ABFC_DIN_REG, dat);
+	ABFC_mWriteReg(baseaddr, ABFC_DIN_REG, datin);
 	ABFC_en_write_en(baseaddr);
 	ABFC_den_write_en(baseaddr);
 	return XST_SUCCESS;
@@ -158,7 +158,7 @@ XTime ABFC_get_time(void)
 XTime ABFC_elapsed_time_us(const XTime startTime)
 {
   XTime tempXTime;
-  tempXTime = get_time();
+  tempXTime = ABFC_get_time();
   tempXTime = tempXTime - startTime;
   tempXTime = tempXTime / ((COUNTS_PER_SECOND) / 1000000UL); 
   return (tempXTime);

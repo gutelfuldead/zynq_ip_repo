@@ -23,8 +23,8 @@ int main()
 
     /* fill fifo */
     for(i = 0; i < TEST_SZ; i++){
-    	TX_BUF[i] = i;
-    	err = ABFC_write_data(ABFC_ADDR,TX_BUF[i])
+        TX_BUF[i] = i;
+        err = ABFC_write_data(ABFC_ADDR,TX_BUF[i]);
         if(err < 0){
             ABFC_print_error(err);
             break;
@@ -34,16 +34,16 @@ int main()
     /* read fifo */
     ABFC_read_prep(ABFC_ADDR);
     for(i = TEST_SZ-1; i >= 0; i--){
-    	err = ABFC_read_data(ABFC_ADDR, &RX_BUF[i])
+        err = ABFC_read_data(ABFC_ADDR, &RX_BUF[i]);
         if(err < 0){
            ABFC_print_error(err);
            break;
         }
-    	else{
-			printf("%d : %d\n\r",i,(int)RX_BUF[i]);
-			if(RX_BUF[i] != TX_BUF[i])
-				cnt++;
-    	}
+        else{
+            printf("TXBUF[%d] : %d , RXBUF[%d] %d\n\r",i,(int)TX_BUF[i],i,(int)RX_BUF[i]);
+            if(RX_BUF[i] != TX_BUF[i])
+                cnt++;
+        }
     }
 
     printf("bram status bits empty : %d, full : %d\n\r",ABFC_poll_bram_empty(ABFC_ADDR),
