@@ -1,7 +1,7 @@
 
 
 /***************************** Include Files *******************************/
-#include "axi_bram_FIFO_controller.h"
+#include "axi_bram_FILO_controller.h"
 /************************** Function Definitions ***************************/
 
 u32 ABFC_get_ctrl_reg(const u32 baseaddr)
@@ -88,15 +88,15 @@ u8 ABFC_poll_bram_empty(const u32 baseaddr)
 }
 
 /**
- * @brief      write to the FIFO
+ * @brief      write to the FILO
  * @param[in]  baseaddr  The baseaddr
  * @param[in]  datin     The input dat
- * @return     EABFC_FIFO_FULL if FIFO is full, otherwise XST_SUCCESS
+ * @return     EABFC_FILO_FULL if FILO is full, otherwise XST_SUCCESS
  */
 u32 ABFC_write_data(const u32 baseaddr, const u32 datin)
 {
 	if(ABFC_poll_bram_full(baseaddr))
-		return EABFC_FIFO_FULL;
+		return EABFC_FILO_FULL;
 	ABFC_mWriteReg(baseaddr, ABFC_DIN_REG, datin);
 	ABFC_en_write_en(baseaddr);
 	ABFC_den_write_en(baseaddr);
@@ -117,15 +117,15 @@ void ABFC_read_prep(const u32 baseaddr)
 /**
  * @brief      read from fifo; uses a timer to send a failure return if the ABFC_DOUT_VALID signal
  *             doesn't go high after a time specified by ABFC_POLL_VALID_MAX define in header.
- *             Failure will also occur as a result of the FIFO being empty
+ *             Failure will also occur as a result of the FILO being empty
  * @param[in]  baseaddr  The baseaddr
  * @param      datout    The datout
- * @return     EABFC_FIFO_EMPTY, EABFC_VALID_NOT_ASSERTED, or XST_SUCCESS
+ * @return     EABFC_FILO_EMPTY, EABFC_VALID_NOT_ASSERTED, or XST_SUCCESS
  */
 u32 ABFC_read_data(const u32 baseaddr, u32 *datout)
 {
 	if(ABFC_poll_bram_empty(baseaddr))
-		return EABFC_FIFO_EMPTY;
+		return EABFC_FILO_EMPTY;
 	ABFC_en_read_en(baseaddr);
 	XTime start = ABFC_get_time();
 	while(ABFC_poll_dout_valid(baseaddr) == 0){
@@ -167,11 +167,11 @@ XTime ABFC_elapsed_time_us(const XTime startTime)
 void ABFC_print_error(const int err)
 {
     switch(err){
-        case EABFC_FIFO_FULL :
-            printf("Error Writing FIFO full\n\r");
+        case EABFC_FILO_FULL :
+            printf("Error Writing FILO full\n\r");
             break;
-        case EABFC_FIFO_EMPTY :
-            printf("Error reading FIFO empty\n\r");
+        case EABFC_FILO_EMPTY :
+            printf("Error reading FILO empty\n\r");
             break;
         case EABFC_VALID_NOT_ASSERTED :
             printf("Valid not asserted within %d us\n\r",ABFC_MAX_US_WAIT);

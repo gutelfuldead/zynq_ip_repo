@@ -39,7 +39,7 @@ end fifo_controller_tb;
 
 architecture Behavioral of fifo_controller_tb is
 
-    component FIFO_Controller is
+    component FILO_Controller is
         generic (
                BRAM_ADDR_WIDTH  : integer := 10;
                BRAM_DATA_WIDTH  : integer := 32);
@@ -63,7 +63,7 @@ architecture Behavioral of fifo_controller_tb is
                bram_full  : out std_logic;
                bram_empty : out std_logic
                );
-    end component FIFO_Controller;
+    end component FILO_Controller;
     
                signal bram_full, bram_empty : std_logic := '0';
                signal addra : STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
@@ -94,7 +94,7 @@ begin
       wait for clk_period/2;
   end process clk_process;
 
-  UUT : FIFO_Controller
+  UUT : FILO_Controller
   generic map(
       BRAM_ADDR_WIDTH  => BRAM_ADDR_WIDTH,
       BRAM_DATA_WIDTH  => BRAM_DATA_WIDTH

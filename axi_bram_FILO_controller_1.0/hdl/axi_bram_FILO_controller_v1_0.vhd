@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 library UNISIM;
 use UNISIM.Vcomponents.all;
 
-entity axi_bram_FIFO_controller_v1_0 is
+entity axi_bram_FILO_controller_v1_0 is
 	generic (
 		-- Users to add parameters here
         BRAM_ADDR_WIDTH  : integer := 10;
@@ -54,12 +54,12 @@ entity axi_bram_FIFO_controller_v1_0 is
 		s00_axi_rvalid	: out std_logic;
 		s00_axi_rready	: in std_logic
 	);
-end axi_bram_FIFO_controller_v1_0;
+end axi_bram_FILO_controller_v1_0;
 
-architecture arch_imp of axi_bram_FIFO_controller_v1_0 is
+architecture arch_imp of axi_bram_FILO_controller_v1_0 is
 
 	-- component declaration
-	component axi_bram_FIFO_controller_v1_0_S00_AXI is
+	component axi_bram_FILO_controller_v1_0_S00_AXI is
 		generic (
 		C_S_AXI_DATA_WIDTH	: integer	:= 32;
 		C_S_AXI_ADDR_WIDTH	: integer	:= 4
@@ -96,9 +96,9 @@ architecture arch_imp of axi_bram_FIFO_controller_v1_0 is
 		S_AXI_RVALID	: out std_logic;
 		S_AXI_RREADY	: in std_logic
 		);
-	end component axi_bram_FIFO_controller_v1_0_S00_AXI;
+	end component axi_bram_FILO_controller_v1_0_S00_AXI;
 	
-	component FIFO_Controller is
+	component FILO_Controller is
             generic (
                    BRAM_ADDR_WIDTH  : integer := 10;
                    BRAM_DATA_WIDTH  : integer := 32 );
@@ -122,7 +122,7 @@ architecture arch_imp of axi_bram_FIFO_controller_v1_0 is
                    bram_full  : out std_logic;
                    bram_empty : out std_logic
                    );
-        end component FIFO_Controller;
+        end component FILO_Controller;
         
         signal bram_write_en   : std_logic := '0';
         signal bram_clkEn      : std_logic := '0';
@@ -138,7 +138,7 @@ architecture arch_imp of axi_bram_FIFO_controller_v1_0 is
 begin
 
 -- Instantiation of Axi Bus Interface S00_AXI
-axi_bram_FIFO_controller_v1_0_S00_AXI_inst : axi_bram_FIFO_controller_v1_0_S00_AXI
+axi_bram_FILO_controller_v1_0_S00_AXI_inst : axi_bram_FILO_controller_v1_0_S00_AXI
 	generic map (
 		C_S_AXI_DATA_WIDTH	=> C_S00_AXI_DATA_WIDTH,
 		C_S_AXI_ADDR_WIDTH	=> C_S00_AXI_ADDR_WIDTH
@@ -176,7 +176,7 @@ axi_bram_FIFO_controller_v1_0_S00_AXI_inst : axi_bram_FIFO_controller_v1_0_S00_A
 		S_AXI_RREADY	=> s00_axi_rready
 	);
 
-BRAM_CONTROLLER : FIFO_Controller
+BRAM_CONTROLLER : FILO_Controller
   generic map(
       BRAM_ADDR_WIDTH  => BRAM_ADDR_WIDTH,
       BRAM_DATA_WIDTH  => BRAM_DATA_WIDTH

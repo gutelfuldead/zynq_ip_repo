@@ -2,7 +2,7 @@
 <spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <spirit:vendor>user.org</spirit:vendor>
   <spirit:library>user</spirit:library>
-  <spirit:name>axi_bram_FIFO_controller</spirit:name>
+  <spirit:name>axi_bram_FILO_controller</spirit:name>
   <spirit:version>1.0</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
@@ -323,7 +323,7 @@
         <spirit:displayName>VHDL Synthesis</spirit:displayName>
         <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:synthesis</spirit:envIdentifier>
         <spirit:language>vhdl</spirit:language>
-        <spirit:modelName>axi_bram_FIFO_controller_v1_0</spirit:modelName>
+        <spirit:modelName>axi_bram_FILO_controller_v1_0</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_vhdlsynthesis_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -339,7 +339,7 @@
         <spirit:displayName>VHDL Simulation</spirit:displayName>
         <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:simulation</spirit:envIdentifier>
         <spirit:language>vhdl</spirit:language>
-        <spirit:modelName>axi_bram_FIFO_controller_v1_0</spirit:modelName>
+        <spirit:modelName>axi_bram_FILO_controller_v1_0</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_vhdlbehavioralsimulation_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -396,7 +396,7 @@
         <spirit:name>xilinx_testbench</spirit:name>
         <spirit:displayName>Test Bench</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:simulation.testbench</spirit:envIdentifier>
-        <spirit:modelName>axi_bram_FIFO_controller_v1_0</spirit:modelName>
+        <spirit:modelName>axi_bram_FILO_controller_v1_0</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_testbench_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -869,15 +869,15 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/axi_bram_FIFO_controller_v1_0_S00_AXI.vhd</spirit:name>
+        <spirit:name>hdl/axi_bram_FILO_controller_v1_0_S00_AXI.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/FIFO_controller.vhd</spirit:name>
+        <spirit:name>hdl/FILO_controller.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/axi_bram_FIFO_controller_v1_0.vhd</spirit:name>
+        <spirit:name>hdl/axi_bram_FILO_controller_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_3e579091</spirit:userFileType>
       </spirit:file>
@@ -890,17 +890,17 @@
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/axi_bram_FIFO_controller_v1_0_S00_AXI.vhd</spirit:name>
+        <spirit:name>hdl/axi_bram_FILO_controller_v1_0_S00_AXI.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/FIFO_controller.vhd</spirit:name>
+        <spirit:name>hdl/FILO_controller.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/axi_bram_FIFO_controller_v1_0.vhd</spirit:name>
+        <spirit:name>hdl/axi_bram_FILO_controller_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -908,31 +908,31 @@
     <spirit:fileSet>
       <spirit:name>xilinx_softwaredriver_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>drivers/axi_bram_FIFO_controller_v1_0/data/axi_bram_FIFO_controller.mdd</spirit:name>
+        <spirit:name>drivers/axi_bram_FILO_controller_v1_0/data/axi_bram_FILO_controller.mdd</spirit:name>
         <spirit:userFileType>mdd</spirit:userFileType>
         <spirit:userFileType>driver_mdd</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>drivers/axi_bram_FIFO_controller_v1_0/data/axi_bram_FIFO_controller.tcl</spirit:name>
+        <spirit:name>drivers/axi_bram_FILO_controller_v1_0/data/axi_bram_FILO_controller.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>driver_tcl</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>drivers/axi_bram_FIFO_controller_v1_0/src/Makefile</spirit:name>
+        <spirit:name>drivers/axi_bram_FILO_controller_v1_0/src/Makefile</spirit:name>
         <spirit:userFileType>driver_src</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>drivers/axi_bram_FIFO_controller_v1_0/src/axi_bram_FIFO_controller.h</spirit:name>
+        <spirit:name>drivers/axi_bram_FILO_controller_v1_0/src/axi_bram_FILO_controller.h</spirit:name>
         <spirit:fileType>cSource</spirit:fileType>
         <spirit:userFileType>driver_src</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>drivers/axi_bram_FIFO_controller_v1_0/src/axi_bram_FIFO_controller.c</spirit:name>
+        <spirit:name>drivers/axi_bram_FILO_controller_v1_0/src/axi_bram_FILO_controller.c</spirit:name>
         <spirit:fileType>cSource</spirit:fileType>
         <spirit:userFileType>driver_src</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>drivers/axi_bram_FIFO_controller_v1_0/src/axi_bram_FIFO_controller_selftest.c</spirit:name>
+        <spirit:name>drivers/axi_bram_FILO_controller_v1_0/src/axi_bram_FILO_controller_selftest.c</spirit:name>
         <spirit:fileType>cSource</spirit:fileType>
         <spirit:userFileType>driver_src</spirit:userFileType>
       </spirit:file>
@@ -940,7 +940,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/axi_bram_FIFO_controller_v1_0.tcl</spirit:name>
+        <spirit:name>xgui/axi_bram_FILO_controller_v1_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_4059e946</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
@@ -961,7 +961,7 @@
       </spirit:file>
     </spirit:fileSet>
   </spirit:fileSets>
-  <spirit:description>Instantiates BRAM into a FIFO</spirit:description>
+  <spirit:description>Instantiates BRAM into a FILO</spirit:description>
   <spirit:parameters>
     <spirit:parameter>
       <spirit:name>C_S00_AXI_DATA_WIDTH</spirit:name>
@@ -1015,7 +1015,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">axi_bram_FIFO_controller_v1_0</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">axi_bram_FILO_controller_v1_0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>BRAM_ADDR_WIDTH</spirit:name>
@@ -1036,11 +1036,11 @@
       <xilinx:taxonomies>
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
-      <xilinx:displayName>axi_bram_FIFO_controller_v1.0</xilinx:displayName>
+      <xilinx:displayName>axi_bram_FILO_controller_v1.0</xilinx:displayName>
       <xilinx:coreRevision>20</xilinx:coreRevision>
       <xilinx:coreCreationDateTime>2017-05-22T16:34:20Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
-        <xilinx:tag xilinx:name="user.org:user:axi_bram_FIFO_controller:1.0_ARCHIVE_LOCATION">/home/labuser/gits/zynq_ip_repo/axi_bram_FIFO_controller_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="user.org:user:axi_bram_FILO_controller:1.0_ARCHIVE_LOCATION">/home/labuser/gits/zynq_ip_repo/axi_bram_FILO_controller_1.0</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>

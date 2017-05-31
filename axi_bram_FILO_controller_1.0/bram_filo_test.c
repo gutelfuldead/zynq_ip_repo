@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "platform.h"
-#include "axi_bram_FIFO_controller.h"
+#include "axi_bram_FILO_controller.h"
 
 #define ABFC_ADDR 0x43c00000
 #define TEST_SZ 1000
@@ -15,7 +15,7 @@ int main()
     int i,cnt,err = 0;
 
     printf("\n\r==============\n\r");
-    printf("BRAM FIFO TEST\n\r");
+    printf("BRAM FILO TEST\n\r");
     printf("==============\n\r");
     printf("bram status bits empty : %d, full : %d\n\r",ABFC_poll_bram_empty(ABFC_ADDR),
             ABFC_poll_bram_full(ABFC_ADDR));

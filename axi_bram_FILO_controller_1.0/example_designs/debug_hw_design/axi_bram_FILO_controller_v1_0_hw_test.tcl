@@ -1,8 +1,8 @@
-# Runtime Tcl commands to interact with - axi_bram_FIFO_controller_v1_0
+# Runtime Tcl commands to interact with - axi_bram_FILO_controller_v1_0
 
 # Sourcing design address info tcl
 set bd_path [get_property DIRECTORY [current_project]]/[current_project].srcs/[current_fileset]/bd
-source ${bd_path}/axi_bram_FIFO_controller_v1_0_include.tcl
+source ${bd_path}/axi_bram_FILO_controller_v1_0_include.tcl
 
 # jtag axi master interface hardware name, change as per your design.
 set jtag_axi_master hw_axi_1

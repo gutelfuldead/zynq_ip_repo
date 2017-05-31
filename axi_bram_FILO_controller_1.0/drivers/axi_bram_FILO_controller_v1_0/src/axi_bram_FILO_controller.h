@@ -1,6 +1,6 @@
 
-#ifndef AXI_BRAM_FIFO_CONTROLLER_H
-#define AXI_BRAM_FIFO_CONTROLLER_H
+#ifndef AXI_BRAM_FILO_CONTROLLER_H
+#define AXI_BRAM_FILO_CONTROLLER_H
 
 
 /****************** Include Files ********************/
@@ -29,8 +29,8 @@ enum _ABFC_STATUS_REG_BITS{
 };
 
 /* error defines */
-#define EABFC_FIFO_FULL -1
-#define EABFC_FIFO_EMPTY -2
+#define EABFC_FILO_FULL -1
+#define EABFC_FILO_EMPTY -2
 #define EABFC_VALID_NOT_ASSERTED -3
 
 /* max wait time in microseconds to check for data */
@@ -41,11 +41,11 @@ enum _ABFC_STATUS_REG_BITS{
 /**************************** Type Definitions *****************************/
 /**
  *
- * Write a value to a AXI_BRAM_FIFO_CONTROLLER register. A 32 bit write is performed.
+ * Write a value to a AXI_BRAM_FILO_CONTROLLER register. A 32 bit write is performed.
  * If the component is implemented in a smaller width, only the least
  * significant data is written.
  *
- * @param   BaseAddress is the base address of the AXI_BRAM_FIFO_CONTROLLER device.
+ * @param   BaseAddress is the base address of the AXI_BRAM_FILO_CONTROLLER device.
  * @param   RegOffset is the register offset from the base to write to.
  * @param   Data is the data written to the register.
  *
@@ -61,12 +61,12 @@ enum _ABFC_STATUS_REG_BITS{
 
 /**
  *
- * Read a value from a AXI_BRAM_FIFO_CONTROLLER register. A 32 bit read is performed.
+ * Read a value from a AXI_BRAM_FILO_CONTROLLER register. A 32 bit read is performed.
  * If the component is implemented in a smaller width, only the least
  * significant data is read from the register. The most significant data
  * will be read as 0.
  *
- * @param   BaseAddress is the base address of the AXI_BRAM_FIFO_CONTROLLER device.
+ * @param   BaseAddress is the base address of the AXI_BRAM_FILO_CONTROLLER device.
  * @param   RegOffset is the register offset from the base to write to.
  *
  * @return  Data is the data from the register.
@@ -78,7 +78,7 @@ enum _ABFC_STATUS_REG_BITS{
  */
 #define ABFC_mReadReg(BaseAddress, RegOffset) \
     Xil_In32((BaseAddress) + (RegOffset))
-XStatus AXI_BRAM_FIFO_CONTROLLER_Reg_SelfTest(void * baseaddr_p);
+XStatus AXI_BRAM_FILO_CONTROLLER_Reg_SelfTest(void * baseaddr_p);
 
 extern u32  ABFC_get_ctrl_reg(const u32 baseaddr);
 extern void ABFC_en_write_en(const u32 baseaddr);
@@ -106,4 +106,4 @@ extern XTime ABFC_get_time(void);
 extern XTime ABFC_elapsed_time_us(const XTime startTime);
 
 
-#endif // AXI_BRAM_FIFO_CONTROLLER_H
+#endif // AXI_BRAM_FILO_CONTROLLER_H

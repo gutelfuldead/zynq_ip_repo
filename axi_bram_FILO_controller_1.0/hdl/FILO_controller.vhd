@@ -3,14 +3,14 @@
 -- 
 -- Create Date: 05/17/2017 09:20:37 AM
 -- Design Name: 
--- Module Name: FIFO_Controller - Behavioral
+-- Module Name: FILO_Controller - Behavioral
 -- Target Devices: CSP -- Zynq7020
 -- Tool Versions: Vivado 2015.4
 -- Description:   Controller interface for BRAM block_memory_generator core. 
 --
 --     When issuing the first read command after a series of writes must toggle the
 --     read_en bit high then low one time before valid data is placed on the line
---     this is to set the address pointer to the correct location in the FIFO
+--     this is to set the address pointer to the correct location in the FILO
 --
 --     When reading check the dout_valid signal to be high before pulling the data.
 -- 
@@ -26,7 +26,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity FIFO_Controller is
+entity FILO_Controller is
     generic (
            BRAM_ADDR_WIDTH  : integer := 10;
            BRAM_DATA_WIDTH  : integer := 32 );
@@ -50,9 +50,9 @@ entity FIFO_Controller is
            bram_full  : out std_logic;
            bram_empty : out std_logic
            );
-end FIFO_Controller;
+end FILO_Controller;
 
-architecture Behavioral of FIFO_Controller is
+architecture Behavioral of FILO_Controller is
 
     component addr_gen is
     generic ( BRAM_ADDR_WIDTH  : integer := 10 );
