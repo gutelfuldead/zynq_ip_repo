@@ -1,12 +1,10 @@
 ----------------------------------------------------------------------------------
--- Company:  Space Micro
 -- Engineer: Jason Gutel
 -- 
 -- Create Date: 05/17/2017 09:26:23 AM
 -- Design Name: 
 -- Module Name: addr_gen - Behavioral
--- Project Name: MDA Cubesat Network
--- Target Devices: CSP -- Zynq7020
+-- Target Devices: Zynq7020
 -- Tool Versions:  Vivado 2015.4
 -- Description:    Generates address for BRAM interface
 -- 
