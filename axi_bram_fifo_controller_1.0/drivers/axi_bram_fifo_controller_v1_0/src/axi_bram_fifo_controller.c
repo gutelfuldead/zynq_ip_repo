@@ -141,16 +141,6 @@ u32 AFIFO_read_data(const u32 baseaddr, u32 *datout)
 }
 
 /**
- * Used to switch the BRAM data line from write to read (decrement by one)
- * @param baseaddr the base address
- */
-void AFIFO_read_prep(const u32 baseaddr)
-{
-	AFIFO_en_read_en(baseaddr);
-	AFIFO_den_read_en(baseaddr);		
-}
-
-/**
  * @brief      Used to capture the processor time using the XTime Xilinx type
  * @return     The time in us.
  */

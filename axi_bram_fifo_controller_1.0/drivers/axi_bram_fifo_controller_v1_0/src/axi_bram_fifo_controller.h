@@ -117,7 +117,6 @@ extern u8 AFIFO_poll_bram_empty(const u32 baseaddr);
 extern u32 AFIFO_poll_occupancy(const u32 baseaddr);
 
 extern u32  AFIFO_write_data(const u32 baseaddr, const u32 datin);
-extern void AFIFO_read_prep(const u32 baseaddr);
 extern u32  AFIFO_read_data(const u32 baseaddr, u32 *datout);
 
 extern void AFIFO_print_error(const int err);
