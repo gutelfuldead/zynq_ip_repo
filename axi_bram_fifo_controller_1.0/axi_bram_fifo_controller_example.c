@@ -3,8 +3,8 @@
 #include "platform.h"
 
 #define FIFO_ADDR 0x43c00000
-#define MAX_SZ 1024
-#define TEST_SZ 1020
+#define MAX_SZ 1023
+#define TEST_SZ 1023
 #define NUM_TESTS 5
 //#define VERBOSE
 
@@ -222,11 +222,11 @@ int addr_loop_around_test(u32 *TX_BUF, u32 *RX_BUF)
     int errcnt = 0;
     u32 occupancy = 0;
 
-    for(j = 0 ; j < 20; j++){
+    for(j = 0 ; j < TEST_SZ; j++){
 #ifdef VERBOSE
     	printf("\tIteration %d\n\r",j);
 #endif
-		for(i = 0; i < TEST_SZ; i++){
+		for(i = 0; i < MAX_SZ; i++){
 			TX_BUF[i] = i;
 			errno = AFIFO_write_data(FIFO_ADDR, TX_BUF[i]);
 			if(errno < 0){
