@@ -10,9 +10,9 @@ In order to perform a read first check the occupancy of the core with the `AFIFO
 
 If the core does not assert a data valid signal within `AFIFO_MAX_US_WAIT` microseconds defined in `axi_bram_fifo_controller.h` then an error will be returned.
 
-The `AFIFO_init_core` will perform a soft reset of the core then set the enable signal.
+The `AFIFO_init_core` function will perform a soft reset of the core then set the enable signal.
 
-The `AFIFO_disable_core` will disable the enable signal.
+The `AFIFO_disable_core` function will disable the enable signal.
 
 
 Block Memory Generator parameters
