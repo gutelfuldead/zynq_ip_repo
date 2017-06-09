@@ -5,13 +5,14 @@
 #define FIFO_ADDR 0x43c00000
 #define MAX_SZ 1024
 #define TEST_SZ 1020
-#define NUM_TESTS 4
+#define NUM_TESTS 5
 //#define VERBOSE
 
 int addr_loop_around_test(u32 *TX_BUF, u32 *RX_BUF);
 int stress_test(u32 *TX_BUF, u32 *RX_BUF);
 int overflow_fifo();
 int underflow_fifo();
+int alternate_rdwr_test();
 
 int main()
 {
@@ -19,7 +20,8 @@ int main()
     u32 TX_BUF[TEST_SZ] = {0};
     u32 RX_BUF[TEST_SZ] = {0};
     int status[NUM_TESTS];
-    int tstidx, results = 0;
+    int tstidx = 0;
+    int results = 0;
 
     printf("\n\r=======================\n\r");
     printf("AXI BRAM FIFO TEST STRT\n\r");
@@ -29,29 +31,35 @@ int main()
 
     /* test core's ability to loop the address and read pointers */
     status[tstidx] = addr_loop_around_test(&TX_BUF, &RX_BUF);
-    if(status[tstidx++] == XST_FAILURE)
-    	printf("\t!! Core Address failed to loop from max back to zero\n\r");
+    if(status[tstidx] == XST_FAILURE)
+    	printf("\t!! Core Address failed to loop from max back to zero !!\n\r");
     else
     	printf("\t!! Success !!\n\r");
 
     /* test core's ability to alternate between read and writes w/o losing data */
-    status[tstidx] = stress_test(&TX_BUF, &RX_BUF);
-    if(status[tstidx++] == XST_FAILURE)
-    	printf("\t!! Core failed alternate read writes\n\r");
+    status[++tstidx] = stress_test(&TX_BUF, &RX_BUF);
+    if(status[tstidx] == XST_FAILURE)
+    	printf("\t!! Core failed to retain read pointer !!\n\r");
     else
     	printf("\t!! Success !!\n\r");
 
     /* test core's ability to prevent overflow */
-    status[tstidx] = overflow_fifo();
-    if(status[tstidx++] == XST_FAILURE)
-    	printf("\t!! Core failed to stop writing when FIFO full\n\r");
+    status[++tstidx] = overflow_fifo();
+    if(status[tstidx] == XST_FAILURE)
+    	printf("\t!! Core failed to stop writing when FIFO full !!\n\r");
     else
     	printf("\t!! Success !!\n\r");
 
     /* test core's ability to prevent underflow */
-    status[tstidx] = underflow_fifo();
-    if(status[tstidx++] == XST_FAILURE)
-    	printf("\t!! Core failed to stop reading when FIFO empty\n\r");
+    status[++tstidx] = underflow_fifo();
+    if(status[tstidx] == XST_FAILURE)
+    	printf("\t!! Core failed to stop reading when FIFO empty !!\n\r");
+    else
+    	printf("\t!! Success !!\n\r");
+
+    status[++tstidx] = alternate_rdwr_test();
+    if(status[tstidx] == XST_FAILURE)
+    	printf("\t!! Core failed to alternate read writes !!\n\r");
     else
     	printf("\t!! Success !!\n\r");
 
@@ -60,8 +68,9 @@ int main()
     	if(status[tstidx] == XST_FAILURE)
     		results++;
     }
+
     if(results > 0)
-    	printf("\n\r!! TEST FAILED !!\n\r");
+    	printf("\n\r\t!! TEST FAILED !!\n\r");
     else
     	printf("\n\r\t!! TEST PASSED !!\n\r");
 
@@ -71,6 +80,41 @@ int main()
 
     cleanup_platform();
     return 0;
+}
+
+int alternate_rdwr_test()
+{
+	printf("\n\r\tTesting back to back write/read operations...\n\r");
+    AFIFO_init_core(FIFO_ADDR);
+    int i = 0;
+    int rd = 0;
+    int status = XST_SUCCESS;
+    int errno = 0;
+
+    for(i = 0; i < MAX_SZ; i++){
+		errno = AFIFO_write_data(FIFO_ADDR, i);
+		if(errno < 0){
+			status = XST_FAILURE;
+#ifdef VERBOSE
+			AFIFO_print_error(errno);
+#endif
+		}
+		errno = AFIFO_read_data(FIFO_ADDR, &rd);
+		if(errno < 0){
+#ifdef VERBOSE
+			AFIFO_print_error(errno);
+#endif
+			status = XST_FAILURE;
+		}
+		else if(rd != i){
+#ifdef VERBOSE
+			printf("\tread incorrect value...\n\r");
+#endif
+			status = XST_FAILURE;
+		}
+    }
+    AFIFO_disable_core(FIFO_ADDR);
+    return status;
 }
 
 int underflow_fifo()
