@@ -103,7 +103,6 @@ architecture arch_imp of axi_bram_fifo_controller_v1_0 is
 	
 	component FIFO_Controller is
            generic (
-           READ_SRC         : std_logic := '1';
            BRAM_ADDR_WIDTH  : integer := 10;
            BRAM_DATA_WIDTH  : integer := 32 );
            Port ( 
