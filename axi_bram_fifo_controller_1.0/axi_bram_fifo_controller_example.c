@@ -57,6 +57,7 @@ int main()
     else
     	printf("\t!! Success !!\n\r");
 
+    /* test cores ability to alternate between read and writes back to back */
     status[++tstidx] = alternate_rdwr_test();
     if(status[tstidx] == XST_FAILURE)
     	printf("\t!! Core failed to alternate read writes !!\n\r");
