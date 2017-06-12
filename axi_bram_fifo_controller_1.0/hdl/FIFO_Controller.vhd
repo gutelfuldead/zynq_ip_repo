@@ -81,8 +81,8 @@ architecture Behavioral of FIFO_Controller is
         -- instantiate clock at top level with BUFR; leave this port open in instantiation
         clka <= clk;
         clkb <= clk;
-        ena  <= '1';
-        enb  <= '1';    
+	    ena <= '1' when (clkEn = '1') else '0';
+	    enb <= '1' when (clkEn = '1') else '0';  
         
         bram_full <= addr_full;
         bram_empty <= addr_empty;
