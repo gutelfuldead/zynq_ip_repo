@@ -23,7 +23,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 library work;
-use work.mda_net_csp_pkg.all;
+use work.generic_pkg.all;
 
 entity fifo_addr_gen is
     generic ( BRAM_ADDR_WIDTH  : integer := 10 );

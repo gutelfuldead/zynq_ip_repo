@@ -1107,7 +1107,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_vhdlsynthesis_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>hdl/mda_net_csp_pkg.vhd</spirit:name>
+        <spirit:name>hdl/generic_pkg.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -1139,7 +1139,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_vhdlbehavioralsimulation_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>hdl/mda_net_csp_pkg.vhd</spirit:name>
+        <spirit:name>hdl/generic_pkg.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>

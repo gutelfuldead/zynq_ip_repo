@@ -2,32 +2,11 @@ library ieee;
 	use ieee.std_logic_1164.all;
 	use ieee.std_logic_unsigned.all;
 
-package mda_net_csp_pkg is
+package generic_pkg is
 
 --------------------------------------------------------------------------
 --------------------------- CONSTANTS ------------------------------------
 --------------------------------------------------------------------------
-	-- for fec_mode bit used in the following cores :
-	--		spi_master_stream
-	--		spi_slave_stream
-	--		mda_net_rx_fifo
-	--		mda_net_tx_fifo
-	constant CMN_FEC_MODE  : std_logic := '1';
-	constant CMN_NFEC_MODE : std_logic := '0';
-
-	-- Setting the modes for the spi_master_stream core to 
-	-- transmit stream data or data from the PS directly
-	constant CMN_MODE_PS     : std_logic := '1';
-	constant CMN_MODE_STREAM : std_logic := '0';
-
-	-- Maximum number of packets that can be received from slave
-	-- assuming max message length of 32768 / 4b per transmission
-	constant CMN_MAX_RX_PACKETS : integer := 8192;
-
-	-- The offset to the start of the length field in a network
-	-- header
-    constant CMN_HDR_LEN_OFFSET : integer := 8;
-    
     -- used to latch the dout_valid signal in the bram_fifo_controller core
     -- high when the read interface is coming from the PS to allow time
     -- to capture the data over the AXI bus
@@ -129,4 +108,4 @@ package mda_net_csp_pkg is
 	end component AXI_SLAVE_STREAM;
 
 
-end mda_net_csp_pkg;
+end generic_pkg;

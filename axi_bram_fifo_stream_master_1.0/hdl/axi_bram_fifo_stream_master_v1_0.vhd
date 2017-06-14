@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library work;
-use work.mda_net_csp_pkg.all;
+use work.generic_pkg.all;
 
 library UNISIM;
 use UNISIM.Vcomponents.all;
