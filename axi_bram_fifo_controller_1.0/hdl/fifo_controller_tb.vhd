@@ -82,8 +82,7 @@ architecture Behavioral of fifo_controller_tb is
    signal dout       :  std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
    signal dout_valid :  std_logic := '0';
    signal bram_occupancy  : std_logic_vector(BRAM_ADDR_WIDTH -1 downto 0) := (others => '0');
-   
-   constant NUM_OPS : integer := 10;
+
    constant clk_period : time := 10 ns; -- 100 MHz clock
 begin
 
@@ -125,17 +124,17 @@ begin
   tb : process
   begin
     reset <= '1';
-    wait for clk_period*2;
+    wait for clk_period*10;
     reset <= '0';
-    wait for clk_period*2;
+    wait for clk_period;
     write_en <= '1';
-    wait for clk_period*NUM_OPS;
+    wait for clk_period*1050;
     write_en <= '0';
-    WAIT FOR CLK_PERIOD*2;
+    WAIT FOR CLK_PERIOD*10;
     read_en <= '1';
-    wait for clk_period*NUM_OPS;
+    wait for clk_period*1050;
     read_en <= '0';
-    wait for clk_period*2;
+    wait for clk_period;
 
   end process tb;
 
