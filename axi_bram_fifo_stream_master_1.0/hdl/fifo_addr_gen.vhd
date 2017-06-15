@@ -1,11 +1,9 @@
 ----------------------------------------------------------------------------------
--- Company:  Space Micro
 -- Engineer: Jason Gutel
 -- 
 -- Create Date: 05/17/2017 09:26:23 AM
 -- Design Name: 
--- Module Name: fifo_addr_gen - Behavioral
--- Project Name: MDA Cubesat Network
+-- Module Name: FIFO_ADDR_GEN - Behavioral
 -- Target Devices: CSP -- Zynq7020
 -- Tool Versions:  Vivado 2015.4
 -- Description:    Generates address for BRAM interface
@@ -25,7 +23,7 @@ use IEEE.NUMERIC_STD.ALL;
 library work;
 use work.generic_pkg.all;
 
-entity fifo_addr_gen is
+entity FIFO_ADDR_GEN is
     generic ( BRAM_ADDR_WIDTH  : integer := 10 );
     Port ( clk : in STD_LOGIC;
            en  : in STD_LOGIC;
@@ -34,15 +32,15 @@ entity fifo_addr_gen is
            wren : in STD_LOGIC;
            rd_addr : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
            wr_addr : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
-           fifo_empty : out std_logic;
-           fifo_full  : out std_logic;
-           fifo_occupancy : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0));
-end fifo_addr_gen;
+           empty : out std_logic;
+           full  : out std_logic;
+           occupancy : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0));
+end FIFO_ADDR_GEN;
 
-architecture Behavioral of fifo_addr_gen is
+architecture Behavioral of FIFO_ADDR_GEN is
 
-    constant EMPTY : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    constant FULL  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '1'); 
+    constant C_EMPTY : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
+    constant C_FULL  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '1'); 
     signal s_empty, s_full : std_logic := '0';
     signal s_rd_done, s_wr_done : std_logic := '0';
     signal s_rd_addr, s_wr_addr : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
@@ -59,11 +57,11 @@ begin
     loader : process(clk)
     begin
     if(rising_edge(clk)) then
-        fifo_empty <= s_empty;
-        fifo_full  <= s_full;
+        empty <= s_empty;
+        full  <= s_full;
         rd_addr <= std_logic_vector(s_rd_addr);
         wr_addr <= std_logic_vector(s_wr_addr);
-        fifo_occupancy <= std_logic_vector(s_occupancy);
+        occupancy <= std_logic_vector(s_occupancy);
     end if;
     end process loader;
     
@@ -116,10 +114,10 @@ begin
       if(rst = '1') then
           s_empty <= '1';
           s_full <= '0';
-      elsif(s_occupancy = EMPTY) then
+      elsif(s_occupancy = C_EMPTY) then
           s_empty <= '1';
           s_full  <= '0';
-      elsif(s_occupancy = FULL) then
+      elsif(s_occupancy = C_FULL) then
           s_full  <= '1';
           s_empty <= '0';
       else

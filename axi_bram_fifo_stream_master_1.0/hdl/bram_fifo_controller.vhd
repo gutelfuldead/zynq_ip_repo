@@ -1,11 +1,9 @@
 ----------------------------------------------------------------------------------
--- Company: Space Micro 
 -- Engineer: Jason Gutel
 -- 
 -- Create Date: 05/17/2017 09:20:37 AM
 -- Design Name: 
--- Module Name: bram_fifo_controller - Behavioral
--- Project Name: MDA Cubesat Network
+-- Module Name: BRAM_FIFO_CONTROLLER - Behavioral
 -- Target Devices: CSP -- Zynq7020
 -- Tool Versions: Vivado 2015.4
 -- Description:   Controller interface for BRAM block_memory_generator core
@@ -24,7 +22,7 @@ use IEEE.NUMERIC_STD.ALL;
 library work;
 use work.generic_pkg.all;
 
-entity bram_fifo_controller is
+entity BRAM_FIFO_CONTROLLER is
     generic (
            READ_SRC      : std_logic := CMN_PS_READ;
            BRAM_ADDR_WIDTH  : integer := 10;
@@ -54,13 +52,13 @@ entity bram_fifo_controller is
            din        : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
            dout       : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
            dout_valid : out std_logic;
-           bram_full  : out std_logic;
-           bram_empty : out std_logic;
-           bram_occupancy  : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0)
+           full  : out std_logic;
+           empty : out std_logic;
+           occupancy  : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0)
            );
-end bram_fifo_controller;
+end BRAM_FIFO_CONTROLLER;
 
-architecture Behavioral of bram_fifo_controller is
+architecture Behavioral of BRAM_FIFO_CONTROLLER is
 
     signal rd_addr : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal wr_addr : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
@@ -69,21 +67,20 @@ architecture Behavioral of bram_fifo_controller is
     
 begin 
     
-    addr_gen : fifo_addr_gen
+    addr_gen : FIFO_ADDR_GEN
     generic map ( BRAM_ADDR_WIDTH => BRAM_ADDR_WIDTH )
     port map(
-        clk => clk,
-        en  => clkEn,
-        rst => reset,
-        rden => addr_rden,
-        wren => addr_wren,
-        rd_addr => rd_addr,
-        wr_addr => wr_addr,
-        fifo_empty => addr_empty,
-        fifo_full => addr_full,
-        fifo_occupancy => bram_occupancy
+        clk       => clk,
+        en        => clkEn,
+        rst       => reset,
+        rden      => addr_rden,
+        wren      => addr_wren,
+        rd_addr   => rd_addr,
+        wr_addr   => wr_addr,
+        empty     => addr_empty,
+        full      => addr_full,
+        occupancy => occupancy
     );
-    
     -- instantiate clock at top level with BUFR; leave this port open in instantiation
     clka <= clk;
     clkb <= clk;   
@@ -92,10 +89,10 @@ begin
     begin
     if(rising_edge(clk)) then
         if(clkEn = '1') then
-            bram_full <= addr_full;
-            bram_empty <= addr_empty;
-            ena <= '1';
-            enb <= '1';
+            full  <= addr_full;
+            empty <= addr_empty;
+            ena   <= '1';
+            enb   <= '1';
         else
             ena <= '0';
             enb <= '0';

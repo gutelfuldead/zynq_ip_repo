@@ -38,22 +38,17 @@ architecture implementation of AXI_MASTER_STREAM is
 	type state is (ST_IDLE, ST_WRITE);
 	signal fsm : state := ST_IDLE;
 	
-	--streaming data valid
-	signal axis_tvalid	: std_logic;
-	--streaming data valid delayed by one clock cycle
-	signal axis_tvalid_delay	: std_logic;
-	--Last of the streaming data 
-	signal axis_tlast	: std_logic;
-	--Last of the streaming data delayed by one clock cycle
-	signal axis_tlast_delay	: std_logic;
-	--FIFO implementation signals
-	signal stream_data_out	: std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
 begin
-	-- I/O Connections assignments
 
+	----------------------------------------------
+	-- un-used interface ports set to constants --
+	----------------------------------------------
 	M_AXIS_TLAST	<= '0';
 	M_AXIS_TSTRB	<= (others => '1');
     
+    ----------------------------------
+	-- axi4-stream master interface --
+    ----------------------------------
     stream_master : process(M_AXIS_ACLK)
     begin
     if(rising_edge(M_AXIS_ACLK)) then

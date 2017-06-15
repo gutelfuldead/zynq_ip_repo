@@ -16,13 +16,13 @@ entity axi_bram_fifo_stream_master_v1_0_S00_AXI is
 		C_S_AXI_ADDR_WIDTH	: integer	:= 4
 	);
 	port (
-        fifo_clkEn      : out std_logic;
-        fifo_write_en   : out std_logic;
-        fifo_reset      : out std_logic;
-        fifo_din        : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        fifo_bram_full  : in std_logic;
-        fifo_bram_empty : in std_logic;
-        fifo_bram_occupancy  : in std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+        fifo_clkEn     : out std_logic;
+        fifo_write_en  : out std_logic;
+        fifo_reset     : out std_logic;
+        fifo_din       : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+        fifo_full      : in std_logic;
+        fifo_empty     : in std_logic;
+        fifo_occupancy : in std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
 
 		-- Global Clock Signal
 		S_AXI_ACLK	: in std_logic;
@@ -400,10 +400,10 @@ begin
     fifo_din <= slv_reg1;
 
     -- slv_reg2 occupancy PL --> PS reg
-    slv_reg2(BRAM_ADDR_WIDTH-1 downto 0) <= fifo_bram_occupancy;
+    slv_reg2(BRAM_ADDR_WIDTH-1 downto 0) <= fifo_occupancy;
     
     -- slvreg3 PL --> PS
-    slv_reg3(0) <= fifo_bram_full;
-    slv_reg3(1) <= fifo_bram_empty;
+    slv_reg3(0) <= fifo_full;
+    slv_reg3(1) <= fifo_empty;
 
 end arch_imp;
