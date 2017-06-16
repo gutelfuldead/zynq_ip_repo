@@ -41,6 +41,9 @@ XSDK Verification
 #define STDIN_BASEADDRESS 0xE0001000  // XPAR_PS7_UART_1_BASEADDR
 #define STDOUT_BASEADDRESS 0xE0001000 // XPAR_PS7_UART_1_BASEADDR
 ```
+EXAMPLE CODE
+------------
+
 1. Example program `loopback_example.c` provided to flood UART0 with "hello world" and recieve it back in loopback mode. The USB UART1 will print results to a terminal session. 
 
 1. Example program `irq_test.c` will prompt data to be input on a serial terminal then output the received data on the usb/uart terminal.
