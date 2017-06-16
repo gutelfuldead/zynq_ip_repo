@@ -14,25 +14,15 @@ Vivado Setup
 	1. peripheral i/o pins -> click **UART 0**
 	1. PS-PL Configuration -> set **UART0 Baud Rate** to *115200*
 
-1. Add block to repository
-	1. Project Settings
-	1. IP -> Repository Manager
-	1. Add -> point to the top level IP core -> refresh all -> apply -> ok
-
-1. Add pmod_rs485_controller IP to block
-	1. Run Connection Automation (default options)
-	1. Make the following Connections on the block diagram:
+1. 
 	
 	| pmod_rs485_controller port | connection port                      |
 	|----------------------------|--------------------------------------|
-	| PS_RX                      | UART0_RX on zynq block               |
-	| PS_TX                      | UART0_TX on zynq block               |
-	| PMOD_RXD                   | create port : pmod_rs485_RXD type IN |
-	| PMOD_TXD                   | create port : pmod_rs485_TXD type OUT|
-	| DE                         | create port : pmod_rs485_DE  type OUT|
-	| RE                         | create port : pmod_rs485_RE  type OUT|
+	| PS7/UART0_RX               | create port : pmod_rs485_RXD type IN |
+	| PS7/UART0_TX               | create port : pmod_rs485_TXD type OUT|
+	| Xilinx Constant Block = 1  | create port : pmod_rs485_DE  type OUT|
+	| Xilinx Constant Block = 0  | create port : pmod_rs485_RE  type OUT|
 	
-	**NOTE** if using Vivado 2015.4 xparameters.h will not import the proper axi interface address from user created IP. Make sure to note the *offset address* being used by the core in the *address editor* tab of vivado
 
 1. Use the JA1 top row Pmod ports to attach the Digilent PMOD RS485 UART device
 
@@ -51,7 +41,9 @@ XSDK Verification
 #define STDIN_BASEADDRESS 0xE0001000  // XPAR_PS7_UART_1_BASEADDR
 #define STDOUT_BASEADDRESS 0xE0001000 // XPAR_PS7_UART_1_BASEADDR
 ```
-1. Example program `loopback_example.c` provided to flood UART0 with "hello world" and recieve it back in loopback mode. The USB UART1 will print results to a teleterminal session. 
+1. Example program `loopback_example.c` provided to flood UART0 with "hello world" and recieve it back in loopback mode. The USB UART1 will print results to a terminal session. 
 
-1. Example program `interrupt_loopback_test.c` sends data when an RX flag is high, recieves the data via an interrupt handler and turns the flag low, rinse and repeat.
+1. Example program `irq_test.c` will prompt data to be input on a serial terminal then output the received data on the usb/uart terminal.
+
+1. Example program `polling_test.c` will constantly poll the serial uart until a certain amount of data is received then print it to the usb/uart terminal.
 
