@@ -84,22 +84,22 @@ begin
 	        dina  => dina,
 	        ena   => ena,
 	        wea   => wea,
-	        clka  => open, -- instantiated with BUFR top level
+	        clka  => clka, -- instantiated with BUFR top level
 	        rsta  => rsta,
 	        addrb => addrb,
 	        doutb => doutb,
 	        enb   => enb,
-	        clkb  => open, -- instantiated with BUFR top level
+	        clkb  => clkb, -- instantiated with BUFR top level
 	        rstb  => rstb,
 	        
 	        clk        => clk,
 	        clkEn      => clkEn,
 	        write_en   => fifo_write_en,
 	        reset      => reset,
-	        din        => din,
+	        din        => fifo_din,
 	        read_en    => sig_fifo_read_en,
 	        dout       => sig_fifo_dout,
-	        dout_valid => sig_fifo_dvalid,
+	        dvalid     => sig_fifo_dvalid,
 	        full       => sig_fifo_full,
 	        empty      => sig_fifo_empty,
 	        occupancy  => sig_fifo_occupancy

@@ -118,6 +118,7 @@ architecture arch_imp of axi_bram_fifo_stream_master_v1_0 is
     signal sig_fifo_full  : std_logic := '0';
     signal sig_fifo_empty : std_logic := '0';
     signal sig_fifo_occupancy  : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal bram_clk : std_logic := '0';
 
 begin
 
@@ -163,12 +164,12 @@ axi_bram_fifo_stream_master_v1_0_S00_AXI_inst : axi_bram_fifo_stream_master_v1_0
 		S_AXI_RREADY	=> s00_axi_rready
 	);
 
-    fifo_stream_controll_inst : FIFO_MASTER_STREAM_CONTROLLER
+    fifo_stream_control_inst : FIFO_MASTER_STREAM_CONTROLLER
     generic map(
                 -- Users to add parameters here
         BRAM_ADDR_WIDTH  => BRAM_ADDR_WIDTH,
         BRAM_DATA_WIDTH  => BRAM_DATA_WIDTH,
-        C_M_AXIS_TDATA_WIDTH => C_M_AXIS_TDATA_WIDTH
+        C_M_AXIS_TDATA_WIDTH => C_M_AXIS_TDATA_WIDTH)
     port map (
         -- BRAM write port lines
         addra => addra,
@@ -204,7 +205,6 @@ axi_bram_fifo_stream_master_v1_0_S00_AXI_inst : axi_bram_fifo_stream_master_v1_0
         fifo_empty      => sig_fifo_empty,
         fifo_occupancy  => sig_fifo_occupancy
         );
-end FIFO_MASTER_STREAM_CONTROLLER;
 
     --------------------------------
     -- generate bram clock buffer --

@@ -51,7 +51,7 @@ entity BRAM_FIFO_CONTROLLER is
            reset      : in std_logic;
            din        : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
            dout       : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-           dout_valid : out std_logic;
+           dvalid : out std_logic;
            full  : out std_logic;
            empty : out std_logic;
            occupancy  : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0)
@@ -107,18 +107,18 @@ begin
     begin
     if(rising_edge(clk)) then
         if(reset = '1') then
-            dout_valid <= '0';
+            dvalid <= '0';
             rstb       <= '1';
         elsif(clkEn = '1') then
             rstb <= '0';
             if(read_en = '1' and addr_empty = '0') then
                 dout <= doutb;
-                dout_valid <= '1';
+                dvalid <= '1';
                 addr_rden  <= '1';
             else
                 addr_rden <= '0';
                 if(READ_SRC = CMN_PL_READ) then
-                  dout_valid <= '0';
+                  dvalid <= '0';
                 end if;
             end if;
         end if;

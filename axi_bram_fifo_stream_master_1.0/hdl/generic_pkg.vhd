@@ -68,9 +68,9 @@ package generic_pkg is
                wren : in STD_LOGIC;
                rd_addr : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
                wr_addr : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
-               fifo_empty : out std_logic;
-               fifo_full  : out std_logic;
-               fifo_occupancy : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0));
+               empty : out std_logic;
+               full  : out std_logic;
+               occupancy : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0));
     end component FIFO_ADDR_GEN;
 
     ------------------------------------------
