@@ -41,29 +41,30 @@ architecture Behavioral of FIFO_ADDR_GEN is
 
     constant C_EMPTY : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     constant C_FULL  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '1'); 
-    signal s_empty, s_full : std_logic := '0';
+    signal s_full : std_logic := '0';
+    signal s_empty : std_logic := '1';
     signal s_rd_done, s_wr_done : std_logic := '0';
     signal s_rd_addr, s_wr_addr : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal s_occupancy : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
 
 begin
 
---    fifo_empty <= s_empty;
---    fifo_full  <= s_full;
---    rd_addr <= std_logic_vector(s_rd_addr);
---    wr_addr <= std_logic_vector(s_wr_addr);
---    fifo_occupancy <= std_logic_vector(s_occupancy);
+    empty <= s_empty;
+    full  <= s_full;
+    rd_addr <= std_logic_vector(s_rd_addr);
+    wr_addr <= std_logic_vector(s_wr_addr);
+    occupancy <= std_logic_vector(s_occupancy);
     
-    loader : process(clk)
-    begin
-    if(rising_edge(clk)) then
-        empty <= s_empty;
-        full  <= s_full;
-        rd_addr <= std_logic_vector(s_rd_addr);
-        wr_addr <= std_logic_vector(s_wr_addr);
-        occupancy <= std_logic_vector(s_occupancy);
-    end if;
-    end process loader;
+--    loader : process(clk)
+--    begin
+--    if(rising_edge(clk)) then
+--        empty <= s_empty;
+--        full  <= s_full;
+--        rd_addr <= std_logic_vector(s_rd_addr);
+--        wr_addr <= std_logic_vector(s_wr_addr);
+--        occupancy <= std_logic_vector(s_occupancy);
+--    end if;
+--    end process loader;
     
     address_gen_read : process(clk)
     begin
@@ -99,7 +100,7 @@ begin
     begin
     if(rising_edge(clk)) then
         if(rst = '1') then
-          s_occupancy <= (others => '0');
+          s_occupancy <= C_EMPTY;
         elsif(s_rd_done = '1' and s_wr_done = '0') then
           s_occupancy <= s_occupancy - 1;
         elsif(s_wr_done = '1' and s_rd_done = '0') then

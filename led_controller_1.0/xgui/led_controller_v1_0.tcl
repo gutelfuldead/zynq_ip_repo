@@ -10,7 +10,28 @@ proc init_gui { IPINST } {
   ipgui::add_param $IPINST -name "C_S00_AXI_BASEADDR" -parent ${Page_0}
   ipgui::add_param $IPINST -name "C_S00_AXI_HIGHADDR" -parent ${Page_0}
 
+  ipgui::add_param $IPINST -name "NUM_LEDS"
+  set CYCLES_ON [ipgui::add_param $IPINST -name "CYCLES_ON"]
+  set_property tooltip {Number of clock cycles an LED stays lit for after enabled} ${CYCLES_ON}
 
+}
+
+proc update_PARAM_VALUE.CYCLES_ON { PARAM_VALUE.CYCLES_ON } {
+	# Procedure called to update CYCLES_ON when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.CYCLES_ON { PARAM_VALUE.CYCLES_ON } {
+	# Procedure called to validate CYCLES_ON
+	return true
+}
+
+proc update_PARAM_VALUE.NUM_LEDS { PARAM_VALUE.NUM_LEDS } {
+	# Procedure called to update NUM_LEDS when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.NUM_LEDS { PARAM_VALUE.NUM_LEDS } {
+	# Procedure called to validate NUM_LEDS
+	return true
 }
 
 proc update_PARAM_VALUE.C_S00_AXI_DATA_WIDTH { PARAM_VALUE.C_S00_AXI_DATA_WIDTH } {
@@ -58,5 +79,15 @@ proc update_MODELPARAM_VALUE.C_S00_AXI_DATA_WIDTH { MODELPARAM_VALUE.C_S00_AXI_D
 proc update_MODELPARAM_VALUE.C_S00_AXI_ADDR_WIDTH { MODELPARAM_VALUE.C_S00_AXI_ADDR_WIDTH PARAM_VALUE.C_S00_AXI_ADDR_WIDTH } {
 	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
 	set_property value [get_property value ${PARAM_VALUE.C_S00_AXI_ADDR_WIDTH}] ${MODELPARAM_VALUE.C_S00_AXI_ADDR_WIDTH}
+}
+
+proc update_MODELPARAM_VALUE.NUM_LEDS { MODELPARAM_VALUE.NUM_LEDS PARAM_VALUE.NUM_LEDS } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.NUM_LEDS}] ${MODELPARAM_VALUE.NUM_LEDS}
+}
+
+proc update_MODELPARAM_VALUE.CYCLES_ON { MODELPARAM_VALUE.CYCLES_ON PARAM_VALUE.CYCLES_ON } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.CYCLES_ON}] ${MODELPARAM_VALUE.CYCLES_ON}
 }
 

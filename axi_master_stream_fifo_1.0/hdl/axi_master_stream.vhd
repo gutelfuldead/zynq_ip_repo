@@ -35,7 +35,7 @@ end AXI_MASTER_STREAM;
 
 architecture implementation of AXI_MASTER_STREAM is
 
-	type state is (ST_IDLE, ST_WRITE);
+	type state is (ST_IDLE, ST_WRITE); --, ST_CLEAN);
 	signal fsm : state := ST_IDLE;
 	
 begin
@@ -74,7 +74,11 @@ begin
 					M_AXIS_TVALID <= '0';
 					M_AXIS_TDATA  <= (others => '0');
 					fsm <= ST_IDLE;
+--                    fsm <= ST_CLEAN;
 				end if;
+--            when ST_CLEAN =>
+--                M_AXIS_TVALID <= '0';
+--                fsm <= ST_IDLE;
 			when others =>
 				fsm <= ST_IDLE;
 			end case;

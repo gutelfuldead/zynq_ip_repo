@@ -5,9 +5,6 @@ use ieee.numeric_std.all;
 library work;
 use work.generic_pkg.all;
 
-library UNISIM;
-use UNISIM.Vcomponents.all;
-
 entity FIFO_MASTER_STREAM_CONTROLLER is
 	generic (
         BRAM_ADDR_WIDTH  : integer := 10;
@@ -74,7 +71,7 @@ architecture Behavorial of FIFO_MASTER_STREAM_CONTROLLER is
 begin
 
 	-- Instantiation of FIFO Controller
-	axi_BRAM_FIFO_CONTROLLER_inst : BRAM_FIFO_CONTROLLER
+	BRAM_FIFO_CONTROLLER_inst : BRAM_FIFO_CONTROLLER
 	    generic map( 
 	        READ_SRC => CMN_PL_READ,
 	        BRAM_ADDR_WIDTH => BRAM_ADDR_WIDTH,
