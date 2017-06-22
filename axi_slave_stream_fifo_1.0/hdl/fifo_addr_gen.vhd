@@ -41,18 +41,13 @@ architecture Behavioral of FIFO_ADDR_GEN is
 
     constant C_EMPTY : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     constant C_FULL  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '1'); 
-    signal s_empty, s_full : std_logic := '0';
+    signal s_empty : std_logic := '1'; 
+    signal s_full : std_logic := '0';
     signal s_rd_done, s_wr_done : std_logic := '0';
     signal s_rd_addr, s_wr_addr : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal s_occupancy : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
 
 begin
-
---    fifo_empty <= s_empty;
---    fifo_full  <= s_full;
---    rd_addr <= std_logic_vector(s_rd_addr);
---    wr_addr <= std_logic_vector(s_wr_addr);
---    fifo_occupancy <= std_logic_vector(s_occupancy);
     
     loader : process(clk)
     begin
