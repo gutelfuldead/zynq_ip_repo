@@ -36,19 +36,22 @@ end AXI_SLAVE_STREAM;
 
 architecture arch_imp of AXI_SLAVE_STREAM is
 
-	type state is ( ST_IDLE, ST_READ );
+	type state is ( ST_IDLE, ST_READ);
     signal fsm : state := ST_IDLE;
 	signal s_tready	: std_logic;
 
 begin
 
 	stream_slave : process(S_AXIS_ACLK)
+	   constant MAX_CNT : integer := 4;
+	   variable cnt : integer range 0 to MAX_CNT := 0;
 	begin
 	if (rising_edge (S_AXIS_ACLK)) then
 		if(S_AXIS_ARESETN = '0') then
 			fsm         <= ST_IDLE;
 			user_dvalid <= '0';
 			S_AXIS_TREADY    <= '0';
+			cnt := 0;
 		else
 		  	case (fsm) is
 		        when ST_IDLE     => 
@@ -65,7 +68,7 @@ begin
 	                    user_data     <= S_AXIS_TDATA;	
 						user_dvalid   <= '1';
 						fsm <= ST_IDLE;
-					end if;
+					end if;                    
 		        when others => 
 	          		fsm <= ST_IDLE;
 		  	end case;

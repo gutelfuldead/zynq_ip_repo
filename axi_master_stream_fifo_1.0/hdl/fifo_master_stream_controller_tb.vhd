@@ -49,20 +49,20 @@ architecture tb of fifo_master_stream_controller_tb is
     signal fifo_occupancy : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
 	constant clk_period : time := 10 ns; -- 100 MHz clock
 
-    signal new_wea : std_logic_vector(3 downto 0);
+--    signal new_wea : std_logic_vector(3 downto 0);
 
 begin
 
-    update_wea : process(clk)
-    begin
-    if(rising_edge(clk)) then
-        if(wea = '1') then
-            new_wea <= (others => '1');
-        else
-            new_wea <= (others => '0');
-        end if;
-    end if;
-    end process update_wea;
+--    update_wea : process(clk)
+--    begin
+--    if(rising_edge(clk)) then
+--        if(wea = '1') then
+--            new_wea <= (others => '1');
+--        else
+--            new_wea <= (others => '0');
+--        end if;
+--    end if;
+--    end process update_wea;
     
 
 	DUT : FIFO_MASTER_STREAM_CONTROLLER

@@ -65,7 +65,7 @@ architecture Behavorial of FIFO_MASTER_STREAM_CONTROLLER is
     signal sig_axis_rdy    : std_logic := '0';
 
     -- state machine signals
-    type state is (ST_IDLE, ST_ACTIVE, ST_WAIT);
+    type state is (ST_IDLE, ST_ACTIVE, ST_WAIT, ST_SYNC);
     signal fsm : state := ST_IDLE;
 
 begin
@@ -73,7 +73,6 @@ begin
 	-- Instantiation of FIFO Controller
 	BRAM_FIFO_CONTROLLER_inst : BRAM_FIFO_CONTROLLER
 	    generic map( 
-	        READ_SRC => CMN_PL_READ,
 	        BRAM_ADDR_WIDTH => BRAM_ADDR_WIDTH,
 	        BRAM_DATA_WIDTH => BRAM_DATA_WIDTH)
 	    port map (
@@ -135,12 +134,15 @@ begin
     -- Stream and FIFO read controller --
     -------------------------------------
     axis_read_ctrl : process(clk) 
+        constant MAX_WAIT : integer := 4;
+        variable cnt : integer range 0 to MAX_WAIT := 0;
     begin
     if(rising_edge(clk)) then
         if(reset = '1') then
             fsm <= ST_IDLE;
             sig_axis_dvalid <= '0';
             sig_fifo_read_en <= '0';
+            cnt := 0;
         elsif(clkEn = '1') then
             case(fsm) is
                 when ST_IDLE =>
@@ -160,7 +162,15 @@ begin
                 when ST_WAIT =>
                     sig_axis_dvalid <= '0';   
                     if(sig_axis_txdone = '1') then
+                        fsm <= ST_SYNC;
+                    end if;
+                
+                when ST_SYNC =>
+                    if(cnt = MAX_WAIT) then
+                        cnt := 0;
                         fsm <= ST_IDLE;
+                    else
+                        cnt := cnt + 1;
                     end if;
 
                 when others =>

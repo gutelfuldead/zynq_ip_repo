@@ -5,15 +5,6 @@ library ieee;
 package generic_pkg is
 
 --------------------------------------------------------------------------
---------------------------- CONSTANTS ------------------------------------
---------------------------------------------------------------------------
-    -- used to latch the dout_valid signal in the BRAM_FIFO_CONTROLLER core
-    -- high when the read interface is coming from the PS to allow time
-    -- to capture the data over the AXI bus
-    constant CMN_PS_READ : std_logic := '1';
-    constant CMN_PL_READ : std_logic := '0';
-
---------------------------------------------------------------------------
 --------------------------- COMPONENTS -----------------------------------
 --------------------------------------------------------------------------
 
@@ -22,7 +13,6 @@ package generic_pkg is
 	--------------------------------------
 	component BRAM_FIFO_CONTROLLER is
 	    generic (
-	           READ_SRC         : std_logic := '1';
 	           BRAM_ADDR_WIDTH  : integer := 10;
 	           BRAM_DATA_WIDTH  : integer := 32 );
 	    Port ( 
@@ -183,6 +173,10 @@ package generic_pkg is
         enb   : out STD_LOGIC;
         clkb  : out std_logic;
         rstb  : out std_logic;
+        
+        --AXIL Read Control Ports
+        axil_dvalid    : out std_logic;
+        axil_read_done : in std_logic;
 
         -- AXIS Slave Stream Ports
         S_AXIS_ACLK : in std_logic;
@@ -201,8 +195,7 @@ package generic_pkg is
         fifo_empty     : out std_logic;
         fifo_occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
         fifo_read_en   : in std_logic;
-        fifo_dout      : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        fifo_dvalid    : out std_logic
+        fifo_dout      : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0)
 		);
 end component FIFO_SLAVE_STREAM_CONTROLLER;
 

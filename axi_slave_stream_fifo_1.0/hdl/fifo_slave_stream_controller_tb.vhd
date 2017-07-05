@@ -42,10 +42,11 @@ architecture tb of fifo_slave_stream_controller_tb is
     signal fifo_read_en   : std_logic;
     signal fifo_full      : std_logic;
     signal fifo_empty     : std_logic;
-    signal fifo_dvalid    : std_logic;
     signal fifo_occupancy : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+    signal axil_dvalid    : std_logic;
+    signal axil_read_done : std_logic;
 	constant clk_period : time := 10 ns; -- 100 MHz clock
-
+	
 begin
 
     DUT : FIFO_SLAVE_STREAM_CONTROLLER
@@ -64,6 +65,9 @@ begin
         enb   => enb,
         clkb  => clkb,
         rstb  => rstb,
+        
+        axil_dvalid => axil_dvalid,
+        axil_read_done => axil_read_done,
 
         -- AXIS Slave Stream Ports
         S_AXIS_ACLK    => clk,
@@ -82,8 +86,7 @@ begin
         fifo_empty     => fifo_empty,
         fifo_occupancy => fifo_occupancy,
         fifo_read_en   => fifo_read_en,
-        fifo_dout      => fifo_dout,
-        fifo_dvalid    => fifo_dvalid
+        fifo_dout      => fifo_dout
         );    
 
     S_AXIS_ARESETN <= not reset;
@@ -95,21 +98,87 @@ begin
 		clk <= '0';
 		wait for clk_period/2;
 	end process clk_process;
-
-	tb : process
+	
+	rst_proc : process(clk)
+	   constant rst_cnt : integer := 200;
+	   variable cnt : integer range 0 to rst_cnt := rst_cnt;
 	begin
-		clkEn <= '1';
-		reset <= '1';
-        S_AXIS_TVALID <= '0';
-        S_AXIS_TDATA  <= (others => '1');
-		wait for clk_period*4;
-		reset <= '0';
-		wait for clk_period;
-        S_AXIS_TVALID <= '1';
-        wait for clk_period*10;
-        S_AXIS_TVALID <= '0';
-        wait for clk_period*10;
-	end process;
+	   if(rising_edge(clk)) then
+	       if (cnt = rst_cnt) then
+	           reset <= '1';
+	           cnt := 0;
+           else
+               reset <= '0';
+               cnt := cnt + 1;
+           end if;
+       end if;
+   end process rst_proc;
+      
+   read_test : process(clk)
+       variable data_val : integer := 1;
+       constant maxcnt : integer := 10;
+       variable cnt : integer range 0 to maxcnt := 0;
+       variable read_en_asserted : std_logic := '0';
+       variable read_done_asserted : std_logic := '0';
+   begin
+   if(reset = '1') then
+       data_val := 1;
+       read_en_asserted := '0';
+       read_done_asserted := '0';
+       fifo_read_en <= '0';
+       cnt := 0;
+   elsif(rising_edge(clk)) then
+   
+       if(fifo_empty = '0' and axil_dvalid = '0' and read_en_asserted = '0') then
+           fifo_read_en <= '1';
+           doutb <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
+           read_en_asserted := '1';
+       elsif(read_en_asserted = '1') then
+           fifo_read_en <= '0';
+       end if;
+       
+       if(axil_dvalid = '1' and read_done_asserted = '0') then
+           axil_read_done <= '1';
+           read_done_asserted := '1';
+           cnt := 0;
+       elsif(read_done_asserted = '1') then
+           axil_read_done <= '0';
+           if(cnt = maxcnt) then
+               data_val := data_val + 1;
+               read_done_asserted := '0';
+               read_en_asserted := '0';
+           else
+              cnt := cnt + 1;
+           end if;
+       end if;
+           
+   end if;
+   end process read_test;
+   
+   
+   valid_assert : process(clk)
+       variable data_val : integer := 1;
+       variable asserted : std_logic := '0';
+   begin
+   if(reset = '1') then
+       data_val := 1;
+       asserted := '0';
+   elsif(rising_edge(clk)) then
+       if(asserted = '0') then
+           S_AXIS_TVALID <= '1';
+           asserted := '1';
+           S_AXIS_TDATA <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
+       elsif(S_AXIS_TREADY = '1') then
+           S_AXIS_TVALID <= '0';
+           S_AXIS_TDATA <= (others => '0');
+           data_val := data_val + 1;
+           asserted := '0';
+       end if;
+   end if;
+   end process valid_assert;
+   
+   clkEn <= '1';
+
 
 
 end tb;

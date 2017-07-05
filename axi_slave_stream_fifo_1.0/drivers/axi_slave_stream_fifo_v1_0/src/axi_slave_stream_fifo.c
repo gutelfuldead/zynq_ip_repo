@@ -88,6 +88,17 @@ u8 ASSF_poll_bram_empty(const u32 baseaddr)
 }
 
 /**
+ * @brief Tells hardware the read was successful
+ * @param baseaddr The baseaddr
+ */
+void ASSF_read_done(const u32 baseaddr)
+{
+	const u32 reg = ASSF_get_ctrl_reg(baseaddr);
+	AXI_SLAVE_STREAM_FIFO_mWriteReg(baseaddr,ASSF_CONTROL_REG_OFFSET, reg | ASSF_READ_DN);
+	AXI_SLAVE_STREAM_FIFO_mWriteReg(baseaddr,ASSF_CONTROL_REG_OFFSET, reg & ~ASSF_READ_DN);
+}
+
+/**
  * @brief      read from fifo; uses a timer to send a failure return if the ASSF_DOUT_VALID signal
  *             doesn't go high after a time specified by ASSF_POLL_VALID_MAX define in header.
  *             Failure will also occur as a result of the FILO being empty
@@ -109,6 +120,7 @@ u32 ASSF_read_data(const u32 baseaddr, u32 *datout)
 	}
 	*datout = AXI_SLAVE_STREAM_FIFO_mReadReg(baseaddr, ASSF_DATA_OUT_REG_OFFSET);
 	ASSF_den_read_en(baseaddr);
+	ASSF_read_done(baseaddr);
 	return XST_SUCCESS;
 }
 

@@ -85,6 +85,7 @@ architecture arch_imp of axi_slave_stream_fifo_v1_0 is
 		fifo_bram_empty : in std_logic;
         fifo_bram_occupancy  : in std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
         fifo_read_en : out std_logic;
+        fifo_read_done       : out std_logic;
         fifo_din : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
         fifo_din_valid       : in std_logic;	
 
@@ -115,9 +116,11 @@ architecture arch_imp of axi_slave_stream_fifo_v1_0 is
 	-- ports to control the bram from axi-lite interface
 	signal axil_clkEn      : std_logic := '0';
 	signal axil_read_en    : std_logic := '0';
+	signal axil_read_done  : std_logic := '0';
 	signal axil_reset      : std_logic := '0';
 	signal axil_dout       : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
-	signal axil_dout_valid : std_logic := '0';
+	signal s_axil_dvalid     : std_logic := '0';
+	signal s_axil_read_done  : std_logic := '0';
 	-- information ports from bram
 	signal bram_full       : std_logic := '0';
 	signal bram_empty      : std_logic := '0';
@@ -144,8 +147,8 @@ axi_slave_stream_fifo_v1_0_S00_AXI_inst : axi_slave_stream_fifo_v1_0_S00_AXI
         fifo_bram_occupancy  => bram_occupancy,
         fifo_read_en         => axil_read_en,
         fifo_din             => axil_dout,
-        fifo_din_valid       => axil_dout_valid,
-
+        fifo_din_valid       => s_axil_dvalid,
+        fifo_read_done       => s_axil_read_done,
 		S_AXI_ACLK	=> s00_axi_aclk,
 		S_AXI_ARESETN	=> s00_axi_aresetn,
 		S_AXI_AWADDR	=> s00_axi_awaddr,
@@ -199,6 +202,10 @@ axi_slave_stream_fifo_v1_0_S00_AXI_inst : axi_slave_stream_fifo_v1_0_S00_AXI
         S_AXIS_TSTRB   => S_AXIS_TSTRB,
         S_AXIS_TLAST   => S_AXIS_TLAST,
         S_AXIS_TVALID  => S_AXIS_TVALID,
+        
+        -- axil done line
+        axil_read_done => s_axil_read_done,
+        axil_dvalid    => s_axil_dvalid,
 
         -- fifo control lines
         clk            => s00_axi_aclk,
@@ -208,8 +215,7 @@ axi_slave_stream_fifo_v1_0_S00_AXI_inst : axi_slave_stream_fifo_v1_0_S00_AXI
         fifo_empty     => bram_empty,
         fifo_occupancy => bram_occupancy,
         fifo_read_en   => axil_read_en,
-        fifo_dout      => axil_dout,
-        fifo_dvalid    => axil_dout_valid
+        fifo_dout      => axil_dout
         );
 
     -- bram clock and reset line

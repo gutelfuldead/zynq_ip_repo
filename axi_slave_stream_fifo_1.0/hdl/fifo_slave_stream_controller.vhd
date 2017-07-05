@@ -29,7 +29,11 @@ entity FIFO_SLAVE_STREAM_CONTROLLER is
         enb   : out STD_LOGIC;
         clkb  : out std_logic;
         rstb  : out std_logic;
-
+        
+        --AXIL Read Control Ports
+        axil_dvalid    : out std_logic;
+        axil_read_done : in std_logic;
+        
         -- AXIS Slave Stream Ports
         S_AXIS_ACLK : in std_logic;
         S_AXIS_ARESETN  : in std_logic;
@@ -47,12 +51,14 @@ entity FIFO_SLAVE_STREAM_CONTROLLER is
         fifo_empty     : out std_logic;
         fifo_occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
         fifo_read_en   : in  std_logic;
-        fifo_dout      : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        fifo_dvalid    : out std_logic
+        fifo_dout      : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0)
 		);
 end FIFO_SLAVE_STREAM_CONTROLLER;
 
 architecture Behavorial of FIFO_SLAVE_STREAM_CONTROLLER is
+    
+    -- axi-lite signals
+    signal sig_axil_dvalid : std_logic := '0';
     
     -- axi-stream signals
     signal sig_axis_dout      : std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
@@ -67,6 +73,7 @@ architecture Behavorial of FIFO_SLAVE_STREAM_CONTROLLER is
     signal sig_fifo_occupancy : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal sig_fifo_write_en  : std_logic := '0';
     signal sig_fifo_din       : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
+    signal sig_fifo_dvalid    : std_logic := '0';
 
     -- state machine signals
     type state is (ST_IDLE, ST_ACTIVE, ST_WAIT);
@@ -77,7 +84,6 @@ begin
 	-- Instantiation of FIFO Controller
 	bram_fifo_controller_inst : BRAM_FIFO_CONTROLLER
 	    generic map( 
-	        READ_SRC => CMN_PS_READ,
 	        BRAM_ADDR_WIDTH => BRAM_ADDR_WIDTH,
 	        BRAM_DATA_WIDTH => BRAM_DATA_WIDTH)
 	    port map (
@@ -100,7 +106,7 @@ begin
 	        din        => sig_fifo_din,
 	        read_en    => fifo_read_en,
 	        dout       => fifo_dout,
-	        dvalid     => fifo_dvalid,
+	        dvalid     => sig_fifo_dvalid,
 	        full       => sig_fifo_full,
 	        empty      => sig_fifo_empty,
 	        occupancy  => sig_fifo_occupancy 
@@ -134,8 +140,27 @@ begin
     	fifo_empty     <= sig_fifo_empty;
     	fifo_full      <= sig_fifo_full;
     	fifo_occupancy <= sig_fifo_occupancy;
+    	axil_dvalid    <= sig_axil_dvalid;
     end if;
     end process loader;
+    
+    --------------------------
+    -- FIFO Read Controller --
+    --------------------------
+    read_ctrl : process(clk, reset)
+    begin
+    if(reset = '1') then
+        sig_axil_dvalid <= '0';
+    elsif(rising_edge(clk)) then
+        if(sig_fifo_dvalid = '1') then
+            sig_axil_dvalid <= '1';
+        end if;
+        if(sig_axil_dvalid = '1' and axil_read_done = '1') then
+            sig_axil_dvalid <= '0';
+        end if;
+    end if;
+    end process;
+
 
     -------------------------------------
     -- Stream and FIFO write controller --

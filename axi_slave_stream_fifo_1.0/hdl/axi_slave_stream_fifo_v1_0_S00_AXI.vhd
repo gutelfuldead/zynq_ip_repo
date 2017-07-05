@@ -23,6 +23,7 @@ entity axi_slave_stream_fifo_v1_0_S00_AXI is
 		fifo_bram_empty      : in std_logic;
         fifo_bram_occupancy  : in std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
         fifo_read_en         : out std_logic;
+        fifo_read_done       : out std_logic;
         fifo_din             : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
         fifo_din_valid       : in std_logic;
 
@@ -125,6 +126,7 @@ architecture arch_imp of axi_slave_stream_fifo_v1_0_S00_AXI is
 	signal byte_index	: integer;
 
 	signal read_en_q : std_logic := '0';
+	signal read_done_q : std_logic := '0';
 
 begin
 	-- I/O Connections assignments
@@ -392,6 +394,7 @@ begin
 	begin
 	   if(rising_edge(S_AXI_ACLK)) then
 	       read_en_q <= not slv_reg0(2);
+	       read_done_q <= not slv_reg0(3);
 	   end if;
     end process;
 
@@ -399,6 +402,7 @@ begin
 	fifo_clkEn   <= slv_reg0(0);
 	fifo_reset   <= slv_reg0(1);
 	fifo_read_en <= read_en_q and slv_reg0(2);
+	fifo_read_done <= read_done_q and slv_reg0(3);
 
 	-- slv_reg1 PL --> PS status
 	slv_reg1(0) <= fifo_bram_full;

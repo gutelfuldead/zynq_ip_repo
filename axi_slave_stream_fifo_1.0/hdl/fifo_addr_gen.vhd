@@ -49,16 +49,16 @@ architecture Behavioral of FIFO_ADDR_GEN is
 
 begin
     
-    loader : process(clk)
-    begin
-    if(rising_edge(clk)) then
+    --loader : process(clk)
+    --begin
+    --if(rising_edge(clk)) then
         empty <= s_empty;
         full  <= s_full;
         rd_addr <= std_logic_vector(s_rd_addr);
         wr_addr <= std_logic_vector(s_wr_addr);
         occupancy <= std_logic_vector(s_occupancy);
-    end if;
-    end process loader;
+    --end if;
+    --end process loader;
     
     address_gen_read : process(clk)
     begin

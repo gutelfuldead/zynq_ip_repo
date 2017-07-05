@@ -24,7 +24,6 @@ use work.generic_pkg.all;
 
 entity BRAM_FIFO_CONTROLLER is
     generic (
-           READ_SRC      : std_logic := CMN_PS_READ;
            BRAM_ADDR_WIDTH  : integer := 10;
            BRAM_DATA_WIDTH  : integer := 32 );
     Port ( 
@@ -117,9 +116,7 @@ begin
                 addr_rden  <= '1';
             else
                 addr_rden <= '0';
-                if(READ_SRC = CMN_PL_READ) then
-                  dvalid <= '0';
-                end if;
+                dvalid <= '0';
             end if;
         end if;
     end if;

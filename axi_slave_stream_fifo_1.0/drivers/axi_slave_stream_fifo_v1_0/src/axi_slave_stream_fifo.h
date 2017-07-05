@@ -16,7 +16,8 @@ typedef enum _control_reg_mask
 {
 	ASSF_CLKEN   = (1 << 0),
 	ASSF_RESET   = (1 << 1),
-	ASSF_READ_EN = (1 << 2)
+	ASSF_READ_EN = (1 << 2),
+	ASSF_READ_DN = (1 << 3)
 };
 
 typedef enum _status_reg_mask
@@ -111,6 +112,7 @@ extern u8 ASSF_poll_bram_empty(const u32 baseaddr);
 extern u32 ASSF_poll_occupancy(const u32 baseaddr);
 
 extern u32  ASSF_read_data(const u32 baseaddr, u32 *datout);
+extern void ASSF_read_done(const u32 baseaddr);
 
 extern void ASSF_disable_core(const u32 baseaddr);
 extern void ASSF_init_core(const u32 baseaddr);
