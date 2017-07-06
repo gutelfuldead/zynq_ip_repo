@@ -65,7 +65,7 @@ architecture Behavorial of FIFO_MASTER_STREAM_CONTROLLER is
     signal sig_axis_rdy    : std_logic := '0';
 
     -- state machine signals
-    type state is (ST_IDLE, ST_ACTIVE, ST_WAIT, ST_SYNC);
+    type state is (ST_IDLE, ST_ACTIVE, ST_WAIT);
     signal fsm : state := ST_IDLE;
 
 begin
@@ -162,15 +162,7 @@ begin
                 when ST_WAIT =>
                     sig_axis_dvalid <= '0';   
                     if(sig_axis_txdone = '1') then
-                        fsm <= ST_SYNC;
-                    end if;
-                
-                when ST_SYNC =>
-                    if(cnt = MAX_WAIT) then
-                        cnt := 0;
                         fsm <= ST_IDLE;
-                    else
-                        cnt := cnt + 1;
                     end if;
 
                 when others =>

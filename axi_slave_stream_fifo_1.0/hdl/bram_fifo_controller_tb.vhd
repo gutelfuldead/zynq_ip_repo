@@ -151,9 +151,12 @@ begin
    			data_read_asserted := '1';
 		elsif(data_read_asserted = '1') then
 			read_en <= '0';
-			if(dvalid = '1') then
+			if(dvalid = '1' or cnt = READ_WAIT) then
 				data_read_asserted := '0';
 				data := data + 1;
+				cnt := 0;
+			else
+				cnt := cnt + 1;
 			end if;
 		else
 			read_en <= '0';

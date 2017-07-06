@@ -5,11 +5,6 @@ use ieee.numeric_std.all;
 library work;
 use work.generic_pkg.all;
 
-Library UNISIM;
-use UNISIM.vcomponents.all;
-library UNIMACRO;
-use unimacro.Vcomponents.all;
-
 entity fifo_master_stream_controller_tb is
 --port();
 end fifo_master_stream_controller_tb;
@@ -51,25 +46,9 @@ architecture tb of fifo_master_stream_controller_tb is
 
 --    signal new_wea : std_logic_vector(3 downto 0);
 
-begin
-
---    update_wea : process(clk)
---    begin
---    if(rising_edge(clk)) then
---        if(wea = '1') then
---            new_wea <= (others => '1');
---        else
---            new_wea <= (others => '0');
---        end if;
---    end if;
---    end process update_wea;
-    
+begin    
 
 	DUT : FIFO_MASTER_STREAM_CONTROLLER
---    generic map(
---        BRAM_ADDR_WIDTH  => BRAM_ADDR_WIDTH,
---        BRAM_DATA_WIDTH  => BRAM_DATA_WIDTH,
---        C_M_AXIS_TDATA_WIDTH => C_M_AXIS_TDATA_WIDTH)
     port map (
         -- BRAM write port lines
         addra => addra,
@@ -105,37 +84,9 @@ begin
         fifo_empty      => fifo_empty,
         fifo_occupancy  => fifo_occupancy
         );
-        
---    BRAM_SDP_MACRO_inst : BRAM_SDP_MACRO
---    generic map(
---        BRAM_SIZE => "36kb",
---        DEVICE    => "7SERIES",
---        WRITE_WIDTH => BRAM_DATA_WIDTH,
---        READ_WIDTH  => BRAM_DATA_WIDTH,
---        DO_REG => 0,
---        INIT_FILE => "NONE",
---        SIM_COLLISION_CHECK => "ALL",
---        SRVAL => X"000000000000000000",
---        WRITE_MODE => "READ_FIRST",
---        INIT => X"000000000000000000",
---        INIT_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
---        INIT_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
---        INIT_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
---        INIT_03 => X"0000000000000000000000000000000000000000000000000000000000000000")
---    port map(
---        DO => sig_doutb,
---        DI => dina,
---        RDADDR => addrb,
---        RDCLK => clk,
---        RDEN => enb,
---        RST  => rstb,
---        REGCE => '0',
---        WE => new_wea,
---        WRADDR => addra,
---        WRCLK => clk,
---        WREN => ena
---    );
 
+    clkEn <= '1';
+        
 	clk_process : process
 	begin
 		clk <= '1';
@@ -144,39 +95,75 @@ begin
 		wait for clk_period/2;
 	end process clk_process;
 
-	tb : process
-	begin
-		clkEn <= '1';
-		reset <= '1';
-        M_AXIS_TREADY <= '0';
-        sig_doutb <= (others => '1');
-		wait for clk_period*4;
-		reset <= '0';
-		wait for clk_period;
-		fifo_din <= (others => '1');
-		fifo_write_en <= '1';
-		wait for clk_period;
-		fifo_write_en <= '0';
-		wait for clk_period*10;
-		fifo_write_en <= '1';
-		wait for clk_period;
-		fifo_write_en <= '0';
-		wait for clk_period*10;
-		fifo_write_en <= '1';
-		wait for clk_period;
-		fifo_write_en <= '0';
-		wait for clk_period*3;
---		wait for M_AXIS_TVALID = '1';
-		M_AXIS_TREADY <= '1';
-        wait for clk_period;
-        M_AXIS_TREADY <= '0';
-        wait for clk_period*10;
-        M_AXIS_TREADY <= '1';
-        wait for clk_period;
-        M_AXIS_TREADY <= '0';
-        wait for clk_period*10;
+    rst_proc : process(clk)
+       constant rst_cnt : integer := 200;
+       variable cnt : integer range 0 to rst_cnt := rst_cnt;
+    begin
+       if(rising_edge(clk)) then
+           if (cnt = rst_cnt) then
+               reset <= '1';
+               cnt := 0;
+           else
+               reset <= '0';
+               cnt := cnt + 1;
+           end if;
+       end if;
+   end process rst_proc;
 
-	end process;
+    write_test : process(clk, reset)
+        constant maxcnt : integer := 10;
+        variable data_val : integer := 1;
+        variable cnt : integer range 0 to maxcnt := 0;
+        variable write_asserted : std_logic := '0';
+    begin
+    if(reset = '1') then
+        cnt := 0;
+        data_val := 1;
+        write_asserted := '0';
+        fifo_write_en <= '0';
+    elsif(rising_edge(clk)) then
+        if(fifo_full = '0' and write_asserted = '0') then
+            fifo_din <= std_logic_vector(to_unsigned(data_val,BRAM_DATA_WIDTH));
+            fifo_write_en <= '1';
+            write_asserted := '1';
+        elsif(write_asserted = '1') then
+            fifo_write_en <= '0';
+            if(cnt = maxcnt) then
+                write_asserted := '0';
+                data_val := data_val + 1;
+                cnt := 0;
+            else
+                cnt := cnt + 1;
+            end if;
+        end if;
+    end if;
+    end process write_test;
+
+    axis_test : process(clk, reset)
+        constant ready_wait : integer := 30;
+        variable cnt : integer range 0 to ready_wait;
+        variable ready_asserted : std_logic := '0';
+    begin
+    if(reset = '1') then
+        cnt := 0;
+        M_AXIS_TREADY <= '0';
+        ready_asserted := '1';
+    elsif(rising_edge(clk)) then
+        if(fifo_empty = '0' and M_AXIS_TVALID = '1' and ready_asserted = '0') then
+            M_AXIS_TREADY <= '1';
+            ready_asserted := '1';
+        elsif(ready_asserted = '1') then
+            M_AXIS_TREADY <= '0';
+            if(cnt = ready_wait) then
+                cnt := 0;
+                ready_asserted := '0';
+            else
+                cnt := cnt + 1;
+            end if;
+        end if;
+    end if;
+    end process axis_test;
+
 
 
 end tb;

@@ -59,96 +59,88 @@ end BRAM_FIFO_CONTROLLER;
 
 architecture Behavioral of BRAM_FIFO_CONTROLLER is
 
-    signal rd_addr : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    signal wr_addr : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    signal addr_rden, addr_wren : std_logic := '0';
+    constant C_EMPTY : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
+    constant C_FULL  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '1'); 
+    signal rd_addr_next : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal wr_addr_next : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal s_occupancy  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal addr_full, addr_empty : std_logic := '0';
     
 begin 
+  
+  -- instantiate clock at top level with BUFR; leave this port open in instantiation
+  clka <= clk;
+  clkb <= clk;   
     
-    addr_gen : FIFO_ADDR_GEN
-    generic map ( BRAM_ADDR_WIDTH => BRAM_ADDR_WIDTH )
-    port map(
-        clk       => clk,
-        en        => clkEn,
-        rst       => reset,
-        rden      => addr_rden,
-        wren      => addr_wren,
-        rd_addr   => rd_addr,
-        wr_addr   => wr_addr,
-        empty     => addr_empty,
-        full      => addr_full,
-        occupancy => occupancy
-    );
-    -- instantiate clock at top level with BUFR; leave this port open in instantiation
-    clka <= clk;
-    clkb <= clk;   
-    
-    loader : process(clk)
-    begin
-    if(rising_edge(clk)) then
-        if(clkEn = '1') then
-            full  <= addr_full;
-            empty <= addr_empty;
-            ena   <= '1';
-            enb   <= '1';
-        else
-            ena <= '0';
-            enb <= '0';
-        end if;
-    end if;
-    end process loader;
+  loader : process(clk)
+  begin
+  if(reset = '1') then
+    addr_empty <= '1';
+    addr_full <= '0';
+  elsif(rising_edge(clk)) then
+      if(clkEn = '1') then
+          addra <= std_logic_vector(wr_addr_next);
+          addrb <= std_logic_vector(rd_addr_next);
+          occupancy <= std_logic_vector(s_occupancy);
+          if(s_occupancy = C_EMPTY) then
+            addr_empty <= '1';
+            empty <= '1';
+            addr_full  <= '0';
+            full  <= '0';
+          elsif(s_occupancy = C_FULL) then
+            addr_full  <= '1';
+            full  <= '1';
+            addr_empty <= '0';
+            empty <= '0';
+          else
+            addr_full  <= '0';
+            full  <= '0';
+            addr_empty <= '0';
+            empty <= '0';
+          end if;
+      end if;
+  end if;
+  end process loader;
      
---  ena <= '1' when (clkEn = '1') else '0';
---  enb <= '1' when (clkEn = '1') else '0';
-    
-    bram_read : process(clk)
-    begin
-    if(rising_edge(clk)) then
-        if(reset = '1') then
-            dvalid <= '0';
-            rstb       <= '1';
-        elsif(clkEn = '1') then
-            rstb <= '0';
-            if(read_en = '1' and addr_empty = '0') then
-                dout <= doutb;
-                dvalid <= '1';
-                addr_rden  <= '1';
-            else
-                addr_rden <= '0';
-                dvalid <= '0';
-            end if;
-        end if;
+  ena <= '1' when (clkEn = '1') else '0';
+  enb <= '1' when (clkEn = '1') else '0';
+  rstb <= '1' when (reset = '1') else '0';
+  rsta <= '1' when (reset = '1') else '0';
+
+  main : process(clk)
+  begin
+  if(reset = '1') then
+    s_occupancy <= (others => '0');
+    dvalid <= '0';
+    wea <= '0';
+    rd_addr_next <= (others => '0');
+    wr_addr_next <= (others => '0');
+  elsif(rising_edge(clk)) then
+    if(clkEn = '1') then
+      if(read_en = '1' and write_en = '0' and addr_empty = '0') then
+        dout <= doutb;
+        dvalid <= '1';
+        s_occupancy <= s_occupancy - 1;
+        rd_addr_next <= rd_addr_next + 1;
+        wea <= '0';
+      elsif(write_en = '1' and read_en = '0' and addr_full = '0') then
+        dina <= din;
+        wea  <= '1';
+        s_occupancy <= s_occupancy + 1;
+        wr_addr_next <= wr_addr_next + 1;
+      elsif(write_en = '1' and read_en = '1') then
+        dina <= din;
+        dout <= doutb;
+        wea  <= '1';
+        dvalid <= '1';
+        wr_addr_next <= wr_addr_next + 1;
+        rd_addr_next <= rd_addr_next + 1;
+      else
+        wea  <= '0';
+        dvalid <= '0';
+      end if;
     end if;
-    end process bram_read;
-    
-    bram_write : process(clk)
-    begin
-    if(rising_edge(clk)) then
-        if(reset = '1') then
-            wea       <= '0';
-            rsta      <= '1';
-            addr_wren <= '0';
-        elsif(clkEn = '1') then
-            rsta <= '0';
-            if(write_en = '1' and addr_full = '0') then
-                dina <= din;
-                wea  <= '1';
-                addr_wren <= '1';
-            else
-                wea <= '0';
-                addr_wren <= '0';
-            end if;
-        end if;
-    end if;
-    end process bram_write;
-    
-    addr_load : process(clk)
-    begin
-    if(rising_edge(clk)) then
-        addra <= wr_addr;
-        addrb <= rd_addr;
-    end if;
-    end process addr_load;
-                
+  end if;
+  end process main;
+
 end Behavioral;
