@@ -1,152 +1,89 @@
-----------------------------------------------------------------------------------
--- Engineer: Jason Gutel
--- 
--- Create Date: 05/17/2017 09:20:37 AM
--- Design Name: 
--- Module Name: BRAM_FIFO_CONTROLLER - Behavioral
--- Target Devices: CSP -- Zynq7020
--- Tool Versions: Vivado 2015.4
--- Description:   Controller interface for BRAM block_memory_generator core
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-library work;
-use work.generic_pkg.all;
+entity AXI_MASTER_STREAM is
+  generic (
+    -- Width of S_AXIS address bus.
+    C_M_AXIS_TDATA_WIDTH  : integer := 32
+  );
+  port (
+    -- the data to be streamed
+    user_din    : in std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
+    -- '1' when user_din is valid
+    user_dvalid : in std_logic; 
+    -- '1' when the transaction has completed
+    user_txdone : out std_logic;
+    -- '1' when core is ready to start a new transaction
+    axis_rdy : out std_logic;
+    -- Global ports
+    M_AXIS_ACLK : in std_logic;
+    -- Active Low Synchronous Reset
+    M_AXIS_ARESETN  : in std_logic;
+    -- Master Stream Ports. TVALID indicates that the master is driving a valid transfer, A transfer takes place when both TVALID and TREADY are asserted. 
+    M_AXIS_TVALID : out std_logic;
+    -- TDATA is the primary payload that is used to provide the data that is passing across the interface from the master.
+    M_AXIS_TDATA  : out std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
+    -- TSTRB is the byte qualifier that indicates whether the content of the associated byte of TDATA is processed as a data byte or a position byte.
+    M_AXIS_TSTRB  : out std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0);
+    -- TLAST indicates the boundary of a packet.
+    M_AXIS_TLAST  : out std_logic;
+    -- TREADY indicates that the slave can accept a transfer in the current cycle.
+    M_AXIS_TREADY : in std_logic
+  );
+end AXI_MASTER_STREAM;
 
-entity BRAM_FIFO_CONTROLLER is
-    generic (
-           BRAM_ADDR_WIDTH  : integer := 10;
-           BRAM_DATA_WIDTH  : integer := 32 );
-    Port ( 
-           -- BRAM write port lines
-           addra : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
-           dina  : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
-           ena   : out STD_LOGIC;
-           wea   : out STD_LOGIC;
-           clka  : out std_logic;
-           rsta  : out std_logic;
-       
-           -- BRAM read port lines
-           addrb : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
-           doutb : in STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
-           enb   : out STD_LOGIC;
-           clkb  : out std_logic;
-           rstb  : out std_logic;
-           
-           -- Core logic
-           clk        : in std_logic;
-           clkEn      : in std_logic;
-           write_en   : in std_logic;
-           read_en    : in std_logic;
-           reset      : in std_logic;
-           din        : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-           dout       : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-           dvalid : out std_logic;
-           full  : out std_logic;
-           empty : out std_logic;
-           occupancy  : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0)
-           );
-end BRAM_FIFO_CONTROLLER;
+architecture implementation of AXI_MASTER_STREAM is
 
-architecture Behavioral of BRAM_FIFO_CONTROLLER is
-
-    constant C_EMPTY : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    constant C_FULL  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '1'); 
-    signal rd_addr_next : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    signal wr_addr_next : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    signal s_occupancy  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    signal addr_full  : std_logic := '1';
-    signal addr_empty : std_logic := '0';
-    
-begin 
+  type state is (ST_IDLE, ST_WRITE); --, ST_CLEAN);
+  signal fsm : state := ST_IDLE;
   
-  -- instantiate clock at top level with BUFR; leave this port open in instantiation
-  clka <= clk;
-  clkb <= clk;   
+begin
+
+  ----------------------------------------------
+  -- un-used interface ports set to constants --
+  ----------------------------------------------
+  M_AXIS_TLAST  <= '0';
+  M_AXIS_TSTRB  <= (others => '1');
     
-  loader : process(clk)
-  begin
-  if(reset = '1') then
-    addr_empty <= '1';
-    addr_full <= '0';
-  elsif(rising_edge(clk)) then
-      if(clkEn = '1') then
-          addra <= std_logic_vector(wr_addr_next);
-          addrb <= std_logic_vector(rd_addr_next);
-          occupancy <= std_logic_vector(s_occupancy);
-          if(s_occupancy = C_EMPTY) then
-            addr_empty <= '1';
-            empty      <= '1';
-            addr_full  <= '0';
-            full       <= '0';
-          elsif(s_occupancy = C_FULL) then
-            addr_full  <= '1';
-            full       <= '1';
-            addr_empty <= '0';
-            empty      <= '0';
-          else
-            addr_full  <= '0';
-            full       <= '0';
-            addr_empty <= '0';
-            empty      <= '0';
-          end if;
-      end if;
-  end if;
-  end process loader;
-     
-  ena  <= '1' when (clkEn = '1') else '0';
-  enb  <= '1' when (clkEn = '1') else '0';
-  rstb <= '1' when (reset = '1') else '0';
-  rsta <= '1' when (reset = '1') else '0';
-
-  main : process(clk)
-  begin
-  if(reset = '1') then
-    s_occupancy  <= (others => '0');
-    dvalid       <= '0';
-    wea          <= '0';
-    rd_addr_next <= (others => '0');
-    wr_addr_next <= (others => '0');
-  elsif(rising_edge(clk)) then
-    if(clkEn = '1') then
-
-      if(read_en = '1' and write_en = '0' and addr_empty = '0') then
-        dout   <= doutb;
-        dvalid <= '1';
-        wea    <= '0';
-        s_occupancy  <= s_occupancy - 1;
-        rd_addr_next <= rd_addr_next + 1;
-      
-      elsif(write_en = '1' and read_en = '0' and addr_full = '0') then
-        dina <= din;
-        wea  <= '1';
-        s_occupancy  <= s_occupancy + 1;
-        wr_addr_next <= wr_addr_next + 1;
-      
-      elsif(write_en = '1' and read_en = '1') then
-        dina   <= din;
-        dout   <= doutb;
-        wea    <= '1';
-        dvalid <= '1';
-        wr_addr_next <= wr_addr_next + 1;
-        rd_addr_next <= rd_addr_next + 1;
-      
-      else
-        wea  <= '0';
-        dvalid <= '0';
-      end if;
-
+    ----------------------------------
+  -- axi4-stream master interface --
+    ----------------------------------
+    stream_master : process(M_AXIS_ACLK)
+    begin
+    if(rising_edge(M_AXIS_ACLK)) then
+      if(M_AXIS_ARESETN = '0') then
+        fsm <= ST_IDLE;
+        user_txdone <= '0';
+        M_AXIS_TVALID <= '0';
+      M_AXIS_TDATA  <= (others => '0');
+    else
+      case(fsm) is
+      when ST_IDLE =>
+        user_txdone <= '0';
+        axis_rdy <= '1';
+        if(user_dvalid = '1') then
+          fsm <= ST_WRITE;
+          M_AXIS_TVALID <= '1';
+          M_AXIS_TDATA  <= user_din;
+        end if;
+      when ST_WRITE =>
+        axis_rdy <= '0';
+        if(M_AXIS_TREADY = '1') then
+          user_txdone   <= '1';
+          M_AXIS_TVALID <= '0';
+          M_AXIS_TDATA  <= (others => '0');
+          fsm <= ST_IDLE;
+--                    fsm <= ST_CLEAN;
+        end if;
+--            when ST_CLEAN =>
+--                M_AXIS_TVALID <= '0';
+--                fsm <= ST_IDLE;
+      when others =>
+        fsm <= ST_IDLE;
+      end case;
     end if;
-  end if;
-  end process main;
+    end if;
+    end process stream_master;
 
-end Behavioral;
+end implementation;
