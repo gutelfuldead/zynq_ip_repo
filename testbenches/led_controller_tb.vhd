@@ -60,7 +60,7 @@ begin
     	wait for clk_period*10;
     	led_ctrl(1) <= '0';
     	led_ctrl(3) <= '0';
-    	wait for clk_period*10000000;
+    	wait for clk_period*100;
     end process tb;
 
 end tb;

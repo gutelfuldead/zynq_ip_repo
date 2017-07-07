@@ -4,15 +4,30 @@ use ieee.numeric_std.all;
 
 entity led_controller_v1_0 is
 	generic (
-		NUM_LEDS : integer := 7;
-		CYCLES_ON : integer := 250000;	
+		-- Users to add parameters here
+
+		-- User parameters ends
+		-- Do not modify the parameters beyond this line
+
+
+		-- Parameters of Axi Slave Bus Interface S00_AXI
 		C_S00_AXI_DATA_WIDTH	: integer	:= 32;
 		C_S00_AXI_ADDR_WIDTH	: integer	:= 4
 	);
 	port (
 		-- Users to add ports here
 		clk : in std_logic;
-        ld  : out std_logic_vector(NUM_LEDS-1 downto 0);
+        ld0 : out std_logic;
+        ld1 : out std_logic;
+        ld2 : out std_logic;
+        ld3 : out std_logic;
+        ld4 : out std_logic;
+        ld5 : out std_logic;
+        ld6 : out std_logic;
+        ld7 : out std_logic;
+		-- User ports ends
+		-- Do not modify the ports beyond this line
+
 
 		-- Ports of Axi Slave Bus Interface S00_AXI
 		s00_axi_aclk	: in std_logic;
@@ -41,35 +56,16 @@ end led_controller_v1_0;
 
 architecture arch_imp of led_controller_v1_0 is
 
-	signal sig_leds : std_logic_vector(NUM_LEDS-1 downto 0) := (others => '0');
-	signal sig_en   : std_logic := '0';
-	signal sig_rst  : std_logic := '0';
-
-	component led_controller is
-		generic(
-			NUM_LEDS : integer := 7;
-			CYCLES_ON : integer := 250000
-			);
-		port(
-			clk : in std_logic;
-			en  : in std_logic;
-			rst : in std_logic;
-			led_ctrl : in  std_logic_vector(NUM_LEDS-1 downto 0);
-	        led_out  : out std_logic_vector(NUM_LEDS-1 downto 0)
-	        );
-	end component led_controller;
-
 	-- component declaration
 	component led_controller_v1_0_S00_AXI is
 		generic (
-		NUM_LEDS : integer := 7;
 		C_S_AXI_DATA_WIDTH	: integer	:= 32;
 		C_S_AXI_ADDR_WIDTH	: integer	:= 4
 		);
 		port (
 		LED_EN      : out std_logic;
 		LED_RST     : out std_logic;
-		LEDS        : out std_logic_vector(NUM_LEDS-1 downto 0);
+		LEDS        : out std_logic_vector(7 downto 0);
 		S_AXI_ACLK	: in std_logic;
 		S_AXI_ARESETN	: in std_logic;
 		S_AXI_AWADDR	: in std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
@@ -94,6 +90,10 @@ architecture arch_imp of led_controller_v1_0 is
 		);
 	end component led_controller_v1_0_S00_AXI;
 
+    signal s_en : std_logic := '0';
+    signal s_rst : std_logic := '0';
+    signal s_leds : std_logic_vector(7 downto 0);
+
 begin
 
 -- Instantiation of Axi Bus Interface S00_AXI
@@ -103,9 +103,9 @@ led_controller_v1_0_S00_AXI_inst : led_controller_v1_0_S00_AXI
 		C_S_AXI_ADDR_WIDTH	=> C_S00_AXI_ADDR_WIDTH
 	)
 	port map (
-	    LED_EN => sig_en,
-	    LED_RST => sig_rst,
-	    LEDS => sig_leds,
+	    LED_EN => s_en,
+	    LED_RST => s_rst,
+	    LEDS => s_leds,
 		S_AXI_ACLK	=> s00_axi_aclk,
 		S_AXI_ARESETN	=> s00_axi_aresetn,
 		S_AXI_AWADDR	=> s00_axi_awaddr,
@@ -129,17 +129,31 @@ led_controller_v1_0_S00_AXI_inst : led_controller_v1_0_S00_AXI
 		S_AXI_RREADY	=> s00_axi_rready
 	);
 
-	led_controller_inst : led_controller
-	generic map(
-		NUM_LEDS => NUM_LEDS,
-		CYCLES_ON => CYCLES_ON)
-	port map(
-		clk => s00_axi_aclk,
-		en  => sig_en,
-		rst => sig_rst,
-		led_ctrl => sig_leds,
-		led_out => ld
-		);
+	-- Add user logic here
+    main : process(clk) 
+    begin
+        if(rising_edge(clk)) then
+            if(s_rst = '1') then
+                ld0 <= '0';
+                ld1 <= '0';
+                ld2 <= '0';
+                ld3 <= '0';
+                ld4 <= '0';     
+                ld5 <= '0';
+                ld6 <= '0';
+                ld7 <= '0';
+             elsif(s_en = '1' and s_rst = '0') then
+                ld0 <= s_leds(0);
+                ld1 <= s_leds(1);
+                ld2 <= s_leds(2);
+                ld3 <= s_leds(3);
+                ld4 <= s_leds(4);     
+                ld5 <= s_leds(5);
+                ld6 <= s_leds(6);
+                ld7 <= s_leds(7);
+            end if;
+        end if;
+    end process main;
                                                     
 	-- User logic ends
 

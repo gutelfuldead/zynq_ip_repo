@@ -4,7 +4,10 @@ use ieee.numeric_std.all;
 
 entity led_controller_v1_0_S00_AXI is
 	generic (
-		NUM_LEDS : integer := 7;
+		-- Users to add parameters here
+
+		-- User parameters ends
+		-- Do not modify the parameters beyond this line
 
 		-- Width of S_AXI data bus
 		C_S_AXI_DATA_WIDTH	: integer	:= 32;
@@ -15,7 +18,7 @@ entity led_controller_v1_0_S00_AXI is
 		-- Users to add ports here
 		LED_EN      : out std_logic;
         LED_RST     : out std_logic;
-        LEDS        : out std_logic_vector(NUM_LEDS-1 downto 0);
+        LEDS        : out std_logic_vector(7 downto 0);
 		-- User ports ends
 		-- Do not modify the ports beyond this line
 
@@ -380,7 +383,7 @@ begin
 	-- Add user logic here
     LED_EN  <= slv_reg0(0);
     LED_RST <= slv_reg0(1);
-    LEDS    <= slv_reg1(NUM_LEDS-1 downto 0);
+    LEDS    <= slv_reg1(7 downto 0);
 	-- User logic ends
 
 end arch_imp;

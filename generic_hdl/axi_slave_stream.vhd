@@ -15,6 +15,7 @@ entity AXI_SLAVE_STREAM is
         user_dvalid : out std_logic;
         -- the received transactional data
         user_data   : out std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
+    	axis_rdy    : out std_logic;
     	-- global ports
 		-- AXI4Stream sink: Clock
 		S_AXIS_ACLK	: in std_logic;
@@ -35,42 +36,44 @@ end AXI_SLAVE_STREAM;
 
 architecture arch_imp of AXI_SLAVE_STREAM is
 
-	type state is ( IDLE, READ_STATE );
-    signal fsm : state := IDLE;
+	type state is ( ST_IDLE, ST_READ);
+    signal fsm : state := ST_IDLE;
 	signal s_tready	: std_logic;
-	signal s_user_data : std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
 
 begin
-	-- I/O Connections assignments
-	s_tready <= '1' when ((fsm = READ_STATE) and (user_rdy = '1')) else '0';
-	S_AXIS_TREADY	<= s_tready;
-	
-	-- Control state machine implementation
-	process(S_AXIS_ACLK)
+
+	stream_slave : process(S_AXIS_ACLK)
+	   constant MAX_CNT : integer := 4;
+	   variable cnt : integer range 0 to MAX_CNT := 0;
 	begin
-	  if (rising_edge (S_AXIS_ACLK)) then
-	  	if(S_AXIS_ARESETN = '0') then
-	  		fsm    <= IDLE;
-	  		user_dvalid <= '0';
-  		else
-	      	case (fsm) is
-		        when IDLE     => 
-		          user_dvalid <= '0';
-		          if (S_AXIS_TVALID = '1')then
-		            fsm <= READ_STATE;
-		          else
-		            fsm <= IDLE;
-		          end if;
-		        when READ_STATE => 
-		          if(s_tready = '1') then
-	                  user_data <= S_AXIS_TDATA;
-	                  user_dvalid <= '1';
-	                  fsm <= IDLE;
-	              end if;
-		        when others    => 
-		          fsm <= IDLE;
-	      	end case;
-	  end if;
-	end process;
+	if (rising_edge (S_AXIS_ACLK)) then
+		if(S_AXIS_ARESETN = '0') then
+			fsm         <= ST_IDLE;
+			user_dvalid <= '0';
+			S_AXIS_TREADY    <= '0';
+			cnt := 0;
+		else
+		  	case (fsm) is
+		        when ST_IDLE     => 
+					axis_rdy <= '1';
+					S_AXIS_TREADY <= '0';
+					user_dvalid   <= '0';
+					if (user_rdy = '1') then
+						fsm <= ST_READ;
+					end if;
+		        when ST_READ => 
+		        	axis_rdy <= '0';
+		        	if(S_AXIS_TVALID = '1') then
+						S_AXIS_TREADY <= '1';
+	                    user_data     <= S_AXIS_TDATA;	
+						user_dvalid   <= '1';
+						fsm <= ST_IDLE;
+					end if;                    
+		        when others => 
+	          		fsm <= ST_IDLE;
+		  	end case;
+		end if;
+	end if;
+	end process stream_slave;
 
 end arch_imp;
