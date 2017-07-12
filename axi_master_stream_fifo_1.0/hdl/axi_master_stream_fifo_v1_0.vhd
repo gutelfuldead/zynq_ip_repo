@@ -86,6 +86,7 @@ architecture arch_imp of axi_master_stream_fifo_v1_0 is
         fifo_full  : in std_logic;
         fifo_empty : in std_logic;
         fifo_occupancy  : in std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+        fifo_ready     : in std_logic;
 
 		S_AXI_ACLK	: in std_logic;
 		S_AXI_ARESETN	: in std_logic;
@@ -116,6 +117,7 @@ architecture arch_imp of axi_master_stream_fifo_v1_0 is
     signal sig_fifo_reset      : std_logic := '0';
     signal sig_fifo_din        : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
     signal sig_fifo_full  : std_logic := '0';
+    signal sig_fifo_ready   : std_logic := '0';
     signal sig_fifo_empty : std_logic := '0';
     signal sig_fifo_occupancy  : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal bram_clk : std_logic := '0';
@@ -140,6 +142,7 @@ axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
         fifo_full       => sig_fifo_full,
         fifo_empty      => sig_fifo_empty,
         fifo_occupancy  => sig_fifo_occupancy,
+        fifo_ready      => sig_fifo_ready,
         -- axi4-lite template signals
 		S_AXI_ACLK	    => s00_axi_aclk,
 		S_AXI_ARESETN	=> s00_axi_aresetn,
@@ -203,6 +206,7 @@ axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
         fifo_write_en   => sig_fifo_write_en,
         fifo_full       => sig_fifo_full,
         fifo_empty      => sig_fifo_empty,
+        fifo_ready      => sig_fifo_ready,
         fifo_occupancy  => sig_fifo_occupancy
         );
 

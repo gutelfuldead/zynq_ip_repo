@@ -44,7 +44,8 @@ entity FIFO_MASTER_STREAM_CONTROLLER is
         fifo_write_en  : in std_logic;
         fifo_full      : out std_logic;
         fifo_empty     : out std_logic;
-        fifo_occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0)
+        fifo_occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+        fifo_ready       : out std_logic
 		);
 end FIFO_MASTER_STREAM_CONTROLLER;
 
@@ -57,6 +58,8 @@ architecture Behavorial of FIFO_MASTER_STREAM_CONTROLLER is
     signal sig_fifo_dout       : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
     signal sig_fifo_dvalid     : std_logic := '0'; 
     signal sig_fifo_read_en    : std_logic := '0';
+    signal sig_fifo_read_ready : std_logic := '0';
+    signal sig_fifo_write_ready : std_logic := '0';
     
     -- axi-stream signals
     signal sig_axis_din    : std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
@@ -94,6 +97,8 @@ begin
 	        reset      => reset,
 	        din        => fifo_din,
 	        read_en    => sig_fifo_read_en,
+            read_ready => sig_fifo_read_ready,
+            write_ready => sig_fifo_write_ready,
 	        dout       => sig_fifo_dout,
 	        dvalid     => sig_fifo_dvalid,
 	        full       => sig_fifo_full,
@@ -127,6 +132,7 @@ begin
     	fifo_empty     <= sig_fifo_empty;
     	fifo_full      <= sig_fifo_full;
     	fifo_occupancy <= sig_fifo_occupancy;
+        fifo_ready       <= sig_fifo_write_ready;
     end if;
     end process loader;
 
@@ -146,7 +152,7 @@ begin
         elsif(clkEn = '1') then
             case(fsm) is
                 when ST_IDLE =>
-                    if(sig_fifo_empty = '0' and sig_axis_rdy = '1') then
+                    if(sig_fifo_empty = '0' and sig_axis_rdy = '1' and sig_fifo_read_ready = '1') then
                         sig_fifo_read_en <= '1';
                         fsm <= ST_ACTIVE;
                     end if;

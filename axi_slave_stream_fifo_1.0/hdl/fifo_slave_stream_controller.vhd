@@ -68,12 +68,17 @@ architecture Behavorial of FIFO_SLAVE_STREAM_CONTROLLER is
     signal sig_controller_rdy : std_logic := '0';
 
     -- fifo signals
+    constant DEADBEEF : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := x"DEADBEEF";
     signal sig_fifo_empty     : std_logic := '0';
     signal sig_fifo_full      : std_logic := '0';
     signal sig_fifo_occupancy : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal sig_fifo_write_en  : std_logic := '0';
     signal sig_fifo_din       : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
     signal sig_fifo_dvalid    : std_logic := '0';
+    signal sig_fifo_dout      : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := DEADBEEF;
+    signal sig_fifo_read_ready : std_logic := '0';
+    signal sig_fifo_write_ready : std_logic := '0';
+    signal sig_fifo_read : std_logic := '0';
 
     -- state machine signals
     type state is (ST_IDLE, ST_ACTIVE, ST_WAIT);
@@ -104,8 +109,10 @@ begin
 	        write_en   => sig_fifo_write_en,
 	        reset      => reset,
 	        din        => sig_fifo_din,
-	        read_en    => fifo_read_en,
-	        dout       => fifo_dout,
+	        read_en    => sig_fifo_read,
+            read_ready => sig_fifo_read_ready,
+            write_ready => sig_fifo_write_ready,
+	        dout       => sig_fifo_dout,
 	        dvalid     => sig_fifo_dvalid,
 	        full       => sig_fifo_full,
 	        empty      => sig_fifo_empty,
@@ -134,32 +141,51 @@ begin
     ------------------------------------------------
     -- load output lines synchronously with clock --
     ------------------------------------------------
-    loader : process(clk)
-    begin
-    if(rising_edge(clk)) then
+    --loader : process(clk)
+    --begin
+    --if(rising_edge(clk)) then
     	fifo_empty     <= sig_fifo_empty;
     	fifo_full      <= sig_fifo_full;
     	fifo_occupancy <= sig_fifo_occupancy;
     	axil_dvalid    <= sig_axil_dvalid;
-    end if;
-    end process loader;
+    --end if;
+    --end process loader;
     
     --------------------------
     -- FIFO Read Controller --
     --------------------------
     read_ctrl : process(clk, reset)
+        variable read_latch : std_logic := '0';
     begin
     if(reset = '1') then
         sig_axil_dvalid <= '0';
+        read_latch := '0';
+        fifo_dout <= DEADBEEF;
     elsif(rising_edge(clk)) then
         if(sig_fifo_dvalid = '1') then
             sig_axil_dvalid <= '1';
+            fifo_dout <= sig_fifo_dout;
         end if;
+
         if(sig_axil_dvalid = '1' and axil_read_done = '1') then
             sig_axil_dvalid <= '0';
+            fifo_dout <= DEADBEEF;
+        end if;
+
+        if(fifo_read_en = '1') then
+            read_latch := '1';
+        end if;
+
+        if(read_latch = '1' and sig_fifo_read_ready = '1') then
+            sig_fifo_read <= '1';
+            read_latch := '0';
+        else
+            sig_fifo_read <= '0';
         end if;
     end if;
     end process;
+
+
 
 
     -------------------------------------
@@ -176,7 +202,7 @@ begin
             case(fsm) is
             when ST_IDLE =>
                 sig_fifo_write_en <= '0';
-                if(sig_fifo_full = '0' and sig_axis_rdy = '1') then
+                if(sig_fifo_full = '0' and sig_axis_rdy = '1' and sig_fifo_write_ready = '1') then
                     sig_controller_rdy <= '1';
                     fsm                <= ST_ACTIVE;
                 end if;

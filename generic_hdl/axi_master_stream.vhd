@@ -56,7 +56,7 @@ begin
         fsm <= ST_IDLE;
         user_txdone <= '0';
         M_AXIS_TVALID <= '0';
-      M_AXIS_TDATA  <= (others => '0');
+        M_AXIS_TDATA  <= (others => '0');
     else
       case(fsm) is
       when ST_IDLE =>

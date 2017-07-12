@@ -66,6 +66,13 @@ architecture Behavioral of fifo_master_slave_joint_tb is
     signal slv_axil_dvalid    : std_logic;
     signal slv_axil_read_done : std_logic;
 
+    -- fifos
+    constant BRAM_MAX_SZ : integer := 1023;
+    constant READ_CNT  : integer := 0;
+    constant DEADBEEF : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := x"DEADBEEF";  
+    type bram_array_type is array (0 to BRAM_MAX_SZ) of std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+    signal mstr_bram : bram_array_type;
+    signal slav_bram : bram_array_type;
 begin
 
 	DUT_MSTR : FIFO_MASTER_STREAM_CONTROLLER
@@ -179,12 +186,14 @@ begin
     if(reset = '1') then
         cnt := 0;
         data_val := 1;
-        write_asserted := '0';
+        write_asserted := '1';
         mstr_fifo_write_en <= '0';
+        for i in 0 to BRAM_MAX_SZ loop
+          mstr_bram(i) <= DEADBEEF;
+        end loop;
     elsif(rising_edge(clk)) then
         if(mstr_fifo_full = '0' and write_asserted = '0') then
-            mstr_fifo_din <= std_logic_vector(to_unsigned(data_val,BRAM_DATA_WIDTH));
-
+            mstr_fifo_din <= mstr_bram(to_integer(unsigned(mstr_addra)));
             mstr_fifo_write_en <= '1';
             write_asserted := '1';
         elsif(write_asserted = '1') then
@@ -192,6 +201,7 @@ begin
             if(cnt = maxcnt) then
                 write_asserted := '0';
                 data_val := data_val + 1;
+                mstr_bram(to_integer(unsigned(mstr_addra))) <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
                 cnt := 0;
             else
                 cnt := cnt + 1;
@@ -210,13 +220,16 @@ begin
    if(reset = '1') then
        data_val := 1;
        read_en_asserted := '0';
-       read_done_asserted := '0';
+       read_done_asserted := '1';
        slv_fifo_read_en <= '0';
        cnt := 0;
+       for i in 0 to BRAM_MAX_SZ loop
+          slav_bram(i) <= DEADBEEF;
+       end loop;
    elsif(rising_edge(clk)) then
-       if(slv_fifo_empty = '0' and slv_axil_dvalid = '0' and read_en_asserted = '0') then
+       if(slv_axil_dvalid = '0' and read_en_asserted = '0') then
            slv_fifo_read_en <= '1';
-           slv_doutb <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
+           slv_doutb <= mstr_bram(to_integer(unsigned(slv_addrb)));
            read_en_asserted := '1';
        elsif(read_en_asserted = '1') then
            slv_fifo_read_en <= '0';
@@ -225,11 +238,13 @@ begin
        if(slv_axil_dvalid = '1' and read_done_asserted = '0') then
            slv_axil_read_done <= '1';
            read_done_asserted := '1';
+           slav_bram(to_integer(unsigned(slv_addrb))) <= slv_fifo_dout;
            cnt := 0;
        elsif(read_done_asserted = '1') then
            slv_axil_read_done <= '0';
            if(cnt = maxcnt) then
                data_val := data_val + 1;
+               slav_bram(to_integer(unsigned(slv_addrb))) <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
                read_done_asserted := '0';
                read_en_asserted := '0';
            else

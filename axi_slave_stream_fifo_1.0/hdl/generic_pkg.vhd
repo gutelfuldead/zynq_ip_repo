@@ -37,6 +37,8 @@ package generic_pkg is
 	           write_en   : in std_logic;
 	           read_en    : in std_logic;
 	           reset      : in std_logic;
+               write_ready  : out std_logic;
+               read_ready   : out std_logic;
 	           din        : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
 	           dout       : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
 	           dvalid     : out std_logic;
@@ -144,6 +146,7 @@ package generic_pkg is
 	        fifo_din       : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
 	        fifo_write_en  : in std_logic;
 	        fifo_full      : out std_logic;
+	        fifo_ready     : out std_logic;
 	        fifo_empty     : out std_logic;
 	        fifo_occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0)
 			);

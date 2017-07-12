@@ -77,6 +77,11 @@ u8 AMSF_poll_bram_empty(const u32 baseaddr)
 	return !!(AXI_MASTER_STREAM_FIFO_mReadReg(baseaddr, AMSF_STATUS_REG_OFFSET) & AMSF_BRAM_EMPTY);
 }
 
+u8 AMSF_poll_bram_ready(const u32 baseaddr)
+{
+	return !!(AXI_MASTER_STREAM_FIFO_mReadReg(baseaddr, AMSF_STATUS_REG_OFFSET) & AMSF_BRAM_READY);
+}
+
 /**
  * @brief      write to the FILO
  * @param[in]  baseaddr  The baseaddr
@@ -87,6 +92,12 @@ u32 AMSF_write_data(const u32 baseaddr, const u32 datin)
 {
 	if(AMSF_poll_bram_full(baseaddr))
 		return EAMSF_FIFO_FULL;
+	XTime start = AMSF_get_time();
+	while(AMSF_poll_bram_ready(baseaddr) == 0){
+		if(AMSF_elapsed_time_us(start) > AMSF_POLL_VALID_MAX){
+			return EAMSF_FIFO_NOT_RDY;
+		}
+	}
 	AXI_MASTER_STREAM_FIFO_mWriteReg(baseaddr, AMSF_DIN_REG_OFFSET, datin);
 	AMSF_en_write_en(baseaddr);
 	AMSF_den_write_en(baseaddr);
@@ -103,4 +114,24 @@ void AMSF_init_core(const u32 baseaddr)
     AMSF_en_reset(baseaddr);
     AMSF_den_reset(baseaddr);
     AMSF_en_clken(baseaddr);
+}
+
+/**
+ * @brief      Used to capture the processor time using the XTime Xilinx type
+ * @return     The time in us.
+ */
+XTime AMSF_get_time(void)
+{
+  XTime tmpTime;
+  XTime_GetTime(&tmpTime);
+  return tmpTime;
+}
+
+XTime AMSF_elapsed_time_us(const XTime startTime)
+{
+  XTime tempXTime;
+  tempXTime = AMSF_get_time();
+  tempXTime = tempXTime - startTime;
+  tempXTime = tempXTime / ((COUNTS_PER_SECOND) / 1000000UL); 
+  return (tempXTime);
 }

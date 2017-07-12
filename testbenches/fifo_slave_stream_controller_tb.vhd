@@ -45,7 +45,13 @@ architecture tb of fifo_slave_stream_controller_tb is
     signal fifo_occupancy : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
     signal axil_dvalid    : std_logic;
     signal axil_read_done : std_logic;
-	constant clk_period : time := 10 ns; -- 100 MHz clock
+  	constant clk_period : time := 10 ns; -- 100 MHz clock
+
+    constant BRAM_MAX_SZ : integer := 1023;
+    constant READ_CNT  : integer := 0;
+    constant DEADBEEF : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := x"DEADBEEF";  
+    type bram_array_type is array (0 to BRAM_MAX_SZ) of std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+    signal bram_array : bram_array_type;
 	
 begin
 
@@ -100,7 +106,7 @@ begin
 	end process clk_process;
 	
 	rst_proc : process(clk)
-	   constant rst_cnt : integer := 200;
+	   constant rst_cnt : integer := 2000;
 	   variable cnt : integer range 0 to rst_cnt := rst_cnt;
 	begin
 	   if(rising_edge(clk)) then
@@ -115,23 +121,20 @@ begin
    end process rst_proc;
       
    read_test : process(clk)
-       variable data_val : integer := 1;
-       constant maxcnt : integer := 10;
-       variable cnt : integer range 0 to maxcnt := 0;
+       variable cnt : integer range 0 to READ_CNT := 0;
        variable read_en_asserted : std_logic := '0';
        variable read_done_asserted : std_logic := '0';
    begin
    if(reset = '1') then
-       data_val := 1;
        read_en_asserted := '0';
        read_done_asserted := '0';
        fifo_read_en <= '0';
        cnt := 0;
+       axil_read_done <= '0';
    elsif(rising_edge(clk)) then
-   
+       doutb <= bram_array(to_integer(unsigned(addrb)));
        if(fifo_empty = '0' and axil_dvalid = '0' and read_en_asserted = '0') then
            fifo_read_en <= '1';
-           doutb <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
            read_en_asserted := '1';
        elsif(read_en_asserted = '1') then
            fifo_read_en <= '0';
@@ -143,8 +146,7 @@ begin
            cnt := 0;
        elsif(read_done_asserted = '1') then
            axil_read_done <= '0';
-           if(cnt = maxcnt) then
-               data_val := data_val + 1;
+           if(cnt = READ_CNT) then
                read_done_asserted := '0';
                read_en_asserted := '0';
            else
@@ -159,20 +161,26 @@ begin
    valid_assert : process(clk)
        variable data_val : integer := 1;
        variable asserted : std_logic := '0';
+       variable addr : integer := 0;
    begin
    if(reset = '1') then
        data_val := 1;
        asserted := '0';
+       for i in 0 to BRAM_MAX_SZ loop
+          bram_array(i) <= DEADBEEF;
+       end loop;
    elsif(rising_edge(clk)) then
        if(asserted = '0') then
            S_AXIS_TVALID <= '1';
            asserted := '1';
            S_AXIS_TDATA <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
+           bram_array(addr) <= std_logic_vector(to_unsigned(data_val,BRAM_DATA_WIDTH));
        elsif(S_AXIS_TREADY = '1') then
            S_AXIS_TVALID <= '0';
            S_AXIS_TDATA <= (others => '0');
            data_val := data_val + 1;
            asserted := '0';
+           addr := addr + 1;
        end if;
    end if;
    end process valid_assert;

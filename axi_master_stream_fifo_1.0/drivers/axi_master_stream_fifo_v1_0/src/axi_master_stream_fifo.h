@@ -6,6 +6,7 @@
 /****************** Include Files ********************/
 #include "xil_types.h"
 #include "xstatus.h"
+#include "xtime_l.h"
 
 #define AMSF_CONTROL_REG_OFFSET 0
 #define AMSF_DIN_REG_OFFSET 4
@@ -13,6 +14,11 @@
 #define AMSF_STATUS_REG_OFFSET 12
 
 #define EAMSF_FIFO_FULL -1
+#define EAMSF_FIFO_NOT_RDY -2
+
+#define AMSF_MAX_US_WAIT 5
+#define AMSF_POLL_VALID_MAX AMSF_MAX_US_WAIT / ((COUNTS_PER_SECOND) / 1000000UL)
+
 
 typedef enum _AMSF_CTRL_REG_MASK
 {
@@ -24,7 +30,8 @@ typedef enum _AMSF_CTRL_REG_MASK
 typedef enum _AMSF_STATUS_REG_MASK
 {
 	AMSF_BRAM_FULL  = (1 << 0),
-	AMSF_BRAM_EMPTY = (1 << 1)
+	AMSF_BRAM_EMPTY = (1 << 1),
+	AMSF_BRAM_READY = (1 << 2)
 };
 
 /**************************** Type Definitions *****************************/
@@ -100,6 +107,7 @@ extern void AMSF_den_reset(const u32 baseaddr);
 
 extern u8 AMSF_poll_bram_full(const u32 baseaddr);
 extern u8 AMSF_poll_bram_empty(const u32 baseaddr);
+extern u8 AMSF_poll_bram_ready(const u32 baseaddr);
 extern u32 AMSF_poll_occupancy(const u32 baseaddr);
 
 extern u32  AMSF_write_data(const u32 baseaddr, const u32 datin);

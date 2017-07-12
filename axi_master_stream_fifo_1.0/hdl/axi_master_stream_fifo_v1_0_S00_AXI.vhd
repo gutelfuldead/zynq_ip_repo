@@ -23,6 +23,7 @@ entity axi_master_stream_fifo_v1_0_S00_AXI is
         fifo_full      : in std_logic;
         fifo_empty     : in std_logic;
         fifo_occupancy : in std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+        fifo_ready     : in std_logic;
 
 		-- Global Clock Signal
 		S_AXI_ACLK	: in std_logic;
@@ -405,5 +406,6 @@ begin
     -- slvreg3 PL --> PS
     slv_reg3(0) <= fifo_full;
     slv_reg3(1) <= fifo_empty;
+    slv_reg3(2) <= fifo_ready;
 
 end arch_imp;
