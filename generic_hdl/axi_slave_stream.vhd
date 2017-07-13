@@ -43,15 +43,12 @@ architecture arch_imp of AXI_SLAVE_STREAM is
 begin
 
 	stream_slave : process(S_AXIS_ACLK)
-	   constant MAX_CNT : integer := 4;
-	   variable cnt : integer range 0 to MAX_CNT := 0;
 	begin
 	if (rising_edge (S_AXIS_ACLK)) then
 		if(S_AXIS_ARESETN = '0') then
 			fsm         <= ST_IDLE;
 			user_dvalid <= '0';
 			S_AXIS_TREADY    <= '0';
-			cnt := 0;
 		else
 		  	case (fsm) is
 		        when ST_IDLE     => 

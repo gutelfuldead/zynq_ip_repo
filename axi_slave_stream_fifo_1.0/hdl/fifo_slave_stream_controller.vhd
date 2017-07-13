@@ -114,9 +114,9 @@ begin
             write_ready => sig_fifo_write_ready,
 	        dout       => sig_fifo_dout,
 	        dvalid     => sig_fifo_dvalid,
-	        full       => sig_fifo_full,
-	        empty      => sig_fifo_empty,
-	        occupancy  => sig_fifo_occupancy 
+	        full       => fifo_full,
+	        empty      => fifo_empty,
+	        occupancy  => fifo_occupancy 
 	    );
 	    
 	-- Instantiation of Slave Stream Interface
@@ -138,55 +138,78 @@ begin
             S_AXIS_TVALID  => S_AXIS_TVALID
             );
 
-    ------------------------------------------------
-    -- load output lines synchronously with clock --
-    ------------------------------------------------
-    --loader : process(clk)
-    --begin
-    --if(rising_edge(clk)) then
-    	fifo_empty     <= sig_fifo_empty;
-    	fifo_full      <= sig_fifo_full;
-    	fifo_occupancy <= sig_fifo_occupancy;
-    	axil_dvalid    <= sig_axil_dvalid;
-    --end if;
-    --end process loader;
-    
+	axil_dvalid    <= sig_axil_dvalid;    
     --------------------------
     -- FIFO Read Controller --
     --------------------------
+    -- takes an input read request pulse (fifo_read_en) and creates a latch
+    -- once the FIFO is synchronized and ready the read request is passed
+    -- once the data from the fifo is claimed valid the data is passed to 
+    -- the above module
     read_ctrl : process(clk, reset)
-        variable read_latch : std_logic := '0';
+        --variable read_latch : std_logic := '0';
+        type fsm_states is (ST_IDLE, ST_SYNC, ST_ACTIVE, ST_WAIT);
+        variable fsm : fsm_states := ST_IDLE;
     begin
     if(reset = '1') then
         sig_axil_dvalid <= '0';
-        read_latch := '0';
+        --read_latch := '0';
         fifo_dout <= DEADBEEF;
+        fsm := ST_IDLE;
     elsif(rising_edge(clk)) then
-        if(sig_fifo_dvalid = '1') then
-            sig_axil_dvalid <= '1';
-            fifo_dout <= sig_fifo_dout;
-        end if;
+        case (fsm) is
+            when ST_IDLE =>
+                fifo_dout <= DEADBEEF;
+                if(fifo_read_en = '1') then
+                    fsm := ST_SYNC;
+                end if;
 
-        if(sig_axil_dvalid = '1' and axil_read_done = '1') then
-            sig_axil_dvalid <= '0';
-            fifo_dout <= DEADBEEF;
-        end if;
+            when ST_SYNC =>
+                if(sig_fifo_read_ready = '1') then
+                    sig_fifo_read <= '1';
+                    fsm := ST_ACTIVE;
+                end if;
 
-        if(fifo_read_en = '1') then
-            read_latch := '1';
-        end if;
+            when ST_ACTIVE =>
+                sig_fifo_read <= '0';
+                if(sig_fifo_dvalid = '1') then
+                    sig_axil_dvalid <= '1';
+                    fifo_dout <= sig_fifo_dout;
+                    fsm := ST_WAIT;
+                end if;
 
-        if(read_latch = '1' and sig_fifo_read_ready = '1') then
-            sig_fifo_read <= '1';
-            read_latch := '0';
-        else
-            sig_fifo_read <= '0';
-        end if;
+            when ST_WAIT =>
+                if(axil_read_done = '1') then
+                    fsm := ST_IDLE;
+                    sig_axil_dvalid <= '0';
+                end if;
+
+        end case;
+
+
+        --if(sig_fifo_dvalid = '1') then
+        --    sig_axil_dvalid <= '1';
+        --    fifo_dout <= sig_fifo_dout;
+        --end if;
+
+        --if(sig_axil_dvalid = '1' and axil_read_done = '1') then
+        --    sig_axil_dvalid <= '0';
+        --    fifo_dout <= DEADBEEF;
+        --end if;
+
+        --if(fifo_read_en = '1') then
+        --    read_latch := '1';
+        --end if;
+
+        --if(read_latch = '1' and sig_fifo_read_ready = '1') then
+        --    sig_fifo_read <= '1';
+        --    read_latch := '0';
+        --else
+        --    sig_fifo_read <= '0';
+        --end if;
+
     end if;
     end process;
-
-
-
 
     -------------------------------------
     -- Stream and FIFO write controller --
@@ -202,7 +225,7 @@ begin
             case(fsm) is
             when ST_IDLE =>
                 sig_fifo_write_en <= '0';
-                if(sig_fifo_full = '0' and sig_axis_rdy = '1' and sig_fifo_write_ready = '1') then
+                if(sig_axis_rdy = '1' and sig_fifo_write_ready = '1') then
                     sig_controller_rdy <= '1';
                     fsm                <= ST_ACTIVE;
                 end if;

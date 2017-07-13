@@ -98,12 +98,12 @@ begin
 	        din        => fifo_din,
 	        read_en    => sig_fifo_read_en,
             read_ready => sig_fifo_read_ready,
-            write_ready => sig_fifo_write_ready,
+            write_ready => fifo_ready,
 	        dout       => sig_fifo_dout,
 	        dvalid     => sig_fifo_dvalid,
-	        full       => sig_fifo_full,
-	        empty      => sig_fifo_empty,
-	        occupancy  => sig_fifo_occupancy
+	        full       => fifo_full,
+	        empty      => fifo_empty,
+	        occupancy  => fifo_occupancy
 	    );
 	    
 	-- Instantiation of Master Stream Interface
@@ -129,10 +129,10 @@ begin
     loader : process(clk)
     begin
     if(rising_edge(clk)) then
-    	fifo_empty     <= sig_fifo_empty;
-    	fifo_full      <= sig_fifo_full;
-    	fifo_occupancy <= sig_fifo_occupancy;
-        fifo_ready       <= sig_fifo_write_ready;
+    	--fifo_empty     <= sig_fifo_empty;
+    	--fifo_full      <= sig_fifo_full;
+    	--fifo_occupancy <= sig_fifo_occupancy;
+        --fifo_ready     <= sig_fifo_write_ready;
     end if;
     end process loader;
 
@@ -152,7 +152,7 @@ begin
         elsif(clkEn = '1') then
             case(fsm) is
                 when ST_IDLE =>
-                    if(sig_fifo_empty = '0' and sig_axis_rdy = '1' and sig_fifo_read_ready = '1') then
+                    if(sig_axis_rdy = '1' and sig_fifo_read_ready = '1') then
                         sig_fifo_read_en <= '1';
                         fsm <= ST_ACTIVE;
                     end if;

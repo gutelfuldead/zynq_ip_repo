@@ -27,8 +27,8 @@ typedef enum _status_reg_mask
 	ASSF_DVALID     = (1 << 2)
 };
 
-#define EASSF_FIFO_EMPTY -2
-#define EASSF_VALID_NOT_ASSERTED -3
+#define EASSF_FIFO_EMPTY -1
+#define EASSF_VALID_NOT_ASSERTED -2
 
 /* max wait time in microseconds to check for data */
 #define ASSF_MAX_US_WAIT 5

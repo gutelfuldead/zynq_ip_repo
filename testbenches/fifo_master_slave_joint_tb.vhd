@@ -24,7 +24,7 @@ architecture Behavioral of fifo_master_slave_joint_tb is
     signal reset          : std_logic;
 
     -- master interface
-	signal mstr_addra : STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
+	  signal mstr_addra : STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
     signal mstr_dina  : STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
     signal mstr_ena   : STD_LOGIC;
     signal mstr_wea   : STD_LOGIC;
@@ -44,6 +44,7 @@ architecture Behavioral of fifo_master_slave_joint_tb is
     signal mstr_fifo_write_en  : std_logic;
     signal mstr_fifo_full      : std_logic;
     signal mstr_fifo_empty     : std_logic;
+    signal mstr_fifo_ready     : std_logic;
     signal mstr_fifo_occupancy : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
 
     -- slave interface
@@ -109,6 +110,7 @@ begin
 	    fifo_write_en   => mstr_fifo_write_en,
 	    fifo_full       => mstr_fifo_full,
 	    fifo_empty      => mstr_fifo_empty,
+      fifo_ready      => mstr_fifo_ready,  
 	    fifo_occupancy  => mstr_fifo_occupancy
 	    );
 
@@ -186,14 +188,15 @@ begin
     if(reset = '1') then
         cnt := 0;
         data_val := 1;
-        write_asserted := '1';
+        write_asserted := '0';
         mstr_fifo_write_en <= '0';
         for i in 0 to BRAM_MAX_SZ loop
           mstr_bram(i) <= DEADBEEF;
         end loop;
     elsif(rising_edge(clk)) then
-        if(mstr_fifo_full = '0' and write_asserted = '0') then
-            mstr_fifo_din <= mstr_bram(to_integer(unsigned(mstr_addra)));
+        if(mstr_fifo_ready = '1' and write_asserted = '0') then
+            mstr_fifo_din <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
+            mstr_bram(to_integer(unsigned(mstr_addra))) <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
             mstr_fifo_write_en <= '1';
             write_asserted := '1';
         elsif(write_asserted = '1') then
@@ -201,7 +204,6 @@ begin
             if(cnt = maxcnt) then
                 write_asserted := '0';
                 data_val := data_val + 1;
-                mstr_bram(to_integer(unsigned(mstr_addra))) <= std_logic_vector(to_unsigned(data_val, BRAM_DATA_WIDTH));
                 cnt := 0;
             else
                 cnt := cnt + 1;
@@ -220,7 +222,7 @@ begin
    if(reset = '1') then
        data_val := 1;
        read_en_asserted := '0';
-       read_done_asserted := '1';
+       read_done_asserted := '0';
        slv_fifo_read_en <= '0';
        cnt := 0;
        for i in 0 to BRAM_MAX_SZ loop

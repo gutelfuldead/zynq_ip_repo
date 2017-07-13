@@ -52,8 +52,11 @@ architecture tb of fifo_master_stream_controller_tb is
     signal bram_array : bram_array_type;
 
     constant RESET_WAIT : integer := 3000;
-    constant WRITE_WAIT : integer := 1;
-    constant AXIS_WAIT  : integer := 1;
+    constant WRITE_WAIT : integer := 0;
+    constant AXIS_WAIT  : integer := 0;
+
+    signal data_val : integer := 1;
+
 begin    
 
 	DUT : FIFO_MASTER_STREAM_CONTROLLER
@@ -96,13 +99,13 @@ begin
 
     clkEn <= '1';
         
-	clk_process : process
-	begin
-		clk <= '1';
-		wait for clk_period/2;
-		clk <= '0';
-		wait for clk_period/2;
-	end process clk_process;
+    clk_process : process
+    begin
+        clk <= '1';
+        wait for clk_period/2;
+        clk <= '0';
+        wait for clk_period/2;
+    end process clk_process;
 
     rst_proc : process(clk)
        variable cnt : integer range 0 to RESET_WAIT := RESET_WAIT;
@@ -125,15 +128,17 @@ begin
     begin
     if(reset = '1') then
         for i in 0 to BRAM_MAX_SZ loop
-            bram_array(i) <= std_logic_vector(to_unsigned(10 + i, BRAM_DATA_WIDTH));
+            bram_array(i) <= DEADBEEF;
         end loop;
         cnt := 0;
+        data_val <= 1;
         write_asserted := '0';
         fifo_write_en <= '0';
     elsif(rising_edge(clk)) then
         if(fifo_full = '0' and fifo_ready = '1' and write_asserted = '0') then
-            fifo_din <= bram_array(addr); 
-            --fifo_din <= std_logic_vector(to_unsigned(data_val,BRAM_DATA_WIDTH));
+            --fifo_din <= bram_array(addr); 
+            bram_array(to_integer(unsigned(addra))) <= std_logic_vector(to_unsigned(data_val,BRAM_DATA_WIDTH));
+            fifo_din <= std_logic_vector(to_unsigned(data_val,BRAM_DATA_WIDTH));
             fifo_write_en <= '1';
             write_asserted := '1';
         elsif(write_asserted = '1') then
@@ -142,6 +147,7 @@ begin
                 write_asserted := '0';
                 cnt := 0;
                 addr := addr + 1;
+                data_val <= data_val + 1;
             else
                 cnt := cnt + 1;
             end if;

@@ -7,16 +7,16 @@
 #define MASTER_ADDR 0X43C00000
 #define SLAVE_ADDR  0X43C30000
 #define BUF_SZ 1023
-#define TEST_SZ 10
+#define TEST_SZ BUF_SZ
 
-#define NUM_TESTS 4
+#define NUM_TESTS 3
 
 int simple_read_write();
 int overflow_master_buffer();
 int underflow_slave_buffer();
-int stress_test();
 
-void print_errors(const int errno);
+void print_mstr_errors(const int errno);
+void print_slav_errors(const int errno);
 
 int main()
 {
@@ -47,12 +47,6 @@ int main()
     else
     	printf("\t!! Underflow Test Passed !!\n\n\r");
 
-    status[++tstidx] = stress_test();
-    if(status[tstidx] == XST_FAILURE)
-    	printf("\t!! Stress Test Failed !!\n\n\r");
-    else
-    	printf("\t!! Stress Test Passed !!\n\n\r");
-
     for(tstidx=0; tstidx < NUM_TESTS; tstidx++){
     	if(status[tstidx] == XST_FAILURE){
     		end_status = XST_FAILURE;
@@ -69,56 +63,6 @@ int main()
     printf("=============================\n\n\r");
     cleanup_platform();
     return 0;
-}
-
-int stress_test()
-{
-	/* initialize cores */
-	AMSF_init_core(MASTER_ADDR);
-	ASSF_init_core(SLAVE_ADDR);
-
-	int status = XST_SUCCESS;
-	int i = 0;
-	u32 tmp = 0;
-	int errno = 0;
-	int errcnt = 0;
-	int max_iterations = 1000000;
-
-	printf("\tStress Test will perform consecutive read/writes until an error occurs or %d iterations\n\r",max_iterations);
-
-	while(status == XST_SUCCESS || i > max_iterations){
-
-		/* write */
-		errno = AMSF_write_data(MASTER_ADDR, i);
-		if(errno < 0){
-			print_errors(errno);
-			status = XST_FAILURE;
-		}
-		/* read */
-		errno = ASSF_read_data(SLAVE_ADDR, &tmp);
-		if(errno < 0){
-			print_errors(errno);
-			status = XST_FAILURE;
-		}
-		/* check */
-		if(tmp != i){
-			errcnt++;
-			status = XST_FAILURE;
-		}
-		if(i == max_iterations){
-			printf("\t\tTest completed with no under/over flows with %d iterations\n\r",i);
-		}
-		i++;
-	}
-
-	printf("\t\tNumber of Errors : %d\n\r",errcnt);
-	printf("\t\tTest finished at %d iterations\n\r",i);
-
-	/* disable cores */
-	AMSF_disable_core(MASTER_ADDR);
-	ASSF_disable_core(SLAVE_ADDR);
-
-	return status;
 }
 
 int underflow_slave_buffer()
@@ -162,7 +106,7 @@ int overflow_master_buffer()
 		errno = AMSF_write_data(MASTER_ADDR, i);
 		if(errno == EAMSF_FIFO_FULL){
 			status = XST_SUCCESS;
-			printf("\t\tOverflowed at i = %d (should be BRAM_DEPTH*2)\n\r",i);
+			printf("\t\tOverflowed at i = %d (should be %d)\n\r",i,BUF_SZ*2+3);
 		}
 		i++;
 	}
@@ -192,18 +136,18 @@ int simple_read_write()
 
 	/* fill buffers */
 	for(i = 0; i < TEST_SZ; i++){
-		tx_buf[i] = i + 68;
+		tx_buf[i] = i + 1;
 		rx_buf[i] = 0;
 	}
 
 	/* write to master interface */
 	printf("\t\tWriting %d items to master interface...\n\r",(int)TEST_SZ);
 	for(i = 0; i < TEST_SZ; i++){
-		printf("\t\twrite : %d\n\r",(int)tx_buf[i]);
+//		printf("\t\twrite : %d\n\r",(int)tx_buf[i]);
 		errno = AMSF_write_data(MASTER_ADDR, tx_buf[i]);
 		if(errno < 0){
 			status = XST_FAILURE;
-			print_errors(errno);
+			print_mstr_errors(errno);
 		}
 	}
 
@@ -211,16 +155,16 @@ int simple_read_write()
 	occ = ASSF_poll_occupancy(SLAVE_ADDR);
 	if(occ != TEST_SZ){
 		printf("\t\tSlave occupancy %d != %d words written...\n\r",(int)occ, TEST_SZ);
-//		return XST_FAILURE;
+		return XST_FAILURE;
 	}
 
 	printf("\t\tReading %d items found in slave interface...\n\r",(int)occ);
 	for(i = 0; i < occ; i++){
 		errno = ASSF_read_data(SLAVE_ADDR, &rx_buf[i]);
-		printf("\t\tread : %d\n\r",(int)rx_buf[i]);
+//		printf("\t\tread : %d\n\r",(int)rx_buf[i]);
 		if(errno < 0){
 			status = XST_FAILURE;
-			print_errors(errno);
+			print_slav_errors(errno);
 		}
 		if(rx_buf[i] != tx_buf[i]){
 			errcnt++;
@@ -238,17 +182,32 @@ int simple_read_write()
 
 }
 
-void print_errors(const int errno)
+void print_mstr_errors(const int errno)
 {
 	switch(errno){
-    case EASSF_FIFO_EMPTY :
-        printf("\t\tError : reading FIFO empty\n\r");
-        break;
-    case EASSF_VALID_NOT_ASSERTED :
-        printf("\t\tError : Valid not asserted within %d us\n\r",ASSF_MAX_US_WAIT);
-        break;
-    case EAMSF_FIFO_FULL :
-    	printf("\t\tError : FIFO is full and could not be written to\n\r");
+	case EAMSF_FIFO_FULL :
+    	printf("\t\t\tMaster Error : FIFO is full and could not be written to\n\r");
     	break;
+	case EAMSF_FIFO_NOT_RDY :
+		printf("\t\t\tMaster Error : FIFO not ready to write to\n\r");
+		break;
+	default :
+		printf("\t\t\tMaster Error : Unspecified\n\r");
+		break;
+	}
+}
+
+void print_slav_errors(const int errno)
+{
+	switch(errno){
+	case EASSF_FIFO_EMPTY :
+		printf("\t\t\tSlave Error : FIFO empty\n\r");
+		break;
+	case EASSF_VALID_NOT_ASSERTED :
+		printf("\t\t\tSlave Error : Valid was not asserted\n\r");
+		break;
+	default :
+		printf("\t\t\tSlave Error : Unspecified\n\r");
+		break;
 	}
 }

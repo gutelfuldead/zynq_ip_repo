@@ -16,7 +16,7 @@
 #define EAMSF_FIFO_FULL -1
 #define EAMSF_FIFO_NOT_RDY -2
 
-#define AMSF_MAX_US_WAIT 5
+#define AMSF_MAX_US_WAIT 500
 #define AMSF_POLL_VALID_MAX AMSF_MAX_US_WAIT / ((COUNTS_PER_SECOND) / 1000000UL)
 
 
@@ -114,5 +114,8 @@ extern u32  AMSF_write_data(const u32 baseaddr, const u32 datin);
 
 extern void AMSF_disable_core(const u32 baseaddr);
 extern void AMSF_init_core(const u32 baseaddr);
+
+extern XTime AMSF_get_time(void);
+extern XTime AMSF_elapsed_time_us(const XTime startTime);
 
 #endif // AXI_MASTER_STREAM_FIFO_H

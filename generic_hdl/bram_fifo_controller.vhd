@@ -47,6 +47,8 @@ entity BRAM_FIFO_CONTROLLER is
            clkEn      : in std_logic;
            write_en   : in std_logic;
            read_en    : in std_logic;
+           write_ready  : out std_logic;
+           read_ready   : out std_logic;
            reset      : in std_logic;
            din        : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
            dout       : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
@@ -66,18 +68,24 @@ architecture Behavioral of BRAM_FIFO_CONTROLLER is
     signal s_occupancy  : unsigned(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal addr_full  : std_logic := '1';
     signal addr_empty : std_logic := '0';
-    
+
+    type fsm_states is (ST_SYNC, ST_WORK);
+    constant SYNC_LEN : integer := 3;
+
+
 begin 
   
   -- instantiate clock at top level with BUFR; leave this port open in instantiation
   clka <= clk;
   clkb <= clk;   
     
-  loader : process(clk)
+  loader : process(clk, reset)
   begin
   if(reset = '1') then
     addr_empty <= '1';
-    addr_full <= '0';
+    addr_full  <= '0';
+    empty <= '1';
+    full  <= '0';
   elsif(rising_edge(clk)) then
       if(clkEn = '1') then
           addra <= std_logic_vector(wr_addr_next);
@@ -108,45 +116,92 @@ begin
   rstb <= '1' when (reset = '1') else '0';
   rsta <= '1' when (reset = '1') else '0';
 
-  main : process(clk)
+  occ_check : process(clk,read_en,write_en)
   begin
   if(reset = '1') then
-    s_occupancy  <= (others => '0');
-    dvalid       <= '0';
-    wea          <= '0';
-    rd_addr_next <= (others => '0');
-    wr_addr_next <= (others => '0');
+    s_occupancy <= (others => '0');
   elsif(rising_edge(clk)) then
-    if(clkEn = '1') then
-
-      if(read_en = '1' and write_en = '0' and addr_empty = '0') then
-        dout   <= doutb;
-        dvalid <= '1';
-        wea    <= '0';
-        s_occupancy  <= s_occupancy - 1;
-        rd_addr_next <= rd_addr_next + 1;
-      
-      elsif(write_en = '1' and read_en = '0' and addr_full = '0') then
-        dina <= din;
-        wea  <= '1';
-        s_occupancy  <= s_occupancy + 1;
-        wr_addr_next <= wr_addr_next + 1;
-      
-      elsif(write_en = '1' and read_en = '1') then
-        dina   <= din;
-        dout   <= doutb;
-        wea    <= '1';
-        dvalid <= '1';
-        wr_addr_next <= wr_addr_next + 1;
-        rd_addr_next <= rd_addr_next + 1;
-      
-      else
-        wea  <= '0';
-        dvalid <= '0';
-      end if;
-
+    if(read_en = '1' and write_en = '0' and addr_empty = '0') then
+      s_occupancy <= s_occupancy - 1;
+    elsif(read_en = '0' and write_en = '1' and addr_full = '0') then
+      s_occupancy <= s_occupancy + 1;
     end if;
   end if;
-  end process main;
+  end process occ_check;
+
+  read_proc : process(clk,reset)
+    variable fsm : fsm_states := ST_WORK;
+    variable cnt : integer range 0 to SYNC_LEN := 0;
+  begin
+  if(reset = '1') then
+    fsm := ST_WORK;
+    read_ready <= '0';
+    cnt := 0;
+    dvalid <= '0';
+    rd_addr_next <= (others => '0');
+  elsif(rising_edge(clk)) then
+    case(fsm) is
+    when ST_WORK =>
+      if(addr_empty = '0') then
+        read_ready <= '1';
+        if(read_en = '1') then
+          dout         <= doutb;
+          dvalid       <= '1';
+          rd_addr_next <= rd_addr_next + 1;
+          read_ready   <= '0'; 
+          fsm := ST_SYNC;
+        end if;
+      end if;
+
+    when ST_SYNC =>
+      dvalid <= '0';
+      if(cnt = SYNC_LEN) then
+        cnt := 0;
+        fsm := ST_WORK;
+      else 
+        cnt := cnt + 1;
+      end if;
+
+    end case;
+  end if;
+  end process read_proc;
+
+  write_proc : process(clk,reset)
+    variable fsm : fsm_states := ST_WORK;
+    variable cnt : integer range 0 to SYNC_LEN := 0;
+  begin
+  if(reset = '1') then
+    fsm := ST_WORK;
+    write_ready <= '0';
+    cnt := 0;
+    wea <= '0';
+    wr_addr_next <= (others => '0');
+  elsif(rising_edge(clk)) then
+    case(fsm) is
+
+    when ST_WORK =>
+      if(addr_full = '0') then
+        write_ready <= '1'; 
+        if(write_en = '1') then
+          dina <= din;
+          wea  <= '1';
+          wr_addr_next <= wr_addr_next + 1;
+          write_ready <= '0';
+          fsm := ST_SYNC;
+        end if;
+      end if;
+
+    when ST_SYNC =>
+      wea <= '0';
+      if(cnt = SYNC_LEN) then
+        cnt := 0;
+        fsm := ST_WORK;
+      else
+        cnt := cnt + 1;
+      end if;
+
+    end case;
+  end if;
+  end process write_proc;
 
 end Behavioral;
