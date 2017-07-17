@@ -167,8 +167,11 @@ begin
         type fsm_states_mstr is (ST_IDLE, ST_BIT_MANIP, ST_ACTIVE, ST_NEW_BYTE);
         variable fsm : fsm_states_mstr := ST_IDLE;
         variable byte_index : integer range 0 to NUM_BYTES-1 := 0;
+        constant sync_delay : integer := 1;
+        variable cnt : integer range 0 to sync_delay := 0;
     begin
     if(reset = '0') then
+        cnt := 0;
         byte_index    := 0;
         m_user_data   <= (others => '0');
         m_user_dvalid <= '0';
@@ -208,12 +211,17 @@ begin
 
         when ST_NEW_BYTE =>
             m_user_dvalid <= '0';
-            if(byte_index = NUM_BYTES-1) then
-                byte_index := 0;
-                fsm        := ST_IDLE;
+            if(cnt = sync_delay) then
+                cnt := 0;
+                if(byte_index = NUM_BYTES-1) then
+                    byte_index := 0;
+                    fsm        := ST_IDLE;
+                else
+                    byte_index := byte_index + 1;
+                    fsm        := ST_ACTIVE;
+                end if;
             else
-                byte_index := byte_index + 1;
-                fsm        := ST_ACTIVE;
+                cnt := cnt + 1;
             end if;
 
         when others =>

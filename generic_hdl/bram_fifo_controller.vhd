@@ -70,7 +70,7 @@ architecture Behavioral of BRAM_FIFO_CONTROLLER is
     signal addr_empty : std_logic := '0';
 
     type fsm_states is (ST_SYNC, ST_WORK);
-    constant SYNC_LEN : integer := 3;
+    constant SYNC_LEN : integer := 1;
 
 
 begin 
