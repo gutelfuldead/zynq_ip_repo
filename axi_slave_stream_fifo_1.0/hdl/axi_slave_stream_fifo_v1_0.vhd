@@ -14,9 +14,7 @@ entity axi_slave_stream_fifo_v1_0 is
         BRAM_DATA_WIDTH  : integer := 32;
 		-- Parameters of Axi Slave Bus Interface S00_AXI
 		C_S00_AXI_DATA_WIDTH	: integer	:= 32;
-		C_S00_AXI_ADDR_WIDTH    : integer   := 4;
-		-- Parameters of Axi Stream Slave Bus Interface
-        C_S_AXIS_TDATA_WIDTH	: integer	:= 32
+		C_S00_AXI_ADDR_WIDTH    : integer   := 4
 	);
 	port (
 		-- BRAM write port lines
@@ -38,8 +36,8 @@ entity axi_slave_stream_fifo_v1_0 is
 		S_AXIS_ACLK	: in std_logic;
 		S_AXIS_ARESETN	: in std_logic;
 		S_AXIS_TREADY	: out std_logic;
-		S_AXIS_TDATA	: in std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
-		S_AXIS_TSTRB	: in std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0);
+		S_AXIS_TDATA	: in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+		S_AXIS_TSTRB	: in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
 		S_AXIS_TLAST	: in std_logic;
 		S_AXIS_TVALID	: in std_logic;
 
@@ -175,8 +173,7 @@ axi_slave_stream_fifo_v1_0_S00_AXI_inst : axi_slave_stream_fifo_v1_0_S00_AXI
 	fifo_stream_controller_inst :  FIFO_SLAVE_STREAM_CONTROLLER 
     generic map(
         BRAM_ADDR_WIDTH  => BRAM_ADDR_WIDTH,
-        BRAM_DATA_WIDTH  => BRAM_DATA_WIDTH,
-        C_S_AXIS_TDATA_WIDTH  => C_S_AXIS_TDATA_WIDTH
+        BRAM_DATA_WIDTH  => BRAM_DATA_WIDTH
         )
     port map(
         -- BRAM write port lines

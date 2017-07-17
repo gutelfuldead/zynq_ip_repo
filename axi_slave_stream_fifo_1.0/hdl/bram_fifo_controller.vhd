@@ -3,8 +3,8 @@
 -- 
 -- Create Date: 05/17/2017 09:20:37 AM
 -- Design Name: 
--- Module Name: BRAM_FIFO_CONTROLLER - Behavioral
--- Target Devices: CSP -- Zynq7020
+-- Module Name: bram_fifo_controller
+-- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
 -- Description:   Controller interface for BRAM block_memory_generator core
 -- 
@@ -79,6 +79,16 @@ begin
   clka <= clk;
   clkb <= clk;   
     
+  ena  <= '1' when (clkEn = '1') else '0';
+  enb  <= '1' when (clkEn = '1') else '0';
+  rstb <= '1' when (reset = '1') else '0';
+  rsta <= '1' when (reset = '1') else '0';
+
+  ----------------------------------------------------------------------------------
+  -- Loader Process  
+  ----------------------------------------------------------------------------------
+  -- Asynchronous Reset. Loads addresses, occupancy count, and full/empty watermarks  
+  ----------------------------------------------------------------------------------
   loader : process(clk, reset)
   begin
   if(reset = '1') then
@@ -111,12 +121,13 @@ begin
   end if;
   end process loader;
      
-  ena  <= '1' when (clkEn = '1') else '0';
-  enb  <= '1' when (clkEn = '1') else '0';
-  rstb <= '1' when (reset = '1') else '0';
-  rsta <= '1' when (reset = '1') else '0';
 
-  occ_check : process(clk,read_en,write_en)
+  ----------------------------------------------------------------------------------
+  -- Occupancy Check Process (Async. Reset)
+  ----------------------------------------------------------------------------------
+  -- updates occupancy of fifo based on current read/write requests
+  ----------------------------------------------------------------------------------
+  occupancy_check : process(clk,reset)
   begin
   if(reset = '1') then
     s_occupancy <= (others => '0');
@@ -127,8 +138,16 @@ begin
       s_occupancy <= s_occupancy + 1;
     end if;
   end if;
-  end process occ_check;
+  end process occupancy_check;
 
+  ----------------------------------------------------------------------------------
+  -- Read Process (Async Reset)
+  ----------------------------------------------------------------------------------
+  -- Sets a "read ready" bit to inform top module that the fifo is in a good state
+  -- and ready for a read. Once a read request is passed the data on the address
+  -- line is returned and the device is resynchronized to read ready state
+  -- Sync state is used to refresh address lines
+  ----------------------------------------------------------------------------------
   read_proc : process(clk,reset)
     variable fsm : fsm_states := ST_WORK;
     variable cnt : integer range 0 to SYNC_LEN := 0;
@@ -141,6 +160,7 @@ begin
     rd_addr_next <= (others => '0');
   elsif(rising_edge(clk)) then
     case(fsm) is
+
     when ST_WORK =>
       if(addr_empty = '0') then
         read_ready <= '1';
@@ -148,12 +168,12 @@ begin
           dout         <= doutb;
           dvalid       <= '1';
           rd_addr_next <= rd_addr_next + 1;
-          read_ready   <= '0'; 
           fsm := ST_SYNC;
         end if;
       end if;
 
     when ST_SYNC =>
+      read_ready   <= '0'; 
       dvalid <= '0';
       if(cnt = SYNC_LEN) then
         cnt := 0;
@@ -166,6 +186,14 @@ begin
   end if;
   end process read_proc;
 
+  ----------------------------------------------------------------------------------
+  -- Write Process (Async. Reset)
+  ----------------------------------------------------------------------------------
+  -- Sets a "write ready" bit to inform top module that the fifo is in a good state
+  -- and ready for a write. Once a write request is passed the data will be written
+  -- to the FIFO and then resynchronized to a good state
+  -- Sync state is used to refresh address lines
+  ----------------------------------------------------------------------------------
   write_proc : process(clk,reset)
     variable fsm : fsm_states := ST_WORK;
     variable cnt : integer range 0 to SYNC_LEN := 0;
@@ -186,12 +214,12 @@ begin
           dina <= din;
           wea  <= '1';
           wr_addr_next <= wr_addr_next + 1;
-          write_ready <= '0';
           fsm := ST_SYNC;
         end if;
       end if;
 
     when ST_SYNC =>
+      write_ready <= '0';
       wea <= '0';
       if(cnt = SYNC_LEN) then
         cnt := 0;

@@ -468,7 +468,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>a5beefee</spirit:value>
+            <spirit:value>9334907f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -484,7 +484,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>a5beefee</spirit:value>
+            <spirit:value>9334907f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -498,7 +498,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>c4e25647</spirit:value>
+            <spirit:value>b382defc</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -512,7 +512,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9858253a</spirit:value>
+            <spirit:value>8019dd06</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -534,7 +534,7 @@
         <spirit:name>xilinx_testbench</spirit:name>
         <spirit:displayName>Test Bench</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:simulation.testbench</spirit:envIdentifier>
-        <spirit:modelName>fifo_master_stream_controller_tb</spirit:modelName>
+        <spirit:modelName>axi_master_stream_fifo_v1_0</spirit:modelName>
       </spirit:view>
     </spirit:views>
     <spirit:ports>
@@ -744,7 +744,7 @@
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
-            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_M_AXIS_TDATA_WIDTH&apos;)) - 1)">31</spirit:left>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.BRAM_DATA_WIDTH&apos;)) - 1)">31</spirit:left>
             <spirit:right spirit:format="long">0</spirit:right>
           </spirit:vector>
           <spirit:wireTypeDefs>
@@ -761,7 +761,7 @@
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
-            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="((spirit:decode(id(&apos;MODELPARAM_VALUE.C_M_AXIS_TDATA_WIDTH&apos;)) / 8) - 1)">3</spirit:left>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="((spirit:decode(id(&apos;MODELPARAM_VALUE.BRAM_DATA_WIDTH&apos;)) / 8) - 1)">3</spirit:left>
             <spirit:right spirit:format="long">0</spirit:right>
           </spirit:vector>
           <spirit:wireTypeDefs>
@@ -1132,11 +1132,6 @@
         <spirit:displayName>Bram Data Width</spirit:displayName>
         <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.BRAM_DATA_WIDTH">32</spirit:value>
       </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="integer">
-        <spirit:name>C_M_AXIS_TDATA_WIDTH</spirit:name>
-        <spirit:displayName>C M Axis Tdata Width</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_M_AXIS_TDATA_WIDTH">32</spirit:value>
-      </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
   <spirit:choices>
@@ -1185,7 +1180,7 @@
       <spirit:file>
         <spirit:name>hdl/axi_master_stream_fifo_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_4fafea9d</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_247a1564</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -1262,7 +1257,7 @@
       <spirit:file>
         <spirit:name>xgui/axi_master_stream_fifo_v1_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_9858253a</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_8019dd06</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -1337,13 +1332,8 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>BRAM_DATA_WIDTH</spirit:name>
-      <spirit:displayName>Bram Data Width</spirit:displayName>
+      <spirit:displayName>AXIS/Bram Data Width</spirit:displayName>
       <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.BRAM_DATA_WIDTH">32</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_M_AXIS_TDATA_WIDTH</spirit:name>
-      <spirit:displayName>C M Axis Tdata Width</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_M_AXIS_TDATA_WIDTH">32</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -1355,8 +1345,8 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axi_master_stream_fifo_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>13</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-07-13T18:18:18Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>15</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2017-07-17T19:27:34Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="xilinx.com:user:axi_master_stream_fifo:1.0_ARCHIVE_LOCATION">/home/jgutel/gits/zynq_ip_repo/axi_master_stream_fifo_1.0</xilinx:tag>
       </xilinx:tags>
@@ -1365,10 +1355,10 @@
       <xilinx:xilinxVersion>2015.4.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="e983fe3d"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="ca22a6c3"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="b7195364"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="4b6b9b0a"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="6c0c9d7b"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="1b8d5ff5"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="f523fc82"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="acb89905"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="b8ce995b"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="6d8c053c"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

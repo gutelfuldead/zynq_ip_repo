@@ -1,3 +1,26 @@
+----------------------------------------------------------------------------------
+-- Engineer: Jason Gutel
+-- 
+-- Create Date: 05/17/2017 09:20:37 AM
+-- Design Name: 
+-- Package Name: fifo_master_stream_controller
+-- Target Devices: Zynq7020
+-- Tool Versions: Vivado 2015.4
+-- Description: Module that takes data from AXI4-Lite interface with associated
+--  device drivers and writes them to a dual port BRAM FIFO. Has independent 
+--  AXI4-Stream interface that will read from the FIFO and pass the data to the
+--  downstream slave device independently.
+--
+--  Generics for setting the BRAM Address and Data Widths. The Data Width of the
+--  AXI-Stream Master interface is equal to the BRAM Data Width.
+-- 
+-- Dependencies: bram_fifo_controller.vhd and axi_master_stream.vhd
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -8,8 +31,7 @@ use work.generic_pkg.all;
 entity FIFO_MASTER_STREAM_CONTROLLER is
 	generic (
         BRAM_ADDR_WIDTH  : integer := 10;
-        BRAM_DATA_WIDTH  : integer := 32;
-		C_M_AXIS_TDATA_WIDTH : integer := 32
+        BRAM_DATA_WIDTH  : integer := 32
 		);
 	port (
         -- BRAM write port lines
@@ -31,8 +53,8 @@ entity FIFO_MASTER_STREAM_CONTROLLER is
         M_AXIS_ACLK	    : in std_logic;
         M_AXIS_ARESETN  : in std_logic;
         M_AXIS_TVALID   : out std_logic;
-        M_AXIS_TDATA    : out std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
-        M_AXIS_TSTRB    : out std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0);
+        M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+        M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
         M_AXIS_TLAST    : out std_logic;
         M_AXIS_TREADY   : in std_logic;
 
@@ -62,7 +84,7 @@ architecture Behavorial of FIFO_MASTER_STREAM_CONTROLLER is
     signal sig_fifo_write_ready : std_logic := '0';
     
     -- axi-stream signals
-    signal sig_axis_din    : std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
+    signal sig_axis_din    : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
     signal sig_axis_dvalid : std_logic := '0';
     signal sig_axis_txdone : std_logic := '0';
     signal sig_axis_rdy    : std_logic := '0';
@@ -108,7 +130,7 @@ begin
 	    
 	-- Instantiation of Master Stream Interface
 	axi_master_stream_inst : AXI_MASTER_STREAM
-	    generic map( C_M_AXIS_TDATA_WIDTH => C_M_AXIS_TDATA_WIDTH)
+	    generic map( C_M_AXIS_TDATA_WIDTH => BRAM_DATA_WIDTH)
 	    port map(
 	        user_din        => sig_axis_din,
 	        user_dvalid     => sig_axis_dvalid,
@@ -123,34 +145,24 @@ begin
 	        M_AXIS_TREADY   => M_AXIS_TREADY
 	    );
 
-    ------------------------------------------------
-    -- load output lines synchronously with clock --
-    ------------------------------------------------
-    loader : process(clk)
+    --------------------------------------------------------------------------
+    -- Stream and FIFO read controller (Async. Reset)
+    --------------------------------------------------------------------------
+    -- Checks if the AXIS interface is ready and if the FIFO is ready to read
+    -- Then will pass the current FIFO address data to the AXIS interface
+    -- Will wait for confirmation of transmission then move to the next
+    -- FIFO address data
+    --------------------------------------------------------------------------
+    axis_read_ctrl : process(clk, reset) 
     begin
-    if(rising_edge(clk)) then
-    	--fifo_empty     <= sig_fifo_empty;
-    	--fifo_full      <= sig_fifo_full;
-    	--fifo_occupancy <= sig_fifo_occupancy;
-        --fifo_ready     <= sig_fifo_write_ready;
-    end if;
-    end process loader;
-
-    -------------------------------------
-    -- Stream and FIFO read controller --
-    -------------------------------------
-    axis_read_ctrl : process(clk) 
-        constant MAX_WAIT : integer := 4;
-        variable cnt : integer range 0 to MAX_WAIT := 0;
-    begin
-    if(rising_edge(clk)) then
-        if(reset = '1') then
-            fsm <= ST_IDLE;
-            sig_axis_dvalid <= '0';
-            sig_fifo_read_en <= '0';
-            cnt := 0;
-        elsif(clkEn = '1') then
+    if(reset = '1') then
+        fsm <= ST_IDLE;
+        sig_axis_dvalid <= '0';
+        sig_fifo_read_en <= '0';
+    elsif(rising_edge(clk)) then
+        if(clkEn = '1') then
             case(fsm) is
+
                 when ST_IDLE =>
                     if(sig_axis_rdy = '1' and sig_fifo_read_ready = '1') then
                         sig_fifo_read_en <= '1';
@@ -160,9 +172,9 @@ begin
                 when ST_ACTIVE =>
                     sig_fifo_read_en <= '0';
                     if(sig_fifo_dvalid = '1') then
-                        sig_axis_din <= sig_fifo_dout;
+                        sig_axis_din    <= sig_fifo_dout;
                         sig_axis_dvalid <= '1'; 
-                        fsm <= ST_WAIT;
+                        fsm             <= ST_WAIT;
                     end if;
 
                 when ST_WAIT =>

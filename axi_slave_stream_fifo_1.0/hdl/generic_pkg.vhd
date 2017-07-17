@@ -1,3 +1,22 @@
+----------------------------------------------------------------------------------
+-- Engineer: Jason Gutel
+-- 
+-- Create Date: 05/17/2017 09:20:37 AM
+-- Design Name: 
+-- Package Name: generic_pkg
+-- Target Devices: Zynq7020
+-- Tool Versions: Vivado 2015.4
+-- Description: Contains component declarations for bram_fifo_controller,
+--	axi_master_stream, axi_slave_stream, fifo_master_stream_controller,
+--  fifo_slave_stream_controller
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
 library ieee;
 	use ieee.std_logic_1164.all;
 	use ieee.std_logic_unsigned.all;
@@ -48,23 +67,6 @@ package generic_pkg is
 	           );
 	end component BRAM_FIFO_CONTROLLER;
 
-	------------------------------------------------
-    -- address generator for BRAM_FIFO_CONTROLLER --
-	------------------------------------------------
-    component FIFO_ADDR_GEN is
-        generic ( BRAM_ADDR_WIDTH  : integer := 10 );
-        Port ( clk : in STD_LOGIC;
-               en  : in STD_LOGIC;
-               rst : in STD_LOGIC;
-               rden : in STD_LOGIC;
-               wren : in STD_LOGIC;
-               rd_addr : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
-               wr_addr : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
-               empty : out std_logic;
-               full  : out std_logic;
-               occupancy : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0));
-    end component FIFO_ADDR_GEN;
-
     ------------------------------------------
     -- Generic AXI4-Stream Master Interface --
     ------------------------------------------
@@ -105,14 +107,13 @@ package generic_pkg is
 		S_AXIS_TVALID	: in std_logic);
 	end component AXI_SLAVE_STREAM;
 	
-	---------------------------------------------------------------------
-	-- controller combining AXI_MASTER_STREAM and BRAM_FIFO_CONTROLLER --
-	---------------------------------------------------------------------
+	----------------------------------------------------------------------------------------------------
+	-- controller combining AXI_MASTER_STREAM and BRAM_FIFO_CONTROLLER with AXI4-Lite write interface --
+	----------------------------------------------------------------------------------------------------
 	component FIFO_MASTER_STREAM_CONTROLLER is
 		generic (
 	        BRAM_ADDR_WIDTH  : integer := 10;
-	        BRAM_DATA_WIDTH  : integer := 32;
-			C_M_AXIS_TDATA_WIDTH : integer := 32
+	        BRAM_DATA_WIDTH  : integer := 32
 			);
 		port (
 	        -- BRAM write port lines
@@ -134,8 +135,8 @@ package generic_pkg is
 	        M_AXIS_ACLK	    : in std_logic;
 	        M_AXIS_ARESETN  : in std_logic;
 	        M_AXIS_TVALID   : out std_logic;
-	        M_AXIS_TDATA    : out std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
-	        M_AXIS_TSTRB    : out std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0);
+	        M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+	        M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
 	        M_AXIS_TLAST    : out std_logic;
 	        M_AXIS_TREADY   : in std_logic;
 
@@ -152,14 +153,13 @@ package generic_pkg is
 			);
 	end component FIFO_MASTER_STREAM_CONTROLLER;
 
-	--------------------------------------------------------------------
-	-- controller combining AXI_SLAVE_STREAM and BRAM_FIFO_CONTROLLER --
-	--------------------------------------------------------------------
+	--------------------------------------------------------------------------------------------------
+	-- controller combining AXI_SLAVE_STREAM and BRAM_FIFO_CONTROLLER with AXI4-Lite Read Interface --
+	--------------------------------------------------------------------------------------------------
 	component FIFO_SLAVE_STREAM_CONTROLLER is
 	generic (
         BRAM_ADDR_WIDTH  : integer := 10;
-        BRAM_DATA_WIDTH  : integer := 32;
-        C_S_AXIS_TDATA_WIDTH    : integer   := 32
+        BRAM_DATA_WIDTH  : integer := 32
 		);
 	port (
         -- BRAM write port lines
@@ -185,8 +185,8 @@ package generic_pkg is
         S_AXIS_ACLK : in std_logic;
         S_AXIS_ARESETN  : in std_logic;
         S_AXIS_TREADY   : out std_logic;
-        S_AXIS_TDATA    : in std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
-        S_AXIS_TSTRB    : in std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0);
+        S_AXIS_TDATA    : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+        S_AXIS_TSTRB    : in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
         S_AXIS_TLAST    : in std_logic;
         S_AXIS_TVALID   : in std_logic;
 
@@ -200,7 +200,19 @@ package generic_pkg is
         fifo_read_en   : in std_logic;
         fifo_dout      : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0)
 		);
-end component FIFO_SLAVE_STREAM_CONTROLLER;
+	end component FIFO_SLAVE_STREAM_CONTROLLER;
 
+	----------------------------------
+	-- generates a pulse from an input
+	----------------------------------
+	component pulse_generator is
+		port (
+	        clk       : in std_logic;
+	        enable    : in std_logic;
+            reset     : in std_logic;	
+	        sig_in    : in std_logic;
+	        pulse_out : out std_logic
+		);
+	end component pulse_generator;
 
 end generic_pkg;
