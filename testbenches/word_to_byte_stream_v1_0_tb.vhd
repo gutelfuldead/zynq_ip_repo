@@ -13,33 +13,33 @@ architecture arch_tb of word_to_byte_stream_v1_0_tb is
 
     component word_to_byte_streamer_v1_0 is
     generic (
-    C_M_AXIS_TDATA_WIDTH  : integer := 8;
-    C_S_AXIS_TDATA_WIDTH  : integer := 32;
-    ENDIAN                : string := "BIG"
+    WORD_SIZE_OUT  : integer := 8;
+    WORD_SIZE_IN   : integer := 32
     );
     port (
     S_AXIS_ACLK : in std_logic;
     S_AXIS_ARESETN    : in std_logic;
     S_AXIS_TREADY    : out std_logic;
-    S_AXIS_TDATA    : in std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
-    S_AXIS_TSTRB    : in std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0);
+    S_AXIS_TDATA    : in std_logic_vector(WORD_SIZE_IN-1 downto 0);
+    S_AXIS_TSTRB    : in std_logic_vector((WORD_SIZE_IN/8)-1 downto 0);
     S_AXIS_TLAST    : in std_logic;
     S_AXIS_TVALID    : in std_logic;
     
     M_AXIS_ACLK : in std_logic;
     M_AXIS_ARESETN  : in std_logic;
     M_AXIS_TVALID : out std_logic;
-    M_AXIS_TDATA  : out std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
-    M_AXIS_TSTRB  : out std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0);
+    M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
+    M_AXIS_TSTRB  : out std_logic_vector((WORD_SIZE_OUT/8)-1 downto 0);
     M_AXIS_TLAST  : out std_logic;
     M_AXIS_TREADY : in std_logic
     );
     end component;
 
-    constant C_M_AXIS_TDATA_WIDTH  : integer := 8;
-    constant C_S_AXIS_TDATA_WIDTH  : integer := 32;
+    constant WORD_SIZE_OUT  : integer := 8;
+    constant WORD_SIZE_IN  : integer := 16;
     constant clk_period : time := 10 ns; -- 100 MHz clock
-    constant TEST_WORD : std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0) := x"AABBCCDD";
+    constant TEST_WORD_32 : std_logic_vector(31 downto 0) := x"AABBCCDD";
+    constant TEST_WORD_16 : std_logic_vector(15 downto 0) := x"ABCD";
 
     signal clk           : std_logic := '0';
     signal reset         : std_logic := '0';
@@ -49,24 +49,24 @@ architecture arch_tb of word_to_byte_stream_v1_0_tb is
     signal M_ACLK : std_logic := '0';
     signal S_ARESETN : std_logic := '0';
     signal M_ARESETN : std_logic := '0';
-    signal S_TDATA  : std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0)     := (others => '0');
-    signal S_TSTRB  : std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
-    signal M_TDATA  : std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0)     := (others => '0');
-    signal M_TSTRB  : std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
+    signal S_TDATA  : std_logic_vector(WORD_SIZE_IN-1 downto 0)     := (others => '0');
+    signal S_TSTRB  : std_logic_vector((WORD_SIZE_IN/8)-1 downto 0) := (others => '0');
+    signal M_TDATA  : std_logic_vector(WORD_SIZE_OUT-1 downto 0)     := (others => '0');
+    signal M_TSTRB  : std_logic_vector((WORD_SIZE_OUT/8)-1 downto 0) := (others => '0');
     signal S_TLAST  : std_logic := '0';
     signal S_TVALID : std_logic := '0';
     signal M_TVALID : std_logic := '0';
     signal M_TLAST  : std_logic := '0';
     signal M_TREADY : std_logic := '0';
 
-    signal new_msg : std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
+    signal new_msg : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
 
 begin
 
     DUT : word_to_byte_streamer_v1_0
-    generic map(ENDIAN => "BIG",
-    C_M_AXIS_TDATA_WIDTH => C_M_AXIS_TDATA_WIDTH,
-    C_S_AXIS_TDATA_WIDTH => C_S_AXIS_TDATA_WIDTH
+    generic map(
+    WORD_SIZE_OUT => WORD_SIZE_OUT,
+    WORD_SIZE_IN => WORD_SIZE_IN
     )
     port map(
         S_AXIS_ACLK    => clk,
@@ -120,7 +120,11 @@ begin
    elsif(rising_edge(clk)) then
         case(fsm) is
             when ST_NEW_MSG =>
-                S_TDATA  <= std_logic_vector(rotate_left(unsigned(TEST_WORD),8*roll));
+                if(WORD_SIZE_IN = 32) then
+                    S_TDATA  <= std_logic_vector(rotate_left(unsigned(TEST_WORD_32),8*roll));
+                elsif(WORD_SIZE_IN = 16) then
+                    S_TDATA  <= std_logic_vector(rotate_left(unsigned(TEST_WORD_16),8*roll));
+                end if;
                 S_TVALID <= '1';
                 fsm := ST_WORKING;
 

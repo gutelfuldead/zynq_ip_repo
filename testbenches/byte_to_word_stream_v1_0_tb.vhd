@@ -13,31 +13,30 @@ architecture arch_tb of byte_to_word_stream_v1_0_tb is
 
     component byte_to_word_streamer_v1_0 is
     generic (
-    C_M_AXIS_TDATA_WIDTH  : integer := 32;
-    C_S_AXIS_TDATA_WIDTH  : integer := 8;
-    ENDIAN                : string := "BIG"
+    WORD_SIZE_OUT  : integer := 32;
+    WORD_SIZE_IN  : integer := 8
     );
     port (
     S_AXIS_ACLK : in std_logic;
     S_AXIS_ARESETN    : in std_logic;
     S_AXIS_TREADY    : out std_logic;
-    S_AXIS_TDATA    : in std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
-    S_AXIS_TSTRB    : in std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0);
+    S_AXIS_TDATA    : in std_logic_vector(WORD_SIZE_IN-1 downto 0);
+    S_AXIS_TSTRB    : in std_logic_vector((WORD_SIZE_IN/8)-1 downto 0);
     S_AXIS_TLAST    : in std_logic;
     S_AXIS_TVALID    : in std_logic;
     
     M_AXIS_ACLK : in std_logic;
     M_AXIS_ARESETN  : in std_logic;
     M_AXIS_TVALID : out std_logic;
-    M_AXIS_TDATA  : out std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
-    M_AXIS_TSTRB  : out std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0);
+    M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
+    M_AXIS_TSTRB  : out std_logic_vector((WORD_SIZE_OUT/8)-1 downto 0);
     M_AXIS_TLAST  : out std_logic;
     M_AXIS_TREADY : in std_logic
     );
     end component;
 
-    constant C_M_AXIS_TDATA_WIDTH  : integer := 32;
-    constant C_S_AXIS_TDATA_WIDTH  : integer := 8;
+    constant WORD_SIZE_OUT  : integer := 16;
+    constant WORD_SIZE_IN  : integer := 8;
     constant clk_period : time := 10 ns; -- 100 MHz clock
     type byte_array_type is array (0 to 3) of std_logic_vector(7 downto 0);
     signal byte_array : byte_array_type;
@@ -50,24 +49,24 @@ architecture arch_tb of byte_to_word_stream_v1_0_tb is
     signal M_ACLK : std_logic := '0';
     signal S_ARESETN : std_logic := '0';
     signal M_ARESETN : std_logic := '0';
-    signal S_TDATA  : std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0)     := (others => '0');
-    signal S_TSTRB  : std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
-    signal M_TDATA  : std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0)     := (others => '0');
-    signal M_TSTRB  : std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
+    signal S_TDATA  : std_logic_vector(WORD_SIZE_IN-1 downto 0)     := (others => '0');
+    signal S_TSTRB  : std_logic_vector((WORD_SIZE_IN/8)-1 downto 0) := (others => '0');
+    signal M_TDATA  : std_logic_vector(WORD_SIZE_OUT-1 downto 0)     := (others => '0');
+    signal M_TSTRB  : std_logic_vector((WORD_SIZE_OUT/8)-1 downto 0) := (others => '0');
     signal S_TLAST  : std_logic := '0';
     signal S_TVALID : std_logic := '0';
     signal M_TVALID : std_logic := '0';
     signal M_TLAST  : std_logic := '0';
     signal M_TREADY : std_logic := '0';
 
-    signal new_msg : std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
+    signal new_msg : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
 
 begin
 
     DUT : byte_to_word_streamer_v1_0
-    generic map(ENDIAN => "LITTLE",
-    C_M_AXIS_TDATA_WIDTH => C_M_AXIS_TDATA_WIDTH,
-    C_S_AXIS_TDATA_WIDTH => C_S_AXIS_TDATA_WIDTH
+    generic map(
+    WORD_SIZE_OUT => WORD_SIZE_OUT,
+    WORD_SIZE_IN => WORD_SIZE_IN
     )
     port map(
         S_AXIS_ACLK    => clk,
@@ -135,10 +134,18 @@ begin
                     S_TVALID <= '0';
                     S_TDATA  <= (others => '0');
                     fsm := ST_NEW_MSG;
-                    if(byte_idx = 3) then
-                        byte_idx := 0;
-                    else
-                        byte_idx := byte_idx + 1;
+                    if(WORD_SIZE_OUT = 32) then
+                        if(byte_idx = 3) then
+                            byte_idx := 0;
+                        else
+                            byte_idx := byte_idx + 1;
+                        end if;
+                    elsif(WORD_SIZE_OUT = 16) then
+                        if(byte_idx = 1) then
+                            byte_idx := 0;
+                        else
+                            byte_idx := byte_idx + 1;
+                        end if;
                     end if;
                 end if;
 

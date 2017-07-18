@@ -73,8 +73,9 @@ architecture arch_imp of axi_master_stream_fifo_v1_0 is
 	component axi_master_stream_fifo_v1_0_S00_AXI is
 		generic (
         BRAM_ADDR_WIDTH  : integer := 10;
-		C_S_AXI_DATA_WIDTH	: integer	:= 32;
-		C_S_AXI_ADDR_WIDTH	: integer	:= 4
+        BRAM_DATA_WIDTH  : integer := 32;
+		C_S_AXI_ADDR_WIDTH	: integer	:= 4;
+        C_S_AXI_DATA_WIDTH  : integer   := 32
 		);
 		port (
         fifo_clkEn      : out std_logic;
@@ -128,6 +129,7 @@ begin
 axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
 	generic map (
 	    BRAM_ADDR_WIDTH     => BRAM_ADDR_WIDTH,
+        BRAM_DATA_WIDTH     => BRAM_DATA_WIDTH,
 		C_S_AXI_DATA_WIDTH	=> C_S00_AXI_DATA_WIDTH,
 		C_S_AXI_ADDR_WIDTH	=> C_S00_AXI_ADDR_WIDTH
 	)

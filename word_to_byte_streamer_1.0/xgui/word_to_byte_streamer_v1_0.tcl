@@ -4,50 +4,36 @@ proc init_gui { IPINST } {
   #Adding Page
   ipgui::add_page $IPINST -name "Page 0"
 
-  ipgui::add_param $IPINST -name "ENDIAN" -widget comboBox
+  ipgui::add_param $IPINST -name "WORD_SIZE_IN" -widget comboBox
 
 }
 
-proc update_PARAM_VALUE.C_M_AXIS_TDATA_WIDTH { PARAM_VALUE.C_M_AXIS_TDATA_WIDTH } {
-	# Procedure called to update C_M_AXIS_TDATA_WIDTH when any of the dependent parameters in the arguments change
+proc update_PARAM_VALUE.WORD_SIZE_IN { PARAM_VALUE.WORD_SIZE_IN } {
+	# Procedure called to update WORD_SIZE_IN when any of the dependent parameters in the arguments change
 }
 
-proc validate_PARAM_VALUE.C_M_AXIS_TDATA_WIDTH { PARAM_VALUE.C_M_AXIS_TDATA_WIDTH } {
-	# Procedure called to validate C_M_AXIS_TDATA_WIDTH
+proc validate_PARAM_VALUE.WORD_SIZE_IN { PARAM_VALUE.WORD_SIZE_IN } {
+	# Procedure called to validate WORD_SIZE_IN
 	return true
 }
 
-proc update_PARAM_VALUE.C_S_AXIS_TDATA_WIDTH { PARAM_VALUE.C_S_AXIS_TDATA_WIDTH } {
-	# Procedure called to update C_S_AXIS_TDATA_WIDTH when any of the dependent parameters in the arguments change
+proc update_PARAM_VALUE.WORD_SIZE_OUT { PARAM_VALUE.WORD_SIZE_OUT } {
+	# Procedure called to update WORD_SIZE_OUT when any of the dependent parameters in the arguments change
 }
 
-proc validate_PARAM_VALUE.C_S_AXIS_TDATA_WIDTH { PARAM_VALUE.C_S_AXIS_TDATA_WIDTH } {
-	# Procedure called to validate C_S_AXIS_TDATA_WIDTH
-	return true
-}
-
-proc update_PARAM_VALUE.ENDIAN { PARAM_VALUE.ENDIAN } {
-	# Procedure called to update ENDIAN when any of the dependent parameters in the arguments change
-}
-
-proc validate_PARAM_VALUE.ENDIAN { PARAM_VALUE.ENDIAN } {
-	# Procedure called to validate ENDIAN
+proc validate_PARAM_VALUE.WORD_SIZE_OUT { PARAM_VALUE.WORD_SIZE_OUT } {
+	# Procedure called to validate WORD_SIZE_OUT
 	return true
 }
 
 
-proc update_MODELPARAM_VALUE.C_M_AXIS_TDATA_WIDTH { MODELPARAM_VALUE.C_M_AXIS_TDATA_WIDTH PARAM_VALUE.C_M_AXIS_TDATA_WIDTH } {
+proc update_MODELPARAM_VALUE.WORD_SIZE_OUT { MODELPARAM_VALUE.WORD_SIZE_OUT PARAM_VALUE.WORD_SIZE_OUT } {
 	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
-	set_property value [get_property value ${PARAM_VALUE.C_M_AXIS_TDATA_WIDTH}] ${MODELPARAM_VALUE.C_M_AXIS_TDATA_WIDTH}
+	set_property value [get_property value ${PARAM_VALUE.WORD_SIZE_OUT}] ${MODELPARAM_VALUE.WORD_SIZE_OUT}
 }
 
-proc update_MODELPARAM_VALUE.C_S_AXIS_TDATA_WIDTH { MODELPARAM_VALUE.C_S_AXIS_TDATA_WIDTH PARAM_VALUE.C_S_AXIS_TDATA_WIDTH } {
+proc update_MODELPARAM_VALUE.WORD_SIZE_IN { MODELPARAM_VALUE.WORD_SIZE_IN PARAM_VALUE.WORD_SIZE_IN } {
 	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
-	set_property value [get_property value ${PARAM_VALUE.C_S_AXIS_TDATA_WIDTH}] ${MODELPARAM_VALUE.C_S_AXIS_TDATA_WIDTH}
-}
-
-proc update_MODELPARAM_VALUE.ENDIAN { MODELPARAM_VALUE.ENDIAN PARAM_VALUE.ENDIAN } {
-	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
-	set_property value [get_property value ${PARAM_VALUE.ENDIAN}] ${MODELPARAM_VALUE.ENDIAN}
+	set_property value [get_property value ${PARAM_VALUE.WORD_SIZE_IN}] ${MODELPARAM_VALUE.WORD_SIZE_IN}
 }
 

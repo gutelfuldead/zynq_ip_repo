@@ -398,7 +398,7 @@ begin
     fifo_reset <= slv_reg0(2);
 
     -- slvreg1 PS --> PL
-    fifo_din <= slv_reg1;
+    fifo_din <= slv_reg1(BRAM_DATA_WIDTH-1 downto 0);
 
     -- slv_reg2 occupancy PL --> PS reg
     slv_reg2(BRAM_ADDR_WIDTH-1 downto 0) <= fifo_occupancy;
