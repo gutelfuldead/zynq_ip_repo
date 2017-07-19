@@ -34,23 +34,20 @@ end pulse_generator;
 architecture arch_imp of pulse_generator is
 
 	signal q_sig : std_logic := '0';
-	signal s_out : std_logic := '0';
 
 begin
 	
-	pulsegen : process(clk) is
+	pulsegen : process(clk,reset)
 	begin
 	if(reset = '1') then
 		q_sig <= '0';
-		s_out <= '0';
-    elsif(rising_edge(clk)) then
-   		if(enable = '1') then
-       		q_sig <= not sig_in;
-       		s_out <= q_sig and sig_in;
-   		end if;
-    end if;
-    end process;
+  elsif(rising_edge(clk)) then
+ 		if(enable = '1') then
+     		q_sig <= not sig_in;
+ 		end if;
+  end if;
+  end process;
 
-    pulse_out <= s_out;
+  pulse_out <= q_sig and sig_in;
 
 end arch_imp;
