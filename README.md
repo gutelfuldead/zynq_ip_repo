@@ -54,3 +54,7 @@ Testbenches for various vhdl files.
 word_to_byte_streamer_1.0
 -------------------------
 Counterpart to byte_to_word_streamer_1.0 which takes a 16 or 32 bit word over the AXI-Stream Slave interface and sends out a series of 8-bit outputs to the AXI-Stream Master interface. Pipelined to be always ready to output data.
+
+byte_to_bit_streamer_1.0
+------------------------
+Takes in a byte over AXI-Stream Slave Interface and then sends one byte at a time with the LSB being progressively taken from the input byte in little endian order and sent along the AXI-Stream Master Interface. Developed to be used with Xilinx Interleaver (SID) Core to the Xilinx Convolutional Encoder (convolution) Core.
