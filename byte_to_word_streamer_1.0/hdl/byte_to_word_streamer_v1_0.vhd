@@ -3,11 +3,11 @@
 -- 
 -- Create Date: 07/17/2017
 -- Design Name: 
--- Module Name: byte_to_streamer_v1_0
+-- Module Name: byte_to_word_streamer_v1_0
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
 -- Description: Converts series of bytes received from an upstream AXI-Stream Module 
---   to a 32 bit word and transmits them to a downstream module. 
+--   to a 32 or 16 bit word and transmits them to a downstream module. 
 -- 
 -- Dependencies: 
 -- 

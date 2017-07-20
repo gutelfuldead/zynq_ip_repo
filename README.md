@@ -63,6 +63,6 @@ convolution_to_viterbi_converter_stream_1.0
 -------------------------------------------
 Used as a glue core to connect the [Xilinx Convolutional Encoder](https://www.xilinx.com/support/documentation/ip_documentation/convolution/v9_0/pg026_convolution.pdf) and [Xilinx Viterbi Decoder](https://www.xilinx.com/support/documentation/ip_documentation/viterbi/v9_1/pg027_viterbi_decoder.pdf) cores for testing purposes.
 
-viterbi_to_deinterleaver_1.0
+bits_to_byte_streamer_1.0
 ----------------------------
-Used as glue logic to connect the [Xilinx Viterbi Decoder](https://www.xilinx.com/support/documentation/ip_documentation/viterbi/v9_1/pg027_viterbi_decoder.pdf) and [Xilinx De-Interleaver Cores](https://www.xilinx.com/support/documentation/ip_documentation/sid/v8_0/pg049-sid.pdf).
+Takes a series of bits over an 8bit bus axi4-stream slave interface buffers them internally until a full byte is received then sends it out over the axi4-stream master interface.

@@ -3,11 +3,11 @@
 -- 
 -- Create Date: 07/17/2017
 -- Design Name: 
--- Module Name: byte_to_streamer_v1_0
+-- Module Name: bits_to_byte_streamer_v1_0
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
--- Description: Converts series of bytes received from an upstream AXI-Stream Module 
---   to a 32 bit word and transmits them to a downstream module. 
+-- Description: Converts series of single bit transactions (LSB of bus width 8) 
+--   to a byte before passing it on
 -- 
 -- Dependencies: 
 -- 
@@ -24,7 +24,7 @@ use ieee.numeric_std.all;
 library work;
 use work.generic_pkg.all;
 
-entity viterbi_to_deinterleaver_v1_0 is
+entity bits_to_byte_streamer_v1_0 is
     generic (
     WORD_SIZE_OUT  : integer := 8;
     WORD_SIZE_IN  : integer := 8
@@ -42,9 +42,9 @@ entity viterbi_to_deinterleaver_v1_0 is
     M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
     M_AXIS_TREADY : in std_logic
     );
-end viterbi_to_deinterleaver_v1_0;
+end bits_to_byte_streamer_v1_0;
 
-architecture behavorial of viterbi_to_deinterleaver_v1_0 is
+architecture behavorial of bits_to_byte_streamer_v1_0 is
 
     -- axi slave signals
     signal s_user_rdy    : std_logic := '0';
@@ -109,9 +109,8 @@ begin
 
     ----------------------------------------------------------------------
     -- Axi-Stream Slave Controller
-    -- Takes in a n-byte word and transfers it to the master state machine
-    -- Captures the next n-byte word always ready to feed the master state
-    -- Machine the next word
+    -- Takes in a 8 bits, assembles a byte and asserts the data is ready
+    -- for the master interface
     ----------------------------------------------------------------------
     slave_proc : process(clk, reset)
         constant NUM_BITS : integer := 8;
@@ -143,6 +142,7 @@ begin
             if(bit_idx = NUM_BITS-1) then
                 bit_idx := 0;
                 fsm := ST_SYNC;
+                new_word_ready <= '1';
             else
                 bit_idx := bit_idx + 1;
                 fsm := ST_IDLE;
@@ -163,9 +163,8 @@ begin
 
     ----------------------------------------------------------------
     -- Axi-Stream Master Controller
-    -- Receives n-byte word from slave controller and parses it up
-    -- into an array of bytes. Sends the bytes in order based on 
-    -- generic endian selected ("BIG" or "LITTLE"). 
+    -- Receives the complete byte from the slave controller and
+    -- transfers it to the downstream module
     ----------------------------------------------------------------
     master_proc : process(clk, reset)
         type fsm_states_mstr is (ST_IDLE, ST_ACTIVE);

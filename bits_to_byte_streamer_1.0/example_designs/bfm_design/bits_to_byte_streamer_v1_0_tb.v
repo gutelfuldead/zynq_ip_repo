@@ -1,7 +1,7 @@
 
 `timescale 1 ns / 1 ps
 
-`include "viterbi_to_deinterleaver_v1_0_tb_include.vh"
+`include "bits_to_byte_streamer_v1_0_tb_include.vh"
 
 // lite_response Type Defines
 `define RESPONSE_OKAY 2'b00
@@ -16,7 +16,7 @@
 `define S00_AXI_ADDRESS_BUS_WIDTH 32
 `define S00_AXI_MAX_DATA_SIZE (`S00_AXI_DATA_BUS_WIDTH*`S00_AXI_MAX_BURST_LENGTH)/8
 
-module viterbi_to_deinterleaver_v1_0_tb;
+module bits_to_byte_streamer_v1_0_tb;
 	reg tb_ACLK;
 	reg tb_ARESETn;
 

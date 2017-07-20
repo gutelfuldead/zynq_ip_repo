@@ -80,6 +80,7 @@ begin
         user_dvalid    => m_user_dvalid,
         user_txdone    => m_user_txdone,
         axis_rdy       => m_axis_rdy,
+        axis_last      => '0',
         M_AXIS_ACLK    => M_AXIS_ACLK,
         M_AXIS_ARESETN => M_AXIS_ARESETN,
         M_AXIS_TVALID  => M_AXIS_TVALID,

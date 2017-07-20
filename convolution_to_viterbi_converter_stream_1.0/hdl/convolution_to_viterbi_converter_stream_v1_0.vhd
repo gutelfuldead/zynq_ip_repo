@@ -3,11 +3,22 @@
 -- 
 -- Create Date: 07/17/2017
 -- Design Name: 
--- Module Name: byte_to_streamer_v1_0
+-- Module Name: convolution_to_viterbi_converter_stream_v1_0
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
--- Description: Converts series of bytes received from an upstream AXI-Stream Module 
---   to a 32 bit word and transmits them to a downstream module. 
+-- Description: Interface to test connections directly from the Xilinx Convolutional
+--   Encoder IP Core to the Xilinx Viterbi Decoder IP Core. Convolution core outputs
+--   on a bus width of 8 with only the bottom two LSBs being significant. "bit_1" 
+--   takes position '1' and "bit_0" takes on position '0' with type uint. Convolution
+--   core must have the following modes set to use this core : Output Rate = 2 and 
+--   TREADY enabled.
+--
+--   The Viterbi Core takes in two bits of type uint on a bus width of 16 bits. With "bit_1" 
+--   occupying position '8' and "bit_0" occupying position '0'. Viterbi must have the
+--   following modes set to use this core: "Standard", "Hard Coding", Output Rate 0 = '2', 
+--   TREADY enabled.
+--
+--   This core makes that conversion so the two cores can communicate.
 -- 
 -- Dependencies: 
 -- 
@@ -46,8 +57,10 @@ end convolution_to_viterbi_converter_stream_v1_0;
 
 architecture behavorial of convolution_to_viterbi_converter_stream_v1_0 is
 
-    constant bit_0_idx : integer := 0;
-    constant bit_1_idx : integer := 8;
+    constant viterbi_bit_0_idx : integer := 0;
+    constant viterbi_bit_1_idx : integer := 8;
+    constant conv_bit_0_idx    : integer := 0;
+    constant conv_bit_1_idx    : integer := 1;
 
     -- axi slave signals
     signal s_user_rdy    : std_logic := '0';
@@ -111,9 +124,6 @@ begin
 
     ----------------------------------------------------------------------
     -- Axi-Stream Slave Controller
-    -- Takes in a n-byte word and transfers it to the master state machine
-    -- Captures the next n-byte word always ready to feed the master state
-    -- Machine the next word
     ----------------------------------------------------------------------
     slave_proc : process(clk, reset)
         type fsm_states_slv  is (ST_IDLE, ST_ACTIVE, ST_SYNC);
@@ -134,8 +144,8 @@ begin
         when ST_ACTIVE =>
             s_user_rdy <= '0';
             if(s_user_dvalid = '1') then
-                new_word(bit_1_idx) <= s_user_data(1);
-                new_word(bit_0_idx) <= s_user_data(0);                
+                new_word(viterbi_bit_1_idx) <= s_user_data(conv_bit_1_idx);
+                new_word(viterbi_bit_0_idx) <= s_user_data(conv_bit_0_idx);                
                 fsm            := ST_SYNC;
                 new_word_ready <= '1';
             end if;
@@ -154,10 +164,7 @@ begin
     end process slave_proc;
 
     ----------------------------------------------------------------
-    -- Axi-Stream Master Controller
-    -- Receives n-byte word from slave controller and parses it up
-    -- into an array of bytes. Sends the bytes in order based on 
-    -- generic endian selected ("BIG" or "LITTLE"). 
+    -- Axi-Stream Master Controller 
     ----------------------------------------------------------------
     master_proc : process(clk, reset)
         type fsm_states_mstr is (ST_IDLE, ST_ACTIVE);

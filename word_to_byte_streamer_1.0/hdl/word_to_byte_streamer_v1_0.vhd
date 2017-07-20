@@ -8,7 +8,8 @@
 -- Tool Versions: Vivado 2015.4
 -- Description: Converts Words received from an upstream AXI-Stream Module 
 --   (size == WORD_SIZE_IN) to a series of bytes and transmits them
---   to a downstream module. 
+--   to a downstream module. Accepts either 32b or 16b words based on generic
+--   choices.
 -- 
 -- Dependencies: 
 -- 

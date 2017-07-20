@@ -14,7 +14,7 @@ NM2=byte_to_word_streamer_1.0
 NM3=word_to_byte_streamer_1.0
 NM4=byte_to_bit_streamer_1.0
 NM5=convolution_to_viterbi_converter_stream_1.0
-NM6=viterbi_to_deinterleaver_1.0
+NM6=bits_to_byte_streamer_1.0
 
 # destination of cores to copy into
 DST0=../$NM0/src
