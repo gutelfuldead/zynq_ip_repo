@@ -33,6 +33,8 @@ entity AXI_MASTER_STREAM is
     user_txdone : out std_logic;
     -- '1' when core is ready to start a new transaction
     axis_rdy : out std_logic;
+    -- '1' when the last piece of data is passed
+    axis_last : in std_logic;
     -- Global AXI-Stream Master Ports
     M_AXIS_ACLK : in std_logic;
     M_AXIS_ARESETN  : in std_logic;
@@ -54,7 +56,6 @@ begin
 ----------------------------------------------
 -- un-used interface ports set to constants --
 ----------------------------------------------
-M_AXIS_TLAST  <= '0';
 M_AXIS_TSTRB  <= (others => '1');
     
 ------------------------------------------------------------------------
@@ -82,6 +83,11 @@ M_AXIS_TSTRB  <= (others => '1');
         fsm <= ST_WRITE;
         M_AXIS_TVALID <= '1';
         M_AXIS_TDATA  <= user_din;
+        if(axis_last = '1') then
+          M_AXIS_TLAST <= '1';
+        else
+          M_AXIS_TLAST <= '0';
+        end if;
       end if;
 
     when ST_WRITE =>

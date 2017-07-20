@@ -28,11 +28,14 @@ entity AXI_SLAVE_STREAM is
 		-- control ports
 		-- top level is ready for new data
 		user_rdy    : in std_logic;
-		-- the user_data line has valid data
+		-- '1' when the user_data line has valid data
         user_dvalid : out std_logic;
         -- the received transactional data
         user_data   : out std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
+        -- '1' when the interface is ready for a new transaction
     	axis_rdy    : out std_logic;
+    	-- '1' when the last transaction is complete
+    	axis_last   : out std_logic;
     	-- global AXI-Stream Slave ports
 		S_AXIS_ACLK	: in std_logic;
 		S_AXIS_ARESETN	: in std_logic;
@@ -66,6 +69,7 @@ begin
 		fsm         <= ST_IDLE;
 		user_dvalid <= '0';
 		S_AXIS_TREADY    <= '0';
+		axis_last <= '0';
 	elsif (rising_edge (S_AXIS_ACLK)) then
 	  	case (fsm) is
 
@@ -84,6 +88,7 @@ begin
                     user_data     <= S_AXIS_TDATA;	
 					user_dvalid   <= '1';
 					fsm <= ST_IDLE;
+					axis_last <= S_AXIS_TLAST;
 				end if; 
 
 	        when others => 

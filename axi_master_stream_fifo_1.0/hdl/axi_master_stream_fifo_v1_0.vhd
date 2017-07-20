@@ -38,8 +38,8 @@ entity axi_master_stream_fifo_v1_0 is
         M_AXIS_ARESETN    : in std_logic;
         M_AXIS_TVALID    : out std_logic;
         M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-        M_AXIS_TLAST    : out std_logic;
+        --M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
+        --M_AXIS_TLAST    : out std_logic;
         M_AXIS_TREADY    : in std_logic;
 
 		-- Ports of Axi Slave Bus Interface S00_AXI
@@ -193,8 +193,8 @@ axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
         M_AXIS_ARESETN  => M_AXIS_ARESETN,
         M_AXIS_TVALID   => M_AXIS_TVALID,
         M_AXIS_TDATA    => M_AXIS_TDATA,
-        M_AXIS_TSTRB    => M_AXIS_TSTRB,
-        M_AXIS_TLAST    => M_AXIS_TLAST,
+        --M_AXIS_TSTRB    => M_AXIS_TSTRB,
+        --M_AXIS_TLAST    => M_AXIS_TLAST,
         M_AXIS_TREADY   => M_AXIS_TREADY,
 
         -- control lines

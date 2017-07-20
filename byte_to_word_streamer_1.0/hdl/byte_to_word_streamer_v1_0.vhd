@@ -34,16 +34,16 @@ entity byte_to_word_streamer_v1_0 is
     S_AXIS_ARESETN    : in std_logic;
     S_AXIS_TREADY    : out std_logic;
     S_AXIS_TDATA    : in std_logic_vector(WORD_SIZE_IN-1 downto 0);
-    S_AXIS_TSTRB    : in std_logic_vector((WORD_SIZE_IN/8)-1 downto 0);
-    S_AXIS_TLAST    : in std_logic;
+    --S_AXIS_TSTRB    : in std_logic_vector((WORD_SIZE_IN/8)-1 downto 0);
+    --S_AXIS_TLAST    : in std_logic;
     S_AXIS_TVALID    : in std_logic;
     
     M_AXIS_ACLK : in std_logic;
     M_AXIS_ARESETN  : in std_logic;
     M_AXIS_TVALID : out std_logic;
     M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
-    M_AXIS_TSTRB  : out std_logic_vector((WORD_SIZE_OUT/8)-1 downto 0);
-    M_AXIS_TLAST  : out std_logic;
+    --M_AXIS_TSTRB  : out std_logic_vector((WORD_SIZE_OUT/8)-1 downto 0);
+    --M_AXIS_TLAST  : out std_logic;
     M_AXIS_TREADY : in std_logic
     );
 end byte_to_word_streamer_v1_0;
@@ -84,12 +84,13 @@ begin
         user_dvalid    => m_user_dvalid,
         user_txdone    => m_user_txdone,
         axis_rdy       => m_axis_rdy,
+        axis_last      => '0',
         M_AXIS_ACLK    => M_AXIS_ACLK,
         M_AXIS_ARESETN => M_AXIS_ARESETN,
         M_AXIS_TVALID  => M_AXIS_TVALID,
         M_AXIS_TDATA   => M_AXIS_TDATA,
-        M_AXIS_TSTRB   => M_AXIS_TSTRB,
-        M_AXIS_TLAST   => M_AXIS_TLAST,
+        M_AXIS_TSTRB   => open,
+        M_AXIS_TLAST   => open,
         M_AXIS_TREADY  => M_AXIS_TREADY
         );
 
@@ -100,12 +101,13 @@ begin
         user_dvalid    => s_user_dvalid,
         user_data      => s_user_data,
         axis_rdy       => s_axis_rdy,
+        axis_last      => open,
         S_AXIS_ACLK    => S_AXIS_ACLK,
         S_AXIS_ARESETN => S_AXIS_ARESETN,
         S_AXIS_TREADY  => S_AXIS_TREADY,
         S_AXIS_TDATA   => S_AXIS_TDATA,
-        S_AXIS_TSTRB   => S_AXIS_TSTRB,
-        S_AXIS_TLAST   => S_AXIS_TLAST,
+        S_AXIS_TSTRB   => (others => '0'),
+        S_AXIS_TLAST   => '0',
         S_AXIS_TVALID  => S_AXIS_TVALID
         );
 

@@ -22,10 +22,11 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity pulse_generator is
+  generic (
+    ACTIVE_LEVEL : string := "HIGH" -- "LOW"
+    );
 	port (
         clk       : in std_logic;
-        enable    : in std_logic;
-        reset     : in std_logic;
         sig_in    : in std_logic;
         pulse_out : out std_logic
 	);
@@ -39,15 +40,18 @@ begin
 	
 	pulsegen : process(clk,reset)
 	begin
-	if(reset = '1') then
-		q_sig <= '0';
-  elsif(rising_edge(clk)) then
- 		if(enable = '1') then
+  if(rising_edge(clk)) then
      		q_sig <= not sig_in;
- 		end if;
   end if;
   end process;
 
-  pulse_out <= q_sig and sig_in;
+  sync_out : process(clk)
+  begin
+    if (ACTIVE_LEVEL = "HIGH") then
+      pulse_out <= q_sig and sig_in;
+    elsif (ACTIVE_LEVEL = "LOW") then
+      pulse_out <= not (q_sig and sig_in);
+    end if;
+  end process sync_out;
 
 end arch_imp;

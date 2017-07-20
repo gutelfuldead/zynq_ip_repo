@@ -76,7 +76,8 @@ package generic_pkg is
 		user_din    : in std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
 		user_dvalid : in std_logic; 
 		user_txdone : out std_logic;
-		axis_rdy: out std_logic;
+		axis_rdy    : out std_logic;
+		axis_last   : in std_logic;
 		-- global ports
 		M_AXIS_ACLK	    : in std_logic;
 		M_AXIS_ARESETN	: in std_logic;
@@ -96,7 +97,8 @@ package generic_pkg is
 		user_rdy    : in std_logic;
         user_dvalid : out std_logic;
         user_data   : out std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
-		axis_rdy: out std_logic;
+		axis_rdy    : out std_logic;
+		axis_last   : out std_logic;
 		-- global ports
 		S_AXIS_ACLK	: in std_logic;
 		S_AXIS_ARESETN	: in std_logic;
@@ -136,8 +138,8 @@ package generic_pkg is
 	        M_AXIS_ARESETN  : in std_logic;
 	        M_AXIS_TVALID   : out std_logic;
 	        M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-	        M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-	        M_AXIS_TLAST    : out std_logic;
+	        --M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
+	        --M_AXIS_TLAST    : out std_logic;
 	        M_AXIS_TREADY   : in std_logic;
 
 	        -- fifo control lines
@@ -186,8 +188,8 @@ package generic_pkg is
         S_AXIS_ARESETN  : in std_logic;
         S_AXIS_TREADY   : out std_logic;
         S_AXIS_TDATA    : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        S_AXIS_TSTRB    : in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-        S_AXIS_TLAST    : in std_logic;
+        --S_AXIS_TSTRB    : in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
+        --S_AXIS_TLAST    : in std_logic;
         S_AXIS_TVALID   : in std_logic;
 
         -- fifo control lines
@@ -206,12 +208,14 @@ package generic_pkg is
 	-- generates a pulse from an input
 	----------------------------------
 	component pulse_generator is
+		generic (
+		ACTIVE_LEVEL : string := "HIGH" -- "LOW"
+    	);
 		port (
-	        clk       : in std_logic;
-	        enable    : in std_logic;
-            reset     : in std_logic;	
-	        sig_in    : in std_logic;
-	        pulse_out : out std_logic
+        clk       : in std_logic;
+        reset     : in std_logic;	
+        sig_in    : in std_logic;
+        pulse_out : out std_logic
 		);
 	end component pulse_generator;
 

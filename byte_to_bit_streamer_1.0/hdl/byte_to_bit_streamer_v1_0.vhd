@@ -92,6 +92,7 @@ begin
         user_dvalid    => s_user_dvalid,
         user_data      => s_user_data,
         axis_rdy       => s_axis_rdy,
+        axis_last      => open,
         S_AXIS_ACLK    => S_AXIS_ACLK,
         S_AXIS_ARESETN => S_AXIS_ARESETN,
         S_AXIS_TREADY  => S_AXIS_TREADY,

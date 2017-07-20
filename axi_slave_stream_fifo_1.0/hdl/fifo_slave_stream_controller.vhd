@@ -61,8 +61,8 @@ entity FIFO_SLAVE_STREAM_CONTROLLER is
         S_AXIS_ARESETN  : in std_logic;
         S_AXIS_TREADY   : out std_logic;
         S_AXIS_TDATA    : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        S_AXIS_TSTRB    : in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-        S_AXIS_TLAST    : in std_logic;
+        --S_AXIS_TSTRB    : in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
+        --S_AXIS_TLAST    : in std_logic;
         S_AXIS_TVALID   : in std_logic;
 
         -- fifo control lines
@@ -150,12 +150,13 @@ begin
             user_dvalid    => sig_axis_dvalid,
             user_data      => sig_axis_dout,
             axis_rdy       => sig_axis_rdy,
+            axis_last      => open,
             S_AXIS_ACLK    => S_AXIS_ACLK,
             S_AXIS_ARESETN => S_AXIS_ARESETN,
             S_AXIS_TREADY  => S_AXIS_TREADY,
             S_AXIS_TDATA   => S_AXIS_TDATA,
-            S_AXIS_TSTRB   => S_AXIS_TSTRB,
-            S_AXIS_TLAST   => S_AXIS_TLAST,
+            S_AXIS_TSTRB   => (others => '0'),
+            S_AXIS_TLAST   => '0',
             S_AXIS_TVALID  => S_AXIS_TVALID
             );
 
