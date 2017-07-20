@@ -1,7 +1,7 @@
 zynq_ip_repo
 ============
 
-This repository contains multiple IP Cores designed for the Zynq7000 series SoC. Some include Xilinx primitives and AXI interfaces.
+This repository contains multiple IP Cores designed for the Zynq7000 series SoC. Some include Xilinx primitives and AXI interfaces. All IP contain `./tb` subfolder with test bench files. Any IP with an AXI4-Lite interface to the processor contains sufficient software drivers and doxy comments for usage.
 
 axi_bram_fifo_controller_1.0
 ----------------------------
@@ -46,10 +46,6 @@ No actual vhd but contains instructions on how to control a specific PMOD RS485 
 tdma_slot_generator_1.0
 -----------------------
 Takes a GPS PPS signal and generates a new pulse every x ms based on generics. If a second passes without an input GPS PPS pulse then the core will cease to function until a new pulse is encountered. Interrupts processor with every pulse with information about whether it was a core generated pulse or the GPS PPS signal itself. Optional output pin that is an active high version of the irq pulse. Contains drivers to configure the device from AXI4-Lite.
-
-testbenches
------------
-Testbenches for various vhdl files.
 
 word_to_byte_streamer_1.0
 -------------------------
