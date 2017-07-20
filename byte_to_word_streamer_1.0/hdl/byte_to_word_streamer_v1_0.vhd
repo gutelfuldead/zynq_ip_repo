@@ -65,7 +65,6 @@ architecture behavorial of byte_to_word_streamer_v1_0 is
 
 begin
 
-
     axi_master_stream_inst : axi_master_stream
     generic map (C_M_AXIS_TDATA_WIDTH => WORD_SIZE_OUT)
     port map (
@@ -75,7 +74,7 @@ begin
         axis_rdy       => m_axis_rdy,
         axis_last      => '0',
         M_AXIS_ACLK    => AXIS_ACLK,
-        M_AXIS_ARESETN => M_AXIS_ARESETN,
+        M_AXIS_ARESETN => AXIS_ARESETN,
         M_AXIS_TVALID  => M_AXIS_TVALID,
         M_AXIS_TDATA   => M_AXIS_TDATA,
         M_AXIS_TSTRB   => open,
@@ -92,7 +91,7 @@ begin
         axis_rdy       => s_axis_rdy,
         axis_last      => open,
         S_AXIS_ACLK    => AXIS_ACLK,
-        S_AXIS_ARESETN => S_AXIS_ARESETN,
+        S_AXIS_ARESETN => AXIS_ARESETN,
         S_AXIS_TREADY  => S_AXIS_TREADY,
         S_AXIS_TDATA   => S_AXIS_TDATA,
         S_AXIS_TSTRB   => (others => '0'),

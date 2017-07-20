@@ -41,6 +41,9 @@ entity convolution_to_viterbi_converter_stream_v1_0 is
     WORD_SIZE_IN  : integer := 8
     );
     port (
+    NUM_IN  : out std_logic_vector(31 downto 0);
+    NUM_OUT : out std_logic_vector(31 downto 0);
+    
     AXIS_ACLK : in std_logic;
     AXIS_ARESETN    : in std_logic;
     
@@ -79,6 +82,9 @@ architecture behavorial of convolution_to_viterbi_converter_stream_v1_0 is
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
 
+    signal cnt_in : integer := 0;
+    signal cnt_out : integer := 0;
+    
 begin
 
     axi_master_stream_inst : axi_master_stream
@@ -118,11 +124,13 @@ begin
     ----------------------------------------------------------------------
     -- Axi-Stream Slave Controller
     ----------------------------------------------------------------------
+    NUM_IN <= std_logic_vector(to_unsigned(cnt_in, 32));
     slave_proc : process(AXIS_ACLK, AXIS_ARESETN)
         type fsm_states_slv  is (ST_IDLE, ST_ACTIVE, ST_SYNC);
         variable fsm : fsm_states_slv := ST_IDLE;
     begin
     if(AXIS_ARESETN = '0') then
+        cnt_in <= 0;
         fsm            := ST_IDLE;
         s_user_rdy     <= '0';
         new_word_ready <= '0';
@@ -141,6 +149,7 @@ begin
                 new_word(viterbi_bit_0_idx) <= s_user_data(conv_bit_0_idx);                
                 fsm            := ST_SYNC;
                 new_word_ready <= '1';
+                cnt_in <= cnt_in + 1;
             end if;
             
         when ST_SYNC =>
@@ -159,11 +168,13 @@ begin
     ----------------------------------------------------------------
     -- Axi-Stream Master Controller 
     ----------------------------------------------------------------
+    NUM_OUT <= std_logic_vector(to_unsigned(cnt_out, 32));
     master_proc : process(AXIS_ACLK, AXIS_ARESETN)
         type fsm_states_mstr is (ST_IDLE, ST_ACTIVE);
         variable fsm : fsm_states_mstr := ST_IDLE;
     begin
     if(AXIS_ARESETN = '0') then
+        cnt_out <= 0;
         m_user_data   <= (others => '0');
         m_user_dvalid <= '0';
         word_accessed <= '0';
@@ -185,6 +196,7 @@ begin
                 m_user_dvalid <= '1';
                 m_user_data   <= current_word;
                 fsm           := ST_IDLE;
+                cnt_out <= cnt_out + 1;
             end if;
 
         when others =>

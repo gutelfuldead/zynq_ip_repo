@@ -50,7 +50,7 @@ begin
         AXIS_ARESETN => reset,
         S_AXIS_TREADY  => S_TREADY,
         S_AXIS_TDATA   => S_TDATA,
-        S_AXIS_TSTRB   => S_TSTRB,
+        S_AXIS_TVALID  => S_TVALID,
         M_AXIS_TVALID  => M_TVALID,
         M_AXIS_TDATA   => M_TDATA,
         M_AXIS_TREADY  => M_TREADY
