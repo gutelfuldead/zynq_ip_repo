@@ -25,33 +25,35 @@ entity pulse_generator is
   generic (
     ACTIVE_LEVEL : string := "HIGH" -- "LOW"
     );
-	port (
+  port (
         clk       : in std_logic;
         sig_in    : in std_logic;
         pulse_out : out std_logic
-	);
+  );
 end pulse_generator;
 
 architecture arch_imp of pulse_generator is
 
-	signal q_sig : std_logic := '0';
+  signal q_sig : std_logic := '0';
 
 begin
-	
-	pulsegen : process(clk,reset)
-	begin
+  
+  pulsegen : process(clk)
+  begin
   if(rising_edge(clk)) then
-     		q_sig <= not sig_in;
+        q_sig <= not sig_in;
   end if;
   end process;
 
   sync_out : process(clk)
   begin
+  if(rising_edge(clk)) then
     if (ACTIVE_LEVEL = "HIGH") then
       pulse_out <= q_sig and sig_in;
     elsif (ACTIVE_LEVEL = "LOW") then
       pulse_out <= not (q_sig and sig_in);
-    end if;
+    end if; 
+  end if;
   end process sync_out;
 
 end arch_imp;
