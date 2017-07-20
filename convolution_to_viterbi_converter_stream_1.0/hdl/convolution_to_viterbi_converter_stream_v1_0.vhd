@@ -41,14 +41,13 @@ entity convolution_to_viterbi_converter_stream_v1_0 is
     WORD_SIZE_IN  : integer := 8
     );
     port (
-    S_AXIS_ACLK : in std_logic;
-    S_AXIS_ARESETN    : in std_logic;
+    AXIS_ACLK : in std_logic;
+    AXIS_ARESETN    : in std_logic;
+    
     S_AXIS_TREADY    : out std_logic;
     S_AXIS_TDATA    : in std_logic_vector(7 downto 0);
     S_AXIS_TVALID    : in std_logic;
     
-    M_AXIS_ACLK : in std_logic;
-    M_AXIS_ARESETN  : in std_logic;
     M_AXIS_TVALID : out std_logic;
     M_AXIS_TDATA  : out std_logic_vector(15 downto 0);
     M_AXIS_TREADY : in std_logic
@@ -80,13 +79,7 @@ architecture behavorial of convolution_to_viterbi_converter_stream_v1_0 is
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
 
-    signal reset : std_logic := '0';
-    signal clk   : std_logic;
-
 begin
-
-    reset <= M_AXIS_ARESETN;
-    clk   <= M_AXIS_ACLK;
 
     axi_master_stream_inst : axi_master_stream
     generic map (C_M_AXIS_TDATA_WIDTH => WORD_SIZE_OUT)
@@ -96,8 +89,8 @@ begin
         user_txdone    => m_user_txdone,
         axis_rdy       => m_axis_rdy,
         axis_last      => '0',
-        M_AXIS_ACLK    => M_AXIS_ACLK,
-        M_AXIS_ARESETN => M_AXIS_ARESETN,
+        M_AXIS_ACLK    => AXIS_ACLK,
+        M_AXIS_ARESETN => AXIS_ARESETN,
         M_AXIS_TVALID  => M_AXIS_TVALID,
         M_AXIS_TDATA   => M_AXIS_TDATA,
         M_AXIS_TSTRB   => open,
@@ -113,8 +106,8 @@ begin
         user_data      => s_user_data,
         axis_rdy       => s_axis_rdy,
         axis_last      => open,
-        S_AXIS_ACLK    => S_AXIS_ACLK,
-        S_AXIS_ARESETN => S_AXIS_ARESETN,
+        S_AXIS_ACLK    => AXIS_ACLK,
+        S_AXIS_ARESETN => AXIS_ARESETN,
         S_AXIS_TREADY  => S_AXIS_TREADY,
         S_AXIS_TDATA   => S_AXIS_TDATA,
         S_AXIS_TSTRB   => (others => '0'),
@@ -125,15 +118,15 @@ begin
     ----------------------------------------------------------------------
     -- Axi-Stream Slave Controller
     ----------------------------------------------------------------------
-    slave_proc : process(clk, reset)
+    slave_proc : process(AXIS_ACLK, AXIS_ARESETN)
         type fsm_states_slv  is (ST_IDLE, ST_ACTIVE, ST_SYNC);
         variable fsm : fsm_states_slv := ST_IDLE;
     begin
-    if(reset = '0') then
+    if(AXIS_ARESETN = '0') then
         fsm            := ST_IDLE;
         s_user_rdy     <= '0';
         new_word_ready <= '0';
-    elsif(rising_edge(clk)) then
+    elsif(rising_edge(AXIS_ACLK)) then
         case(fsm) is
         when ST_IDLE =>
             if(s_axis_rdy = '1') then
@@ -166,16 +159,16 @@ begin
     ----------------------------------------------------------------
     -- Axi-Stream Master Controller 
     ----------------------------------------------------------------
-    master_proc : process(clk, reset)
+    master_proc : process(AXIS_ACLK, AXIS_ARESETN)
         type fsm_states_mstr is (ST_IDLE, ST_ACTIVE);
         variable fsm : fsm_states_mstr := ST_IDLE;
     begin
-    if(reset = '0') then
+    if(AXIS_ARESETN = '0') then
         m_user_data   <= (others => '0');
         m_user_dvalid <= '0';
         word_accessed <= '0';
         fsm := ST_IDLE;
-    elsif(rising_edge(clk)) then
+    elsif(rising_edge(AXIS_ACLK)) then
         case(fsm) is
 
         when ST_IDLE =>

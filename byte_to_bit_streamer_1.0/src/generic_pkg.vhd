@@ -213,7 +213,6 @@ package generic_pkg is
     	);
 		port (
         clk       : in std_logic;
-        reset     : in std_logic;	
         sig_in    : in std_logic;
         pulse_out : out std_logic
 		);
