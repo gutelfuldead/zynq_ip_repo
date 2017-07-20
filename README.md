@@ -17,7 +17,7 @@ Accepts data from an independent AXI4-Stream Slave interface and writes it to th
 
 button_interrupt_1.0
 --------------------
-Generates an interrupt to the processor whenever a button is pressed. Doesn't currently inform which button was pressed. `todo: fix to inform which button was pressed`
+Generates an interrupt to the processor whenever a button is pressed. Doesn't currently inform which button was pressed. **todo: fix to inform which button was pressed**
 
 byte_to_word_streamer_1.0
 -------------------------
@@ -57,4 +57,12 @@ Counterpart to byte_to_word_streamer_1.0 which takes a 16 or 32 bit word over th
 
 byte_to_bit_streamer_1.0
 ------------------------
-Takes in a byte over AXI-Stream Slave Interface and then sends one byte at a time with the LSB being progressively taken from the input byte in little endian order and sent along the AXI-Stream Master Interface. Developed to be used with Xilinx Interleaver (SID) Core to the Xilinx Convolutional Encoder (convolution) Core.
+Takes in a byte over AXI-Stream Slave Interface and then sends one byte at a time with the LSB being progressively taken from the input byte in little endian order and sent along the AXI-Stream Master Interface. Developed to be used with [Xilinx Interleaver Core](https://www.xilinx.com/support/documentation/ip_documentation/sid/v8_0/pg049-sid.pdf) to the [Xilinx Convolutional Encoder](https://www.xilinx.com/support/documentation/ip_documentation/convolution/v9_0/pg026_convolution.pdf) Core.
+
+convolution_to_viterbi_converter_stream_1.0
+-------------------------------------------
+Used as a glue core to connect the [Xilinx Convolutional Encoder](https://www.xilinx.com/support/documentation/ip_documentation/convolution/v9_0/pg026_convolution.pdf) and [Xilinx Viterbi Decoder](https://www.xilinx.com/support/documentation/ip_documentation/viterbi/v9_1/pg027_viterbi_decoder.pdf) cores for testing purposes.
+
+viterbi_to_deinterleaver_1.0
+----------------------------
+Used as glue logic to connect the [Xilinx Viterbi Decoder](https://www.xilinx.com/support/documentation/ip_documentation/viterbi/v9_1/pg027_viterbi_decoder.pdf) and [Xilinx De-Interleaver Cores](https://www.xilinx.com/support/documentation/ip_documentation/sid/v8_0/pg049-sid.pdf).

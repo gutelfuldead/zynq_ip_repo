@@ -26,6 +26,10 @@ library work;
 use work.generic_pkg.all;
 
 entity byte_to_bit_streamer_v1_0 is
+    generic (
+    WORD_SIZE_OUT  : integer := 8;
+    WORD_SIZE_IN  : integer := 8
+    );
     port (
     S_AXIS_ACLK : in std_logic;
     S_AXIS_ARESETN    : in std_logic;
@@ -46,18 +50,18 @@ architecture behavorial of byte_to_bit_streamer_v1_0 is
     -- axi slave signals
     signal s_user_rdy    : std_logic := '0';
     signal s_user_dvalid : std_logic := '0';
-    signal s_user_data   : std_logic_vector(7 downto 0) := (others => '0');
+    signal s_user_data   : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
     signal s_axis_rdy    : std_logic := '0';
 
     -- axi master signals
-    signal m_user_data   : std_logic_vector(7 downto 0) := (others => '0');
+    signal m_user_data   : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
     signal m_user_dvalid : std_logic := '0';
     signal m_user_txdone : std_logic := '0';
     signal m_axis_rdy    : std_logic := '0';
 
     -- internal buffers
-    signal current_word : std_logic_vector(7 downto 0) := (others => '0'); 
-    signal new_word     : std_logic_vector(7 downto 0) := (others => '0');
+    signal current_word : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0'); 
+    signal new_word     : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
 
@@ -70,7 +74,7 @@ begin
     clk   <= M_AXIS_ACLK;
 
     axi_master_stream_inst : axi_master_stream
-    generic map (C_M_AXIS_TDATA_WIDTH => 8)
+    generic map (C_M_AXIS_TDATA_WIDTH => WORD_SIZE_OUT)
     port map (
         user_din       => m_user_data,
         user_dvalid    => m_user_dvalid,
@@ -86,7 +90,7 @@ begin
         );
 
     axi_slave_stream_inst : axi_slave_stream
-    generic map (C_S_AXIS_TDATA_WIDTH => 8)
+    generic map (C_S_AXIS_TDATA_WIDTH => WORD_SIZE_IN)
     port map (
         user_rdy       => s_user_rdy,
         user_dvalid    => s_user_dvalid,
