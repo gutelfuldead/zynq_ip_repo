@@ -13,14 +13,13 @@ architecture arch_tb of byte_to_bit_streamer_v1_0_tb is
 
     component byte_to_bit_streamer_v1_0 is
         port (
-        S_AXIS_ACLK : in std_logic;
-        S_AXIS_ARESETN    : in std_logic;
+        AXIS_ACLK : in std_logic;
+        AXIS_ARESETN    : in std_logic;
+        
         S_AXIS_TREADY    : out std_logic;
         S_AXIS_TDATA    : in std_logic_vector(7 downto 0);
         S_AXIS_TVALID    : in std_logic;
         
-        M_AXIS_ACLK : in std_logic;
-        M_AXIS_ARESETN  : in std_logic;
         M_AXIS_TVALID : out std_logic;
         M_AXIS_TDATA  : out std_logic_vector(7 downto 0);
         M_AXIS_TREADY : in std_logic
@@ -33,10 +32,6 @@ architecture arch_tb of byte_to_bit_streamer_v1_0_tb is
     signal clk           : std_logic := '0';
     signal reset         : std_logic := '0';
 
-    signal S_ACLK : std_logic := '0';
-    signal M_ACLK : std_logic := '0';
-    signal S_ARESETN : std_logic := '0';
-    signal M_ARESETN : std_logic := '0';
     signal S_TDATA  : std_logic_vector(7 downto 0)     := (others => '0');
     signal M_TDATA  : std_logic_vector(7 downto 0)     := (others => '0');
     signal S_TVALID : std_logic := '0';
@@ -54,19 +49,13 @@ begin
     WORD_SIZE_IN => WORD_SIZE_IN
     )
     port map(
-        S_AXIS_ACLK    => clk,
-        S_AXIS_ARESETN => reset,
+        AXIS_ACLK    => clk,
+        AXIS_ARESETN => reset,
         S_AXIS_TREADY  => S_TREADY,
         S_AXIS_TDATA   => S_TDATA,
-        S_AXIS_TSTRB   => S_TSTRB,
-        S_AXIS_TLAST   => S_TLAST,
         S_AXIS_TVALID  => S_TVALID,
-        M_AXIS_ACLK    => clk,
-        M_AXIS_ARESETN => reset,
         M_AXIS_TVALID  => M_TVALID,
         M_AXIS_TDATA   => M_TDATA,
-        M_AXIS_TSTRB   => M_TSTRB,
-        M_AXIS_TLAST   => M_TLAST,
         M_AXIS_TREADY  => M_TREADY
         );
 
