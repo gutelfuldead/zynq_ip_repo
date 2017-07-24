@@ -16,6 +16,7 @@ NM4=byte_to_bit_streamer_1.0
 NM5=convolution_to_viterbi_converter_stream_1.0
 NM6=bits_to_byte_streamer_1.0
 NM7=reset_controller_1.0
+NM8=interleaver_data_buffer_1.0
 
 # destination of cores to copy into
 DST0=../$NM0/src
@@ -26,6 +27,7 @@ DST4=../$NM4/src
 DST5=../$NM5/src
 DST6=../$NM6/src
 DST7=../$NM7/src
+DST8=../$NM8/src
 
 # update all IP source folders
 echo "Updating $NM0 with $SRC0 and $SRC2"
@@ -51,3 +53,6 @@ cp $SRC0 $SRC1 $SRC2 $DST6
 
 echo "Updating $NM7 with $SRC2 and $SRC3"
 cp $SRC2 $SRC3 $DST7
+
+echo "Updating $NM8 with $SRC0, $SRC1, $SRC2"
+cp $SRC0 $SRC1 $SRC2 $DST8

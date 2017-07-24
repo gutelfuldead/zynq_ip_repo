@@ -2,6 +2,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.generic_pkg.all;
+
 entity axi_master_stream_fifo_v1_0_S00_AXI is
 	generic (
 		-- Users to add parameters here
@@ -384,16 +387,14 @@ begin
 	  end if;
 	end process;
 
-
-	pulsegen : process(S_AXI_ACLK) is
-	begin
-	   if(rising_edge(S_AXI_ACLK)) then
-	       write_en_q <= not slv_reg0(0);
-	   end if;
-    end process;
+    write_en_pulse : pulse_generator
+    port map(
+    	clk => S_AXI_ACLK,
+    	sig_in => slv_reg0(0),
+    	pulse_out => fifo_write_en
+    	);
 
     -- slvreg0 PS --> PL
-    fifo_write_en <= write_en_q and slv_reg0(0);
     fifo_clkEn <= slv_reg0(1);
     fifo_reset <= slv_reg0(2);
 
