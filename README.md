@@ -62,3 +62,7 @@ Used as a glue core to connect the [Xilinx Convolutional Encoder](https://www.xi
 bits_to_byte_streamer_1.0
 ----------------------------
 Takes a series of bits over an 8bit bus axi4-stream slave interface buffers them internally until a full byte is received then sends it out over the axi4-stream master interface.
+
+reset_controller_1.0
+--------------------
+Provides PS controlled reset to PL components. Currently implemented : Xilinx Viterbi Controller

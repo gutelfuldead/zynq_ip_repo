@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <spirit:vendor>spacemicro.com</spirit:vendor>
+  <spirit:vendor>gutelfuldead.com</spirit:vendor>
   <spirit:library>user</spirit:library>
   <spirit:name>bits_to_byte_streamer</spirit:name>
   <spirit:version>1.0</spirit:version>
@@ -415,7 +415,7 @@
       <xilinx:coreRevision>3</xilinx:coreRevision>
       <xilinx:coreCreationDateTime>2017-07-20T19:53:10Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
-        <xilinx:tag xilinx:name="spacemicro.com:user:bits_to_byte_streamer:1.0_ARCHIVE_LOCATION">/home/jgutel/gits/zynq_ip_repo/bits_to_byte_streamer_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="gutelfuldead.com:user:bits_to_byte_streamer:1.0_ARCHIVE_LOCATION">/home/jgutel/gits/zynq_ip_repo/bits_to_byte_streamer_1.0</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>

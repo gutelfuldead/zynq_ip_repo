@@ -10,7 +10,7 @@ proc create_ipi_design { offsetfile design_name } {
 	set_property CONFIG.ASSOCIATED_RESET ARESETN $ACLK
 
 	# Create instance: byte_to_bit_streamer_0, and set properties
-	set byte_to_bit_streamer_0 [ create_bd_cell -type ip -vlnv spacemicro.com:user:byte_to_bit_streamer:1.0 byte_to_bit_streamer_0]
+	set byte_to_bit_streamer_0 [ create_bd_cell -type ip -vlnv gutelfuldead.com:user:byte_to_bit_streamer:1.0 byte_to_bit_streamer_0]
 
 	# Create instance: master_0, and set properties
 	set master_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:cdn_axi_bfm master_0]
@@ -46,7 +46,7 @@ proc create_ipi_design { offsetfile design_name } {
 	close $fp
 }
 
-set ip_path [file dirname [file normalize [get_property XML_FILE_NAME [ipx::get_cores spacemicro.com:user:byte_to_bit_streamer:1.0]]]]
+set ip_path [file dirname [file normalize [get_property XML_FILE_NAME [ipx::get_cores gutelfuldead.com:user:byte_to_bit_streamer:1.0]]]]
 set test_bench_file ${ip_path}/example_designs/bfm_design/byte_to_bit_streamer_v1_0_tb.v
 set interface_address_vh_file ""
 
