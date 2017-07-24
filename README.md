@@ -65,4 +65,4 @@ Takes a series of bits over an 8bit bus axi4-stream slave interface buffers them
 
 reset_controller_1.0
 --------------------
-Provides PS controlled reset to PL components. Currently implemented : Xilinx Viterbi Controller
+Provides PS controlled reset to PL components. Currently implemented : [Xilinx Viterbi Decoder](https://www.xilinx.com/support/documentation/ip_documentation/viterbi/v9_1/pg027_viterbi_decoder.pdf)
