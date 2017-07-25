@@ -3,12 +3,10 @@
 -- 
 -- Create Date: 07/17/2017
 -- Design Name: 
--- Module Name: byte_to_bit_streamer_v1_0
+-- Module Name: sid_input_buffer_v1_0
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
--- Description: Converts Words received from an upstream AXI-Stream Module 
---   (size == WORD_SIZE_IN) to a series of bytes and transmits them
---   to a downstream module. 
+-- Description: 
 -- 
 -- Dependencies: 
 -- 
@@ -25,26 +23,28 @@ use ieee.numeric_std.all;
 library work;
 use work.generic_pkg.all;
 
-entity byte_to_bit_streamer_v1_0 is
+entity sid_input_buffer_v1_0 is
     generic (
     WORD_SIZE_OUT  : integer := 8;
-    WORD_SIZE_IN  : integer := 8;
+    WORD_SIZE_IN   : integer := 8;
+    SID_SIZE       : integer := 288
     );
     port (
     AXIS_ACLK : in std_logic;
     AXIS_ARESETN    : in std_logic;
-
+    
     S_AXIS_TREADY    : out std_logic;
-    S_AXIS_TDATA    : in std_logic_vector(7 downto 0);
+    S_AXIS_TDATA    : in std_logic_vector(WORD_SIZE_IN-1 downto 0);
     S_AXIS_TVALID    : in std_logic;
     
     M_AXIS_TVALID : out std_logic;
-    M_AXIS_TDATA  : out std_logic_vector(7 downto 0);
-    M_AXIS_TREADY : in std_logic
+    M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
+    M_AXIS_TREADY : in std_logic;
+    M_AXIS_TLAST  : out std_logic
     );
-end byte_to_bit_streamer_v1_0;
+end sid_input_buffer_v1_0;
 
-architecture behavorial of byte_to_bit_streamer_v1_0 is
+architecture behavorial of sid_input_buffer_v1_0 is
 
     -- axi slave signals
     signal s_user_rdy    : std_logic := '0';
@@ -57,10 +57,11 @@ architecture behavorial of byte_to_bit_streamer_v1_0 is
     signal m_user_dvalid : std_logic := '0';
     signal m_user_txdone : std_logic := '0';
     signal m_axis_rdy    : std_logic := '0';
+    signal sig_axis_tlast  : std_logic := '0';
 
     -- internal buffers
-    signal current_word : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0'); 
-    signal new_word     : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
+    signal current_word : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0'); 
+    signal new_word     : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
 
@@ -73,13 +74,13 @@ begin
         user_dvalid    => m_user_dvalid,
         user_txdone    => m_user_txdone,
         axis_rdy       => m_axis_rdy,
-        axis_last      => '0',
+        axis_last      => sig_axis_tlast,
         M_AXIS_ACLK    => AXIS_ACLK,
         M_AXIS_ARESETN => AXIS_ARESETN,
         M_AXIS_TVALID  => M_AXIS_TVALID,
         M_AXIS_TDATA   => M_AXIS_TDATA,
         M_AXIS_TSTRB   => open,
-        M_AXIS_TLAST   => open,
+        M_AXIS_TLAST   => M_AXIS_TLAST,
         M_AXIS_TREADY  => M_AXIS_TREADY
         );
 
@@ -99,7 +100,7 @@ begin
         S_AXIS_TLAST   => '0',
         S_AXIS_TVALID  => S_AXIS_TVALID
         );
-        
+
     ----------------------------------------------------------------------
     -- Axi-Stream Slave Controller
     -- Takes in a n-byte word and transfers it to the master state machine
@@ -145,31 +146,24 @@ begin
 
     ----------------------------------------------------------------
     -- Axi-Stream Master Controller
-    -- Receives a byte from slave controller and parses it up
-    -- into an array of bits. 
     ----------------------------------------------------------------
-    -- 1 byte word to single bit implementation
-    -------------------------------------
     master_proc : process(AXIS_ACLK, AXIS_ARESETN)
-        constant NUM_BITS : integer := 8;
-        type fsm_states_mstr is (ST_IDLE, ST_ACTIVE, ST_NEW_BYTE);
+        type fsm_states_mstr is (ST_IDLE, ST_ACTIVE);
         variable fsm : fsm_states_mstr := ST_IDLE;
-        variable byte_index : integer range 0 to NUM_BITS-1 := 0;
-        constant sync_delay : integer := 1;
-        variable cnt : integer range 0 to sync_delay := 0;
+        variable cnt : integer range 0 to SID_SIZE-1 := 0;
     begin
     if(AXIS_ARESETN = '0') then
-        cnt := 0;
-        byte_index    := 0;
         m_user_data   <= (others => '0');
         m_user_dvalid <= '0';
         word_accessed <= '0';
         fsm := ST_IDLE;
-        current_word <= (others => '0');
+        cnt := 0;
+        sig_axis_tlast <= '0';
     elsif(rising_edge(AXIS_ACLK)) then
         case(fsm) is
 
         when ST_IDLE =>
+            sig_axis_tlast <= '0';
             if(new_word_ready = '1') then
                 current_word  <= new_word;
                 word_accessed <= '1';
@@ -177,26 +171,16 @@ begin
             end if;
 
         when ST_ACTIVE =>
-            word_accessed <= '0';
             if(m_axis_rdy = '1') then
-                m_user_dvalid  <= '1';
-                m_user_data(0) <= current_word(byte_index);
-                fsm            := ST_NEW_BYTE;
-            end if;
-
-        when ST_NEW_BYTE =>
-            m_user_dvalid <= '0';
-            if(cnt = sync_delay) then
-                cnt := 0;
-                if(byte_index = NUM_BITS-1) then
-                    byte_index := 0;
-                    fsm        := ST_IDLE;
+                if(cnt = SID_SIZE-1) then
+                    sig_axis_tlast <= '1';
+                    cnt := 0;
                 else
-                    byte_index := byte_index + 1;
-                    fsm        := ST_ACTIVE;
+                    cnt := cnt + 1;
                 end if;
-            else
-                cnt := cnt + 1;
+                m_user_dvalid <= '1';
+                m_user_data   <= current_word;
+                fsm           := ST_IDLE;
             end if;
 
         when others =>

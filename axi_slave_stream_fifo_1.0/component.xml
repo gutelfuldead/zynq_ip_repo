@@ -452,7 +452,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>4c1af66d</spirit:value>
+            <spirit:value>46e539c7</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -468,7 +468,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>4c1af66d</spirit:value>
+            <spirit:value>46e539c7</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -511,18 +511,6 @@
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
             <spirit:value>45a2f450</spirit:value>
-          </spirit:parameter>
-        </spirit:parameters>
-      </spirit:view>
-      <spirit:view>
-        <spirit:name>xilinx_testbench</spirit:name>
-        <spirit:displayName>Test Bench</spirit:displayName>
-        <spirit:envIdentifier>:vivado.xilinx.com:simulation.testbench</spirit:envIdentifier>
-        <spirit:modelName>axi_slave_stream_fifo_v1_0</spirit:modelName>
-        <spirit:parameters>
-          <spirit:parameter>
-            <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>b9720f3c</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -1126,6 +1114,12 @@
       <spirit:file>
         <spirit:name>src/generic_pkg.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/pulse_generator.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/axi_slave_stream_fifo_v1_0_S00_AXI.vhd</spirit:name>
@@ -1160,6 +1154,13 @@
         <spirit:name>src/generic_pkg.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/pulse_generator.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/axi_slave_stream_fifo_v1_0_S00_AXI.vhd</spirit:name>
@@ -1303,17 +1304,17 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axi_slave_stream_fifo_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>22</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-07-20T01:59:07Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>23</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2017-07-25T16:59:34Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
-        <xilinx:tag xilinx:name="xilinx.com:user:axi_slave_stream_fifo:1.0_ARCHIVE_LOCATION">/home/afx/gits/zynq_ip_repo/axi_slave_stream_fifo_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="xilinx.com:user:axi_slave_stream_fifo:1.0_ARCHIVE_LOCATION">/home/jgutel/gits/zynq_ip_repo/axi_slave_stream_fifo_1.0</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2015.4</xilinx:xilinxVersion>
+      <xilinx:xilinxVersion>2015.4.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="a74c77e3"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="ca22a6c3"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="2244ae0b"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="b58b6d72"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="48491f18"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="b8ce995b"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="21f1249c"/>
