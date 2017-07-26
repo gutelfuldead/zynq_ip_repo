@@ -3,7 +3,7 @@
   <spirit:vendor>gutelfuldead</spirit:vendor>
   <spirit:library>user</spirit:library>
   <spirit:name>sid_input_buffer</spirit:name>
-  <spirit:version>1.0</spirit:version>
+  <spirit:version>2.0</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>S_AXIS</spirit:name>
@@ -140,7 +140,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>841beb65</spirit:value>
+            <spirit:value>70d04e17</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -156,21 +156,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>841beb65</spirit:value>
-          </spirit:parameter>
-        </spirit:parameters>
-      </spirit:view>
-      <spirit:view>
-        <spirit:name>xilinx_softwaredriver</spirit:name>
-        <spirit:displayName>Software Driver</spirit:displayName>
-        <spirit:envIdentifier>:vivado.xilinx.com:sw.driver</spirit:envIdentifier>
-        <spirit:fileSetRef>
-          <spirit:localName>xilinx_softwaredriver_view_fileset</spirit:localName>
-        </spirit:fileSetRef>
-        <spirit:parameters>
-          <spirit:parameter>
-            <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>c414be97</spirit:value>
+            <spirit:value>70d04e17</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -344,7 +330,7 @@
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>SID_SIZE</spirit:name>
         <spirit:displayName>Sid Size</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.SID_SIZE">288</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.SID_SIZE">255</spirit:value>
       </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
@@ -375,7 +361,7 @@
       <spirit:file>
         <spirit:name>hdl/sid_input_buffer_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_ea64a27a</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_17ef341d</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -404,41 +390,9 @@
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
-      <spirit:name>xilinx_softwaredriver_view_fileset</spirit:name>
-      <spirit:file>
-        <spirit:name>drivers/sid_input_buffer_v1_0/data/sid_input_buffer.mdd</spirit:name>
-        <spirit:userFileType>mdd</spirit:userFileType>
-        <spirit:userFileType>driver_mdd</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>drivers/sid_input_buffer_v1_0/data/sid_input_buffer.tcl</spirit:name>
-        <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>driver_tcl</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>drivers/sid_input_buffer_v1_0/src/Makefile</spirit:name>
-        <spirit:userFileType>driver_src</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>drivers/sid_input_buffer_v1_0/src/sid_input_buffer.h</spirit:name>
-        <spirit:fileType>cSource</spirit:fileType>
-        <spirit:userFileType>driver_src</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>drivers/sid_input_buffer_v1_0/src/sid_input_buffer.c</spirit:name>
-        <spirit:fileType>cSource</spirit:fileType>
-        <spirit:userFileType>driver_src</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>drivers/sid_input_buffer_v1_0/src/sid_input_buffer_selftest.c</spirit:name>
-        <spirit:fileType>cSource</spirit:fileType>
-        <spirit:userFileType>driver_src</spirit:userFileType>
-      </spirit:file>
-    </spirit:fileSet>
-    <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/sid_input_buffer_v1_0.tcl</spirit:name>
+        <spirit:name>xgui/sid_input_buffer_v2_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_ce2a107c</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
@@ -471,7 +425,7 @@
     <spirit:parameter>
       <spirit:name>SID_SIZE</spirit:name>
       <spirit:displayName>Sid Size</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.SID_SIZE">288</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.SID_SIZE">255</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -487,19 +441,19 @@
       <xilinx:upgrades>
         <xilinx:canUpgradeFrom>gutelfuldead:user:sid_input_buffer:1.0</xilinx:canUpgradeFrom>
       </xilinx:upgrades>
-      <xilinx:coreCreationDateTime>2017-07-25T20:27:34Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2017-07-25T22:22:11Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="gutelfuldead:user:sid_input_buffer:1.0_ARCHIVE_LOCATION">/home/jgutel/gits/zynq_ip_repo/sid_input_buffer_1.0</xilinx:tag>
-        <xilinx:tag xilinx:name="gutelfuldead:user:sid_input_buffer:1.0_ARCHIVE_LOCATION">/home/jgutel/gits/zynq_ip_repo/sid_input_buffer_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="gutelfuldead:user:sid_input_buffer:2.0_ARCHIVE_LOCATION">/home/jgutel/gits/zynq_ip_repo/sid_input_buffer_1.0</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2015.4.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="b0d57952"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="d5792b20"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="fb995e98"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="40a1a808"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="d83f7fa0"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="0a3bb5b5"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="2fc77eea"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="13f8f2c5"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

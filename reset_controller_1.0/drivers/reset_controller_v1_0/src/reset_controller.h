@@ -15,7 +15,9 @@
 typedef enum _RST_CTRL_REG_MASK
 {
 	RST_CTRL_SYS_RESET = (1 << 0),
-	RST_CTRL_VITERBI_RESET = (1 << 1)
+	RST_CTRL_VITERBI_RESET = (1 << 1),
+	RST_CTRL_INTERLEAVE_RESET = (1 << 2),
+	RST_CTRL_DEINTERLEAVE_RESET = (1 << 3)
 };
 
 
@@ -85,5 +87,7 @@ XStatus RESET_CONTROLLER_Reg_SelfTest(void * baseaddr_p);
 extern u32  RST_CTRL_get_ctrl_reg(const u32 baseaddr);
 extern void RST_CTRL_system(const u32 baseaddr);
 extern void RST_CTRL_viterbi(const u32 baseaddr);
+extern void RST_CTRL_interleave(const u32 baseaddr);
+extern void RST_CTRL_deinterleave(const u32 baseaddr);
 
 #endif // RESET_CONTROLLER_H

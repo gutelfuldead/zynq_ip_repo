@@ -27,7 +27,7 @@ entity sid_input_buffer_v1_0 is
     generic (
     WORD_SIZE_OUT  : integer := 8;
     WORD_SIZE_IN   : integer := 8;
-    SID_SIZE       : integer := 288
+    SID_SIZE       : integer := 255
     );
     port (
     AXIS_ACLK : in std_logic;
@@ -60,7 +60,7 @@ architecture behavorial of sid_input_buffer_v1_0 is
     signal sig_axis_tlast  : std_logic := '0';
 
     -- internal buffers
-    signal current_word : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0'); 
+    --signal current_word : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0'); 
     signal new_word     : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
@@ -150,7 +150,7 @@ begin
     master_proc : process(AXIS_ACLK, AXIS_ARESETN)
         type fsm_states_mstr is (ST_IDLE, ST_ACTIVE);
         variable fsm : fsm_states_mstr := ST_IDLE;
-        variable cnt : integer range 0 to SID_SIZE-1 := 0;
+        variable cnt : integer range 0 to SID_SIZE := 0;
     begin
     if(AXIS_ARESETN = '0') then
         m_user_data   <= (others => '0');
@@ -163,23 +163,24 @@ begin
         case(fsm) is
 
         when ST_IDLE =>
-            sig_axis_tlast <= '0';
+            m_user_dvalid <= '0';
             if(new_word_ready = '1') then
-                current_word  <= new_word;
+                m_user_data  <= new_word;
                 word_accessed <= '1';
                 fsm := ST_ACTIVE;
             end if;
 
         when ST_ACTIVE =>
+            word_accessed <= '0';
             if(m_axis_rdy = '1') then
-                if(cnt = SID_SIZE-1) then
+                if(cnt = SID_SIZE) then
                     sig_axis_tlast <= '1';
                     cnt := 0;
                 else
+                    sig_axis_tlast <= '0';
                     cnt := cnt + 1;
                 end if;
                 m_user_dvalid <= '1';
-                m_user_data   <= current_word;
                 fsm           := ST_IDLE;
             end if;
 

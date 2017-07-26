@@ -83,11 +83,7 @@ M_AXIS_TSTRB  <= (others => '1');
         fsm <= ST_WRITE;
         M_AXIS_TVALID <= '1';
         M_AXIS_TDATA  <= user_din;
-        if(axis_last = '1') then
-          M_AXIS_TLAST <= '1';
-        else
-          M_AXIS_TLAST <= '0';
-        end if;
+        M_AXIS_TLAST  <= axis_last;
       end if;
 
     when ST_WRITE =>
@@ -95,6 +91,7 @@ M_AXIS_TSTRB  <= (others => '1');
       if(M_AXIS_TREADY = '1') then
         user_txdone   <= '1';
         M_AXIS_TVALID <= '0';
+        M_AXIS_TLAST  <= '0';
         M_AXIS_TDATA  <= (others => '0');
         fsm <= ST_IDLE;
       end if;

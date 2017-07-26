@@ -21,6 +21,8 @@ entity reset_controller_v1_0_S00_AXI is
 		-- Users to add ports here
         sys_reset : out std_logic;
         viterbi_reset : out std_logic;
+        interleave_reset : out std_logic;
+        deinterleave_reset : out std_logic;
 		-- User ports ends
 		-- Do not modify the ports beyond this line
 
@@ -123,6 +125,8 @@ architecture arch_imp of reset_controller_v1_0_S00_AXI is
 
     signal s_sys_reset : std_logic := '0';
     signal s_viterbi_reset : std_logic := '0';
+    signal s_interleave_reset : std_logic := '0';
+    signal s_deinterleave_reset : std_logic := '0';
 
 begin
 	-- I/O Connections assignments
@@ -397,8 +401,24 @@ begin
         sig_in => slv_reg0(1),
         pulse_out => s_viterbi_reset
     );
+    
+    sid_interleave_pulse : pulse_generator
+    port map(
+        clk => S_AXI_ACLK,
+        sig_in => slv_reg0(2),
+        pulse_out => s_interleave_reset
+    );
+    
+    sid_deinterleave_pulse : pulse_generator
+    port map(
+        clk => S_AXI_ACLK,
+        sig_in => slv_reg0(3),
+        pulse_out => s_deinterleave_reset
+    );
 
-	sys_reset <= s_sys_reset;
-	viterbi_reset <= s_viterbi_reset;
+	sys_reset          <= s_sys_reset;
+	viterbi_reset      <= s_viterbi_reset;
+	interleave_reset   <= s_interleave_reset;
+	deinterleave_reset <= s_deinterleave_reset;
 
 end arch_imp;

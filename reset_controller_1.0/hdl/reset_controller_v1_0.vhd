@@ -10,6 +10,8 @@ entity reset_controller_v1_0 is
 	);
 	port (
         aresetn_viterbi : out STD_LOGIC;
+        aresetn_interleave : out std_logic;
+        aresetn_deinterleave : out std_logic;
 		-- Ports of Axi Slave Bus Interface S00_AXI
 		s00_axi_aclk	: in std_logic;
 		s00_axi_aresetn	: in std_logic;
@@ -46,6 +48,8 @@ architecture arch_imp of reset_controller_v1_0 is
 		port (
 		sys_reset  : out std_logic;
 		viterbi_reset : out std_logic;
+		interleave_reset : out std_logic;
+		deinterleave_reset : out std_logic;
 		S_AXI_ACLK	: in std_logic;
 		S_AXI_ARESETN	: in std_logic;
 		S_AXI_AWADDR	: in std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
@@ -74,11 +78,18 @@ architecture arch_imp of reset_controller_v1_0 is
         Port ( clk : in STD_LOGIC;
                reset : in std_logic;
                aresetn_viterbi : out STD_LOGIC;
-               ps_reset_viterbi : in std_logic);
+               aresetn_interleave : out std_logic;
+               aresetn_deinterleave : out std_logic;
+               ps_reset_viterbi : in std_logic;
+               ps_reset_interleave : in std_logic;
+               ps_reset_deinterleave : in std_logic
+               );
     end component reset_controller;
     
     signal s_sys_reset : std_logic := '0';
     signal s_viterbi_reset : std_logic := '0';
+    signal s_interleave_reset : std_logic := '0';
+    signal s_deinterleave_reset : std_logic := '0';
 
 begin
 
@@ -91,6 +102,8 @@ reset_controller_v1_0_S00_AXI_inst : reset_controller_v1_0_S00_AXI
 	port map (
 	    sys_reset   => s_sys_reset,
 	    viterbi_reset => s_viterbi_reset,
+	    interleave_reset => s_interleave_reset,
+	    deinterleave_reset => s_deinterleave_reset,
 		S_AXI_ACLK	=> s00_axi_aclk,
 		S_AXI_ARESETN	=> s00_axi_aresetn,
 		S_AXI_AWADDR	=> s00_axi_awaddr,
@@ -119,7 +132,11 @@ reset_controller_inst : reset_controller
         clk => s00_axi_aclk,
         reset => s_sys_reset,
         aresetn_viterbi => aresetn_viterbi,
-        ps_reset_viterbi => s_viterbi_reset
+        aresetn_interleave => aresetn_interleave,
+        aresetn_deinterleave => aresetn_deinterleave,
+        ps_reset_viterbi => s_viterbi_reset,
+        ps_reset_interleave => s_interleave_reset,
+        ps_reset_deinterleave => s_deinterleave_reset
     );
 
 end arch_imp;
