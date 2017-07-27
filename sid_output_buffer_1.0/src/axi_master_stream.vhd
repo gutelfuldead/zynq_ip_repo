@@ -73,6 +73,7 @@ M_AXIS_TSTRB  <= (others => '1');
     user_txdone <= '0';
     M_AXIS_TVALID <= '0';
     M_AXIS_TDATA  <= (others => '0');
+    M_AXIS_TLAST <= '0';
   elsif(rising_edge(M_AXIS_ACLK)) then
     case(fsm) is
 
