@@ -28,9 +28,6 @@ use ieee.numeric_std.all;
 library work;
 use work.generic_pkg.all;
 
-library UNISIM;
-use UNISIM.Vcomponents.all;
-
 entity FIFO_SLAVE_STREAM_CONTROLLER is
 	generic (
         BRAM_ADDR_WIDTH  : integer := 10;

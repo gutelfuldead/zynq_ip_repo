@@ -24,7 +24,8 @@ typedef enum _AMSF_CTRL_REG_MASK
 {
 	AMSF_WRITE_EN = (1 << 0),
 	AMSF_CLKEN   = (1 << 1),
-	AMSF_RESET    = (1 << 2)
+	AMSF_RESET    = (1 << 2),
+	AMSF_WR_COMMIT = (1 << 3)
 };
 
 typedef enum _AMSF_STATUS_REG_MASK
@@ -111,6 +112,7 @@ extern u8 AMSF_poll_bram_ready(const u32 baseaddr);
 extern u32 AMSF_poll_occupancy(const u32 baseaddr);
 
 extern u32  AMSF_write_data(const u32 baseaddr, const u32 datin);
+extern void AMSF_write_commit(const u32 baseaddr);
 
 extern void AMSF_disable_core(const u32 baseaddr);
 extern void AMSF_init_core(const u32 baseaddr);

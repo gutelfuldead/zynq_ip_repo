@@ -104,6 +104,18 @@ u32 AMSF_write_data(const u32 baseaddr, const u32 datin)
 	return XST_SUCCESS;
 }
 
+/**
+ * Sets write commit -- allows the master interface to begin transfers
+ * @param baseaddr the base address of the core
+ */
+void AMSF_write_commit(const u32 baseaddr)
+{
+	const u32 reg = AMSF_get_ctrl_reg(baseaddr);
+	AXI_MASTER_STREAM_FIFO_mWriteReg(baseaddr,AMSF_CONTROL_REG_OFFSET, reg | AMSF_WR_COMMIT);
+	AXI_MASTER_STREAM_FIFO_mWriteReg(baseaddr,AMSF_CONTROL_REG_OFFSET, reg & ~AMSF_WR_COMMIT);
+}	
+
+
 void AMSF_disable_core(const u32 baseaddr)
 {
     AMSF_den_clken(baseaddr);

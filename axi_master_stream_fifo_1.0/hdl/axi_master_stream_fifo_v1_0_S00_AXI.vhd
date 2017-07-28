@@ -22,6 +22,7 @@ entity axi_master_stream_fifo_v1_0_S00_AXI is
         fifo_clkEn     : out std_logic;
         fifo_write_en  : out std_logic;
         fifo_reset     : out std_logic;
+        write_commit   : out std_logic;
         fifo_din       : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
         fifo_full      : in std_logic;
         fifo_empty     : in std_logic;
@@ -392,6 +393,13 @@ begin
     	clk => S_AXI_ACLK,
     	sig_in => slv_reg0(0),
     	pulse_out => fifo_write_en
+    	);
+
+    write_commit_pulse : pulse_generator
+    port map(
+    	clk => S_AXI_ACLK,
+    	sig_in => slv_reg0(3),
+    	pulse_out => write_commit
     	);
 
     -- slvreg0 PS --> PL

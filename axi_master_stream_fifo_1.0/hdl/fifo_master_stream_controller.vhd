@@ -30,6 +30,7 @@ use work.generic_pkg.all;
 
 entity FIFO_MASTER_STREAM_CONTROLLER is
 	generic (
+        USE_WRITE_COMMIT : string := "ENABLE"; -- "DISABLE"
         BRAM_ADDR_WIDTH  : integer := 10;
         BRAM_DATA_WIDTH  : integer := 32
 		);
@@ -90,10 +91,6 @@ architecture Behavorial of FIFO_MASTER_STREAM_CONTROLLER is
     signal sig_axis_rdy    : std_logic := '0';
     signal sig_axis_last   : std_logic := '0';
 
-    -- used to signal the fifo controller to start transactions
-    signal read_commit : std_logic := '0';
-    constant full : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '1');
-
 begin
 
     -- Instantiation of FIFO Controller
@@ -125,11 +122,10 @@ begin
             dout       => sig_fifo_dout,
             dvalid     => sig_fifo_dvalid,
             full       => fifo_full,
-            empty      => sig_fifo_empty,
+            empty      => fifo_empty,
             occupancy  => sig_fifo_occupancy
         );
 
-    fifo_empty     <= sig_fifo_empty;
     fifo_occupancy <= sig_fifo_occupancy;
 
     -- Instantiation of Master Stream Interface
@@ -161,24 +157,24 @@ begin
     axis_read_ctrl : process(clk, reset) 
         type state is (ST_IDLE, ST_ACTIVE, ST_WORKING);
         variable fsm : state := ST_IDLE;
-        variable transaction_cnt : integer range 0 to to_integer(unsigned(full)) := 0;
-        variable cnt : integer range 0 to to_integer(unsigned(full)) := 0;
     begin
     if(reset = '1') then
-        fsm := ST_IDLE;
+        if(USE_WRITE_COMMIT = "ENABLE") then
+            fsm := ST_IDLE;
+        else
+            fsm := ST_WORKING;
+        end if;
         sig_axis_dvalid <= '0';
         sig_fifo_read_en <= '0';
         sig_axis_last <= '0';
-        cnt := 0;
-        transaction_cnt := 0;
     elsif(rising_edge(clk)) then
         if(clkEn = '1') then
             case(fsm) is
 
             when ST_IDLE =>
+                sig_axis_dvalid <= '0';
                 if(write_commit = '1') then
                     fsm := ST_WORKING;
-                    transaction_cnt := to_integer(unsigned(sig_fifo_occupancy)) - 1;
                 end if;
 
             when ST_WORKING =>
@@ -193,14 +189,17 @@ begin
                 if(sig_fifo_dvalid = '1') then
                     sig_axis_din    <= sig_fifo_dout;
                     sig_axis_dvalid <= '1'; 
-                    if(cnt = transaction_cnt) then
-                        sig_axis_last <= '1';
-                        cnt := 0;
-                        fsm := ST_IDLE;
+                    if(USE_WRITE_COMMIT = "ENABLE") then
+                        if(unsigned(sig_fifo_occupancy) = 1) then
+                            sig_axis_last <= '1';
+                            fsm := ST_IDLE;
+                        else
+                            fsm := ST_WORKING;
+                            sig_axis_last <= '0';
+                        end if;
                     else
-                        sig_axis_last <= '0';
-                        cnt := cnt + 1;
                         fsm := ST_WORKING;
+                        sig_axis_last <= '0';
                     end if;
                 end if;
 

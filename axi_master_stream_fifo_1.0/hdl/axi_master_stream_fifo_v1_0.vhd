@@ -13,6 +13,8 @@ entity axi_master_stream_fifo_v1_0 is
 		-- Users to add parameters here
         BRAM_ADDR_WIDTH  : integer := 10;
         BRAM_DATA_WIDTH  : integer := 32;
+        USE_WRITE_COMMIT : string := "ENABLE"; -- "DISABLE"
+
 		-- Parameters of Axi Slave Bus Interface S00_AXI
 		C_S00_AXI_DATA_WIDTH	: integer	:= 32;
 		C_S00_AXI_ADDR_WIDTH	: integer	:= 4
@@ -79,6 +81,7 @@ architecture arch_imp of axi_master_stream_fifo_v1_0 is
         fifo_clkEn      : out std_logic;
         fifo_write_en   : out std_logic;
         fifo_reset      : out std_logic;
+        write_commit    : out std_logic;
         fifo_din        : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
         fifo_full  : in std_logic;
         fifo_empty : in std_logic;
@@ -109,9 +112,55 @@ architecture arch_imp of axi_master_stream_fifo_v1_0 is
 		);
 	end component axi_master_stream_fifo_v1_0_S00_AXI;	
 
+    component FIFO_MASTER_STREAM_CONTROLLER is
+    generic (
+        USE_WRITE_COMMIT : string := "ENABLE";
+        BRAM_ADDR_WIDTH  : integer := 10;
+        BRAM_DATA_WIDTH  : integer := 32
+        );
+    port (
+        -- BRAM write port lines
+        addra : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
+        dina  : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
+        ena   : out STD_LOGIC;
+        wea   : out STD_LOGIC;
+        clka  : out std_logic;
+        rsta  : out std_logic;
+        
+        -- BRAM read port lines
+        addrb : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
+        doutb : in STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
+        enb   : out STD_LOGIC;
+        clkb  : out std_logic;
+        rstb  : out std_logic;
+
+        -- AXI Master Stream Ports
+        M_AXIS_ACLK     : in std_logic;
+        M_AXIS_ARESETN  : in std_logic;
+        M_AXIS_TVALID   : out std_logic;
+        M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+        --M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
+        M_AXIS_TLAST    : out std_logic;
+        M_AXIS_TREADY   : in std_logic;
+
+        -- fifo control lines
+        clk            : in std_logic;
+        clkEn          : in std_logic;
+        reset          : in std_logic;
+        fifo_din       : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+        fifo_write_en  : in std_logic;
+        fifo_full      : out std_logic;
+        fifo_empty     : out std_logic;
+        fifo_occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+        fifo_ready     : out std_logic;
+        write_commit   : in std_logic
+        );
+end component FIFO_MASTER_STREAM_CONTROLLER;
+
     signal sig_fifo_clkEn      : std_logic := '0';
     signal sig_fifo_write_en   : std_logic := '0';
     signal sig_fifo_reset      : std_logic := '0';
+    signal sig_write_commit    : std_logic := '0';
     signal sig_fifo_din        : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
     signal sig_fifo_full  : std_logic := '0';
     signal sig_fifo_ready   : std_logic := '0';
@@ -141,6 +190,7 @@ axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
         fifo_empty      => sig_fifo_empty,
         fifo_occupancy  => sig_fifo_occupancy,
         fifo_ready      => sig_fifo_ready,
+        write_commit    => sig_write_commit,
         -- axi4-lite template signals
 		S_AXI_ACLK	    => s00_axi_aclk,
 		S_AXI_ARESETN	=> s00_axi_aresetn,
@@ -167,7 +217,7 @@ axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
 
     fifo_stream_control_inst : FIFO_MASTER_STREAM_CONTROLLER
     generic map(
-                -- Users to add parameters here
+        USE_WRITE_COMMIT => USE_WRITE_COMMIT,
         BRAM_ADDR_WIDTH  => BRAM_ADDR_WIDTH,
         BRAM_DATA_WIDTH  => BRAM_DATA_WIDTH)
     port map (
@@ -204,7 +254,8 @@ axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
         fifo_full       => sig_fifo_full,
         fifo_empty      => sig_fifo_empty,
         fifo_ready      => sig_fifo_ready,
-        fifo_occupancy  => sig_fifo_occupancy
+        fifo_occupancy  => sig_fifo_occupancy,
+        write_commit    => sig_write_commit
         );
 
     --------------------------------

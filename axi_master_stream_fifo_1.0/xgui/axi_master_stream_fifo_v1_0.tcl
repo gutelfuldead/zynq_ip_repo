@@ -13,6 +13,8 @@ proc init_gui { IPINST } {
   ipgui::add_param $IPINST -name "BRAM_ADDR_WIDTH"
   set BRAM_DATA_WIDTH [ipgui::add_param $IPINST -name "BRAM_DATA_WIDTH"]
   set_property tooltip {AXI-Stream and Bram Data Width} ${BRAM_DATA_WIDTH}
+  set USE_WRITE_COMMIT [ipgui::add_param $IPINST -name "USE_WRITE_COMMIT" -widget comboBox]
+  set_property tooltip {When enabled the PS must perform a write commit function after data is loaded in the fifo to enable the AXI-Stream Master Interface. Otherwise data is available as soon as it is loaded into the FIFO for the downstream module.} ${USE_WRITE_COMMIT}
 
 }
 
@@ -31,6 +33,15 @@ proc update_PARAM_VALUE.BRAM_DATA_WIDTH { PARAM_VALUE.BRAM_DATA_WIDTH } {
 
 proc validate_PARAM_VALUE.BRAM_DATA_WIDTH { PARAM_VALUE.BRAM_DATA_WIDTH } {
 	# Procedure called to validate BRAM_DATA_WIDTH
+	return true
+}
+
+proc update_PARAM_VALUE.USE_WRITE_COMMIT { PARAM_VALUE.USE_WRITE_COMMIT } {
+	# Procedure called to update USE_WRITE_COMMIT when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.USE_WRITE_COMMIT { PARAM_VALUE.USE_WRITE_COMMIT } {
+	# Procedure called to validate USE_WRITE_COMMIT
 	return true
 }
 
@@ -89,5 +100,10 @@ proc update_MODELPARAM_VALUE.BRAM_ADDR_WIDTH { MODELPARAM_VALUE.BRAM_ADDR_WIDTH 
 proc update_MODELPARAM_VALUE.BRAM_DATA_WIDTH { MODELPARAM_VALUE.BRAM_DATA_WIDTH PARAM_VALUE.BRAM_DATA_WIDTH } {
 	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
 	set_property value [get_property value ${PARAM_VALUE.BRAM_DATA_WIDTH}] ${MODELPARAM_VALUE.BRAM_DATA_WIDTH}
+}
+
+proc update_MODELPARAM_VALUE.USE_WRITE_COMMIT { MODELPARAM_VALUE.USE_WRITE_COMMIT PARAM_VALUE.USE_WRITE_COMMIT } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.USE_WRITE_COMMIT}] ${MODELPARAM_VALUE.USE_WRITE_COMMIT}
 }
 

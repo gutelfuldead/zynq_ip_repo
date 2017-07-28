@@ -111,6 +111,52 @@ architecture arch_imp of axi_slave_stream_fifo_v1_0 is
 		);
 	end component axi_slave_stream_fifo_v1_0_S00_AXI;
 
+	component FIFO_SLAVE_STREAM_CONTROLLER is
+	generic (
+        BRAM_ADDR_WIDTH  : integer := 10;
+        BRAM_DATA_WIDTH  : integer := 32
+		);
+	port (
+        -- BRAM write port lines
+        addra : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
+        dina  : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
+        ena   : out STD_LOGIC;
+        wea   : out STD_LOGIC;
+        clka  : out std_logic;
+        rsta  : out std_logic;
+        
+        -- BRAM read port lines
+        addrb : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
+        doutb : in STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
+        enb   : out STD_LOGIC;
+        clkb  : out std_logic;
+        rstb  : out std_logic;
+        
+        --AXIL Read Control Ports
+        axil_dvalid    : out std_logic; -- assert to axi4-lite interface data is ready
+        axil_read_done : in std_logic;  -- acknowledgment from axi4-lite iface data has been read
+        
+        -- AXIS Slave Stream Ports
+        S_AXIS_ACLK : in std_logic;
+        S_AXIS_ARESETN  : in std_logic;
+        S_AXIS_TREADY   : out std_logic;
+        S_AXIS_TDATA    : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+        --S_AXIS_TSTRB    : in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
+        --S_AXIS_TLAST    : in std_logic;
+        S_AXIS_TVALID   : in std_logic;
+
+        -- fifo control lines
+        clk            : in std_logic;
+        clkEn          : in std_logic;
+        reset          : in std_logic;
+        fifo_full      : out std_logic;
+        fifo_empty     : out std_logic;
+        fifo_occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+        fifo_read_en   : in  std_logic;
+        fifo_dout      : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0)
+		);
+end component FIFO_SLAVE_STREAM_CONTROLLER;
+
 	-- ports to control the bram from axi-lite interface
 	signal axil_clkEn      : std_logic := '0';
 	signal axil_read_en    : std_logic := '0';
