@@ -3,16 +3,10 @@
 -- 
 -- Create Date: 07/17/2017
 -- Design Name: 
--- Module Name: viterbi_input_buffer_v1_0
+-- Module Name: CE_input_Buf_v1_0
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
 -- Description: 
---  Viterbi input buffer primes the Xilinx Viterbi Core by first inserting PRIME_SIZE*4 
---  number of zero vector inputs. After intitialization will simply pass through 2 bits
---  at a time from the received data per the Viterbi Core Specification.
---
---  Priming is being used to prepare for Trellis Termination (Tail Bits) method of 
---  Encoding.
 -- 
 -- Dependencies: 
 -- 
@@ -29,33 +23,36 @@ use ieee.numeric_std.all;
 library work;
 use work.generic_pkg.all;
 
-entity viterbi_input_buffer_v1_0 is
+entity CE_input_Buf_v1_0 is
     generic (
-    WORD_SIZE_OUT  : integer := 16;
+    WORD_SIZE_OUT  : integer := 8;
     WORD_SIZE_IN   : integer := 8;
-    PRIME_SIZE      : integer := 25
+    TAIL_SIZE      : integer := 25;
+    BLOCK_SIZE     : integer := 255
     );
     port (
     AXIS_ACLK : in std_logic;
     AXIS_ARESETN    : in std_logic;
     
-    S_AXIS_TREADY    : out std_logic;
+    S_AXIS_TREADY   : out std_logic;
     S_AXIS_TDATA    : in std_logic_vector(WORD_SIZE_IN-1 downto 0);
-    S_AXIS_TVALID    : in std_logic;
+    S_AXIS_TVALID   : in std_logic;
+    S_AXIS_TLAST    : in std_logic;
     
     M_AXIS_TVALID : out std_logic;
     M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
     M_AXIS_TREADY : in std_logic
     );
-end viterbi_input_buffer_v1_0;
+end CE_input_Buf_v1_0;
 
-architecture behavorial of viterbi_input_buffer_v1_0 is
+architecture behavorial of CE_input_Buf_v1_0 is
 
     -- axi slave signals
     signal s_user_rdy    : std_logic := '0';
     signal s_user_dvalid : std_logic := '0';
     signal s_user_data   : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
     signal s_axis_rdy    : std_logic := '0';
+    signal s_axis_last   : std_logic := '0';
 
     -- axi master signals
     signal m_user_data   : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
@@ -64,13 +61,10 @@ architecture behavorial of viterbi_input_buffer_v1_0 is
     signal m_axis_rdy    : std_logic := '0';
 
     -- internal buffers
-    signal new_word     : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
-    signal current_word     : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
+    signal new_word       : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
+    signal current_word   : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
-
-    -- for every byte there are 4 transactions occuring
-    constant PRIME_XACTIONS  : integer := PRIME_SIZE*4;
 
 begin
 
@@ -98,13 +92,13 @@ begin
         user_dvalid    => s_user_dvalid,
         user_data      => s_user_data,
         axis_rdy       => s_axis_rdy,
-        axis_last      => open,
+        axis_last      => s_axis_last,
         S_AXIS_ACLK    => AXIS_ACLK,
         S_AXIS_ARESETN => AXIS_ARESETN,
         S_AXIS_TREADY  => S_AXIS_TREADY,
         S_AXIS_TDATA   => S_AXIS_TDATA,
         S_AXIS_TSTRB   => (others => '0'),
-        S_AXIS_TLAST   => '0',
+        S_AXIS_TLAST   => S_AXIS_TLAST,
         S_AXIS_TVALID  => S_AXIS_TVALID
         );
 
@@ -155,30 +149,32 @@ begin
     -- Axi-Stream Master Controller
     ----------------------------------------------------------------
     master_proc : process(AXIS_ACLK, AXIS_ARESETN)
-        type fsm_states_mstr is (ST_INITIALIZE, ST_BLOCK_GEN, ST_BLOCK_SEND, 
-            ST_PRIME, ST_BYTE_IDX_UPD, ST_PRIME_CNT);
-        variable fsm : fsm_states_mstr := ST_INITIALIZE;
-        variable cnt_prime  : integer range 0 to PRIME_XACTIONS  := 0;
-        variable INITIALIZE : std_logic := '1';
-        variable bit_idx_0  : integer range 0 to 6 := 0;
-        variable bit_idx_1  : integer range 1 to 7 := 1;
-        variable byte_cnt   : integer range 0 to 2 := 0;
+        constant NUM_BITS : integer := 8;
+        type fsm_states_mstr is (ST_BLOCK_TAIL_CHECK, ST_BLOCK_GEN, ST_BLOCK_SEND,
+            ST_BLOCK_IDX_CHECK, ST_TAIL_SEND, ST_TAIL_CNT);
+        variable fsm : fsm_states_mstr := ST_BLOCK_TAIL_CHECK;
+        variable cnt_block : integer range 0 to BLOCK_SIZE := 0;
+        variable cnt_tail  : integer range 0 to TAIL_SIZE  := 0;
+        variable bit_idx   : integer range 0 to NUM_BITS-1 := 0;
     begin
     if(AXIS_ARESETN = '0') then
         m_user_data   <= (others => '0');
         m_user_dvalid <= '0';
         word_accessed <= '0';
-        fsm := ST_INITIALIZE;
-        cnt_prime  := 0;
-        bit_idx_0 := 0;
-        bit_idx_1 := 1;
-        byte_cnt  := 0;
+        fsm := ST_BLOCK_TAIL_CHECK;
+        cnt_block := 0;
+        cnt_tail  := 0;
+        bit_idx   := 0;
     elsif(rising_edge(AXIS_ACLK)) then
         case(fsm) is
 
-        when ST_INITIALIZE =>
-            if(INITIALIZE = '1') then
-                fsm := ST_PRIME;
+        when ST_BLOCK_TAIL_CHECK =>
+            if(cnt_tail = TAIL_SIZE) then
+                fsm := ST_BLOCK_GEN;
+                cnt_tail  := 0;
+                cnt_block := 0;
+            elsif(cnt_block = BLOCK_SIZE) then
+                fsm := ST_TAIL_SEND;
             else
                 fsm := ST_BLOCK_GEN;
             end if;
@@ -188,57 +184,52 @@ begin
             if(new_word_ready = '1') then
                 current_word <= new_word;
                 word_accessed <= '1';
-                m_user_data <= (others => '0');
                 fsm := ST_BLOCK_SEND;
             end if;
 
         when ST_BLOCK_SEND =>
             word_accessed <= '0';
             if(m_axis_rdy = '1') then
-                m_user_data(0) <= current_word(bit_idx_0);
-                m_user_data(8) <= current_word(bit_idx_1);
+                m_user_data(WORD_SIZE_OUT-1 downto 1) <= (others => '0');
+                m_user_data(0) <= current_word(bit_idx);
                 m_user_dvalid  <= '1';
-                fsm := ST_BYTE_IDX_UPD;
+                fsm := ST_BLOCK_IDX_CHECK;
             end if;
 
-        when ST_BYTE_IDX_UPD =>
+        when ST_BLOCK_IDX_CHECK =>
             m_user_dvalid <= '0';
-            if(m_user_txdone = '1') then
-                if(byte_cnt = 3) then
-                    byte_cnt  := 0;
-                    bit_idx_0 := 0;
-                    bit_idx_1 := 1;
-                    fsm := ST_BLOCK_GEN;
-                else
-                    bit_idx_0 := bit_idx_0 + 2;
-                    bit_idx_1 := bit_idx_1 + 2;
-                    byte_cnt := byte_cnt + 1;
-                    fsm := ST_BLOCK_SEND;
-                end if;
+            if(bit_idx = NUM_BITS-1) then
+                bit_idx   := 0;
+                cnt_block := cnt_block + 1;
+                fsm := ST_BLOCK_TAIL_CHECK;
+            else
+                bit_idx := bit_idx + 1;
+                fsm := ST_BLOCK_SEND;
             end if;
 
-        when ST_PRIME =>
+        when ST_TAIL_SEND =>
+            cnt_block := BLOCK_SIZE;
             if(m_axis_rdy = '1') then
                 m_user_data <= (others => '0');
                 m_user_dvalid <= '1';
-                fsm := ST_PRIME_CNT;
+                fsm := ST_TAIL_CNT;
             end if;
 
-        WHEN ST_PRIME_CNT =>
+        WHEN ST_TAIL_CNT =>
             m_user_dvalid <= '0';
             if(m_user_txdone = '1') then
-                if(cnt_prime = PRIME_XACTIONS) then
-                    cnt_prime := 0;
-                    INITIALIZE := '0';
-                    fsm := ST_BLOCK_SEND;
+                if(bit_idx = NUM_BITS-1) then
+                    bit_idx := 0;
+                    cnt_tail := cnt_tail + 1;
+                    fsm := ST_BLOCK_TAIL_CHECK;
                 else
-                    cnt_prime := cnt_prime + 1;
-                    fsm := ST_PRIME;
+                    bit_idx := bit_idx + 1;
+                    fsm := ST_TAIL_SEND;
                 end if;
             end if;
 
         when others =>
-            fsm := ST_INITIALIZE;
+            fsm := ST_BLOCK_TAIL_CHECK;
 
         end case;
     end if;

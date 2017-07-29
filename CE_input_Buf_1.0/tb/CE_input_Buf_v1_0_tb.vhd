@@ -5,41 +5,36 @@ use ieee.numeric_std.all;
 library work;
 use work.generic_pkg.all;
 
-entity viterbi_output_buffer_v1_0_tb is
+entity CE_input_Buf_v1_0_tb is
     
-end viterbi_output_buffer_v1_0_tb;
+end CE_input_Buf_v1_0_tb;
 
-architecture arch_tb of viterbi_output_buffer_v1_0_tb is
+architecture arch_tb of CE_input_Buf_v1_0_tb is
 
-    component viterbi_output_buffer_v1_0 is
-    generic (
-    WORD_SIZE_OUT  : integer := 8;
-    WORD_SIZE_IN   : integer := 8;
-    TAIL_SIZE      : integer := 25;
-    BLOCK_SIZE     : integer := 255
-    );
-    port (
-    AXIS_ACLK : in std_logic;
-    AXIS_ARESETN    : in std_logic;
-    
-    S_AXIS_TREADY    : out std_logic;
-    S_AXIS_TDATA    : in std_logic_vector(WORD_SIZE_IN-1 downto 0);
-    S_AXIS_TVALID    : in std_logic;
-
-    M_AXIS_TVALID : out std_logic;
-    M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
-    M_AXIS_TREADY : in std_logic;
-    M_AXIS_TLAST  : out std_logic
-    );
-    end component viterbi_output_buffer_v1_0;
+    component CE_input_Buf_v1_0 is
+        generic (
+        WORD_SIZE_OUT  : integer := 8;
+        WORD_SIZE_IN   : integer := 8;
+        TAIL_SIZE      : integer := 25;
+        BLOCK_SIZE     : integer := 255
+        );
+        port (
+        AXIS_ACLK : in std_logic;
+        AXIS_ARESETN    : in std_logic;
+        
+        S_AXIS_TREADY   : out std_logic;
+        S_AXIS_TDATA    : in std_logic_vector(WORD_SIZE_IN-1 downto 0);
+        S_AXIS_TVALID   : in std_logic;
+        S_AXIS_TLAST    : in std_logic;
+        
+        M_AXIS_TVALID : out std_logic;
+        M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
+        M_AXIS_TREADY : in std_logic
+        );
+    end component CE_input_Buf_v1_0;
 
     constant WORD_SIZE_OUT : integer := 8;
     constant WORD_SIZE_IN  : integer := 8;
-    constant TAIL_SIZE     : integer := 25*8;
-    constant BLOCK_SIZE    : integer := 255*8;
-    constant NUM_BLOCKS    : integer := 5;
-
-    constant BUF_SZ : integer := BLOCK_SIZE * NUM_BLOCKS;
 
     constant clk_period : time := 10 ns; -- 100 MHz clock
 
@@ -48,17 +43,17 @@ architecture arch_tb of viterbi_output_buffer_v1_0_tb is
 
     signal S_TREADY : std_logic := '0';
     signal S_TVALID : std_logic := '0';
-    signal S_TDATA  : std_logic_vector(WORD_SIZE_IN-1 downto 0)     := (others => '0');
-    signal M_TDATA  : std_logic_vector(WORD_SIZE_OUT-1 downto 0)     := (others => '0');
+    signal S_TLAST  : std_logic := '0';
+    signal S_TDATA  : std_logic_vector(WORD_SIZE_IN-1 downto 0)   := (others => '0');
+    signal M_TDATA  : std_logic_vector(WORD_SIZE_OUT-1 downto 0)  := (others => '0');
     signal M_TVALID : std_logic := '0';
     signal M_TREADY : std_logic := '0';
-    signal M_TLAST  : std_logic := '0';
 
     signal new_msg : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
 
 begin
 
-    DUT : viterbi_output_buffer_v1_0
+    DUT : CE_input_Buf_v1_0
     generic map(
     WORD_SIZE_OUT => WORD_SIZE_OUT,
     WORD_SIZE_IN  => WORD_SIZE_IN,
@@ -71,9 +66,9 @@ begin
         S_AXIS_TREADY  => S_TREADY,
         S_AXIS_TDATA   => S_TDATA,
         S_AXIS_TVALID  => S_TVALID,
+        S_AXIS_TLAST   => S_TLAST,
         M_AXIS_TVALID  => M_TVALID,
         M_AXIS_TDATA   => M_TDATA,
-        M_AXIS_TLAST   => M_TLAST,
         M_AXIS_TREADY  => M_TREADY
         );
 
@@ -86,7 +81,7 @@ begin
     end process clk_process;
     
     rst_proc : process(clk)
-       constant rst_cnt : integer := 2000000;
+       constant rst_cnt : integer := 20000000;
        variable cnt : integer range 0 to rst_cnt := rst_cnt;
     begin
        if(rising_edge(clk)) then
@@ -101,57 +96,34 @@ begin
    end process rst_proc;
 
    slave_proc_tb : process(clk,reset)
-        type fsm_states is (ST_BLOCK, ST_WAIT, ST_TAIL);
-        variable fsm : fsm_states := ST_BLOCK;
-        variable roll : integer := 0;
-        variable cnt : integer range 0 to BUF_SZ := 1;
-        variable cnt_block : integer range 0 to BLOCK_SIZE := 0;
-        variable cnt_tail : integer range 0 to TAIL_SIZE := 0;
+        type fsm_states is (ST_NEW_MSG, ST_WORKING);
+        variable fsm : fsm_states := ST_NEW_MSG;
+        variable cnt : integer := 1;
    begin
    if(reset = '0') then
-        fsm := ST_BLOCK;
+        fsm := ST_NEW_MSG;
         S_TVALID <= '0';
         S_TDATA  <= (others => '0');
         cnt := 1;
-        cnt_block := 0;
-        cnt_tail := 0;
    elsif(rising_edge(clk)) then
         case(fsm) is
-
-            when ST_BLOCK =>
+            when ST_NEW_MSG =>
                 S_TDATA  <= std_logic_vector(to_unsigned(cnt, WORD_SIZE_IN));
                 S_TVALID <= '1';
-                cnt_block := cnt_block + 1;
-                fsm := ST_WAIT;
+                fsm := ST_WORKING;
 
-            when ST_WAIT =>
+            when ST_WORKING =>
                 if(S_TREADY = '1') then
                     S_TVALID <= '0';
                     S_TDATA  <= (others => '0');
+                    fsm := ST_NEW_MSG;
                     cnt := cnt + 1;
-                    if(cnt_block = BLOCK_SIZE) then
-                        fsm := ST_TAIL;
-                    else
-                        fsm := ST_BLOCK;
-                    end if;
-                end if;
-
-            when ST_TAIL =>
-                if(cnt_tail = TAIL_SIZE) then
-                    cnt_block := 0;
-                    cnt_tail  := 0;
-                    cnt := 1;
-                    fsm := ST_BLOCK;
-                else
-                    S_TDATA <= (others => '0');
-                    S_TVALID <= '1';
-                    cnt_tail := cnt_tail + 1;
-                    fsm := ST_WAIT;
                 end if;
 
         end case;
     end if;
    end process slave_proc_tb;
+
 
    mstr_proc_tb : process(clk,reset)
     type fsm_mstr_states is (ST_WORK, ST_RESET);

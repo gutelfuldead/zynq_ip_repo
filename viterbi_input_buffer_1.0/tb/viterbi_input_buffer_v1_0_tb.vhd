@@ -13,10 +13,9 @@ architecture arch_tb of viterbi_input_buffer_v1_0_tb is
 
     component viterbi_input_buffer_v1_0 is
     generic (
-    WORD_SIZE_OUT  : integer := 8;
+    WORD_SIZE_OUT  : integer := 16;
     WORD_SIZE_IN   : integer := 8;
-    TAIL_SIZE      : integer := 25;
-    BLOCK_SIZE     : integer := 255
+    PRIME_SIZE      : integer := 25
     );
     port (
     AXIS_ACLK : in std_logic;
@@ -32,13 +31,8 @@ architecture arch_tb of viterbi_input_buffer_v1_0_tb is
     );
     end component viterbi_input_buffer_v1_0;
 
-    constant WORD_SIZE_OUT : integer := 8;
+    constant WORD_SIZE_OUT : integer := 16;
     constant WORD_SIZE_IN  : integer := 8;
-    constant TAIL_SIZE     : integer := 25;
-    constant BLOCK_SIZE    : integer := 255;
-    constant NUM_BLOCKS    : integer := 5;
-
-    constant BUF_SZ : integer := BLOCK_SIZE * NUM_BLOCKS;
 
     constant clk_period : time := 10 ns; -- 100 MHz clock
 
@@ -47,8 +41,8 @@ architecture arch_tb of viterbi_input_buffer_v1_0_tb is
 
     signal S_TREADY : std_logic := '0';
     signal S_TVALID : std_logic := '0';
-    signal S_TDATA  : std_logic_vector(WORD_SIZE_IN-1 downto 0)     := (others => '0');
-    signal M_TDATA  : std_logic_vector(WORD_SIZE_OUT-1 downto 0)     := (others => '0');
+    signal S_TDATA  : std_logic_vector(WORD_SIZE_IN-1 downto 0)   := (others => '0');
+    signal M_TDATA  : std_logic_vector(WORD_SIZE_OUT-1 downto 0)  := (others => '0');
     signal M_TVALID : std_logic := '0';
     signal M_TREADY : std_logic := '0';
 
@@ -60,8 +54,7 @@ begin
     generic map(
     WORD_SIZE_OUT => WORD_SIZE_OUT,
     WORD_SIZE_IN  => WORD_SIZE_IN,
-    TAIL_SIZE     => TAIL_SIZE,
-    BLOCK_SIZE    => BLOCK_SIZE
+    PRIME_SIZE     => 25
     )
     port map(
         AXIS_ACLK    => clk,
@@ -83,7 +76,7 @@ begin
     end process clk_process;
     
     rst_proc : process(clk)
-       constant rst_cnt : integer := 2000;
+       constant rst_cnt : integer := 20000000;
        variable cnt : integer range 0 to rst_cnt := rst_cnt;
     begin
        if(rising_edge(clk)) then
@@ -100,8 +93,7 @@ begin
    slave_proc_tb : process(clk,reset)
         type fsm_states is (ST_NEW_MSG, ST_WORKING);
         variable fsm : fsm_states := ST_NEW_MSG;
-        variable roll : integer := 0;
-        variable cnt : integer range 0 to BUF_SZ := 1;
+        variable cnt : integer := 1;
    begin
    if(reset = '0') then
         fsm := ST_NEW_MSG;
@@ -120,11 +112,7 @@ begin
                     S_TVALID <= '0';
                     S_TDATA  <= (others => '0');
                     fsm := ST_NEW_MSG;
-                    if(cnt = BUF_SZ) then
-                        cnt := 1;
-                    else
-                        cnt := cnt + 1;
-                    end if;
+                    cnt := cnt + 1;
                 end if;
 
         end case;
