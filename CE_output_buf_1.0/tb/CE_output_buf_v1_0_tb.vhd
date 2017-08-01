@@ -92,32 +92,27 @@ begin
         type fsm_states is (ST_NEW_MSG, ST_WORKING);
         variable fsm : fsm_states := ST_NEW_MSG;
         variable cnt : integer := 1;
-        variable send_four : integer range 1 to 4 := 1;
+        variable s1 : integer;
    begin
    if(reset = '0') then
         fsm := ST_NEW_MSG;
         S_TVALID <= '0';
         S_TDATA  <= (others => '0');
-        cnt := 1;
-        send_four := 1;
+        cnt := 0;
    elsif(rising_edge(clk)) then
         case(fsm) is
             when ST_NEW_MSG =>
                 S_TDATA  <= std_logic_vector(to_unsigned(cnt, WORD_SIZE_IN));
                 S_TVALID <= '1';
                 fsm := ST_WORKING;
+                s1 := s1 + 1;
 
             when ST_WORKING =>
                 if(S_TREADY = '1') then
                     S_TVALID <= '0';
                     S_TDATA  <= (others => '0');
                     fsm := ST_NEW_MSG;
-                    if(send_four = 4) then
-                        cnt := cnt + 1;
-                        send_four := 1;
-                    else
-                        send_four := send_four + 1;
-                    end if;
+                    cnt := cnt + s1;
                 end if;
 
         end case;

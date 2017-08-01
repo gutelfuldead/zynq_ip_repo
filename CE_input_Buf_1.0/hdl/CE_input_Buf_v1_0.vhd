@@ -7,6 +7,9 @@
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
 -- Description: 
+--   After every BLOCK_SIZE amount of data bytes passed to Xilinx Conv. Encoder Controller
+--   TAIL_SIZE number of zero bytes are passed to the core as a form of
+--   Trellis Termination (Tail Bits) method of Encoding.
 -- 
 -- Dependencies: 
 -- 
@@ -65,6 +68,10 @@ architecture behavorial of CE_input_Buf_v1_0 is
     signal current_word   : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
+
+    --signal dbg_cnt_block : integer := 0;
+    --signal dbg_cnt_tail  : integer := 0;
+    --signal dbg_bit_idx   : integer := 0; 
 
 begin
 
@@ -190,7 +197,6 @@ begin
         when ST_BLOCK_SEND =>
             word_accessed <= '0';
             if(m_axis_rdy = '1') then
-                m_user_data(WORD_SIZE_OUT-1 downto 1) <= (others => '0');
                 m_user_data(0) <= current_word(bit_idx);
                 m_user_dvalid  <= '1';
                 fsm := ST_BLOCK_IDX_CHECK;
@@ -198,17 +204,18 @@ begin
 
         when ST_BLOCK_IDX_CHECK =>
             m_user_dvalid <= '0';
-            if(bit_idx = NUM_BITS-1) then
-                bit_idx   := 0;
-                cnt_block := cnt_block + 1;
-                fsm := ST_BLOCK_TAIL_CHECK;
-            else
-                bit_idx := bit_idx + 1;
-                fsm := ST_BLOCK_SEND;
+            if(m_user_txdone = '1') then
+                if(bit_idx = NUM_BITS-1) then
+                    bit_idx   := 0;
+                    cnt_block := cnt_block + 1;
+                    fsm := ST_BLOCK_TAIL_CHECK;
+                else
+                    bit_idx := bit_idx + 1;
+                    fsm := ST_BLOCK_SEND;
+                end if;
             end if;
 
         when ST_TAIL_SEND =>
-            cnt_block := BLOCK_SIZE;
             if(m_axis_rdy = '1') then
                 m_user_data <= (others => '0');
                 m_user_dvalid <= '1';
@@ -232,6 +239,9 @@ begin
             fsm := ST_BLOCK_TAIL_CHECK;
 
         end case;
+        --dbg_bit_idx <= bit_idx;
+        --dbg_cnt_tail <= cnt_tail;
+        --dbg_cnt_block <= cnt_block;
     end if;
     end process master_proc;
 

@@ -21,6 +21,8 @@ NM8=sid_input_buffer_1.0
 NM9=sid_output_buffer_1.0
 NM10=viterbi_input_buffer_1.0
 NM11=viterbi_output_buffer_1.0
+NM12=CE_input_Buf_1.0
+NM13=CE_output_Buf_1.0
 
 # destination of cores to copy into
 DST0=../$NM0/src
@@ -35,6 +37,8 @@ DST8=../$NM8/src
 DST9=../$NM9/src
 DST10=../$NUM10/src
 DST11=../$NUM11/src
+DST12=../$NUM12/src
+DST13=../$NUM13/src
 
 # update all IP source folders
 echo "Updating $NM0 with $SRC0 and $SRC2"
@@ -72,3 +76,9 @@ cp $SRC0 $SRC1 $SRC2 $DST10
 
 echo "Updating $NM11 with $SRC0, $SRC1, $SRC2"
 cp $SRC0 $SRC1 $SRC2 $DST11
+
+echo "Updating $NM11 with $SRC0, $SRC1, $SRC2"
+cp $SRC0 $SRC1 $SRC2 $DST12
+
+echo "Updating $NM11 with $SRC0, $SRC1, $SRC2"
+cp $SRC0 $SRC1 $SRC2 $DST13

@@ -72,6 +72,11 @@ architecture behavorial of viterbi_input_buffer_v1_0 is
     -- for every byte there are 4 transactions occuring
     constant PRIME_XACTIONS  : integer := PRIME_SIZE*4;
 
+     --signal dbg_cnt_prime  : integer := 0;
+     --signal dbg_bit_idx_0  : integer := 0;
+     --signal dbg_bit_idx_1  : integer := 0;
+     --signal dbg_byte_cnt   : integer := 0;
+
 begin
 
     axi_master_stream_inst : axi_master_stream
@@ -157,19 +162,20 @@ begin
     master_proc : process(AXIS_ACLK, AXIS_ARESETN)
         type fsm_states_mstr is (ST_INITIALIZE, ST_BLOCK_GEN, ST_BLOCK_SEND, 
             ST_PRIME, ST_BYTE_IDX_UPD, ST_PRIME_CNT);
+        constant WORD_SZ    : integer := 3;
         variable fsm : fsm_states_mstr := ST_INITIALIZE;
         variable cnt_prime  : integer range 0 to PRIME_XACTIONS  := 0;
         variable INITIALIZE : std_logic := '1';
         variable bit_idx_0  : integer range 0 to 6 := 0;
         variable bit_idx_1  : integer range 1 to 7 := 1;
-        variable byte_cnt   : integer range 0 to 2 := 0;
+        variable byte_cnt   : integer range 0 to WORD_SZ := 0;
     begin
     if(AXIS_ARESETN = '0') then
         m_user_data   <= (others => '0');
         m_user_dvalid <= '0';
         word_accessed <= '0';
         fsm := ST_INITIALIZE;
-        cnt_prime  := 0;
+        cnt_prime := 0;
         bit_idx_0 := 0;
         bit_idx_1 := 1;
         byte_cnt  := 0;
@@ -204,7 +210,7 @@ begin
         when ST_BYTE_IDX_UPD =>
             m_user_dvalid <= '0';
             if(m_user_txdone = '1') then
-                if(byte_cnt = 3) then
+                if(byte_cnt = WORD_SZ) then
                     byte_cnt  := 0;
                     bit_idx_0 := 0;
                     bit_idx_1 := 1;
@@ -230,7 +236,7 @@ begin
                 if(cnt_prime = PRIME_XACTIONS) then
                     cnt_prime := 0;
                     INITIALIZE := '0';
-                    fsm := ST_BLOCK_SEND;
+                    fsm := ST_BLOCK_GEN;
                 else
                     cnt_prime := cnt_prime + 1;
                     fsm := ST_PRIME;
@@ -241,6 +247,12 @@ begin
             fsm := ST_INITIALIZE;
 
         end case;
+
+         --dbg_byte_cnt  <= byte_cnt;
+         --dbg_cnt_prime <= cnt_prime;
+         --dbg_bit_idx_1 <= bit_idx_1;
+         --dbg_bit_idx_0 <= bit_idx_0;
+
     end if;
     end process master_proc;
 

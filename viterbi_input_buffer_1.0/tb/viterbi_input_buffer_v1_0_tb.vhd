@@ -10,13 +10,15 @@ entity viterbi_input_buffer_v1_0_tb is
 end viterbi_input_buffer_v1_0_tb;
 
 architecture arch_tb of viterbi_input_buffer_v1_0_tb is
+    constant WORD_SIZE_OUT : integer := 16;
+    constant WORD_SIZE_IN  : integer := 8;
 
     component viterbi_input_buffer_v1_0 is
-    generic (
-    WORD_SIZE_OUT  : integer := 16;
-    WORD_SIZE_IN   : integer := 8;
-    PRIME_SIZE      : integer := 25
-    );
+    --generic (
+    --WORD_SIZE_OUT  : integer := 16;
+    --WORD_SIZE_IN   : integer := 8;
+    --PRIME_SIZE      : integer := 25
+    --);
     port (
     AXIS_ACLK : in std_logic;
     AXIS_ARESETN    : in std_logic;
@@ -31,8 +33,6 @@ architecture arch_tb of viterbi_input_buffer_v1_0_tb is
     );
     end component viterbi_input_buffer_v1_0;
 
-    constant WORD_SIZE_OUT : integer := 16;
-    constant WORD_SIZE_IN  : integer := 8;
 
     constant clk_period : time := 10 ns; -- 100 MHz clock
 
@@ -51,11 +51,11 @@ architecture arch_tb of viterbi_input_buffer_v1_0_tb is
 begin
 
     DUT : viterbi_input_buffer_v1_0
-    generic map(
-    WORD_SIZE_OUT => WORD_SIZE_OUT,
-    WORD_SIZE_IN  => WORD_SIZE_IN,
-    PRIME_SIZE     => 25
-    )
+    --generic map(
+    --WORD_SIZE_OUT => WORD_SIZE_OUT,
+    --WORD_SIZE_IN  => WORD_SIZE_IN,
+    --PRIME_SIZE     => 25
+    --)
     port map(
         AXIS_ACLK    => clk,
         AXIS_ARESETN => reset,

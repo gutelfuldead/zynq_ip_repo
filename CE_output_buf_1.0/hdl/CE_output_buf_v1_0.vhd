@@ -6,6 +6,9 @@
 -- Module Name: CE_output_buf_v1_0
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
+-- Description:
+--   The two parity bits generated from the Xilinx Convolutional Encoder core are 
+--   buffered until a full byte is formed. The byte is passed to the master interface.
 -- 
 -- Dependencies: 
 -- 
@@ -14,6 +17,8 @@
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
+
+-- error doesn't seem to be outputting anything other than zero
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -60,6 +65,10 @@ architecture behavorial of CE_output_buf_v1_0 is
     signal current_word   : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
+
+    --signal dbg_xaction_cnt : integer := 0;
+    --signal dbg_bit_idx_0   : integer := 0;
+    --signal dbg_bit_idx_1   : integer := 0;
 
 begin
 
@@ -157,6 +166,11 @@ begin
             fsm := ST_IDLE;
 
         end case;
+
+        --dbg_xaction_cnt <= xaction_cnt;
+        --dbg_bit_idx_1   <= bit_idx_1;
+        --dbg_bit_idx_0   <= bit_idx_0;
+
     end if;
     end process slave_proc;
 
@@ -178,7 +192,6 @@ begin
         case(fsm) is
 
         when ST_IDLE =>
-            m_user_dvalid <= '0';
             if(new_word_ready = '1') then
                 current_word  <= new_word;
                 word_accessed <= '1';

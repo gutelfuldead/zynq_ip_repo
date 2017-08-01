@@ -72,10 +72,14 @@ architecture behavorial of viterbi_output_buffer_v1_0 is
     signal m_axis_rdy    : std_logic := '0';
 
     -- internal buffers
-    signal new_word     : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
+    signal new_word     : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
     signal last_word_block : std_logic := '0';
+
+    signal dbg_bit_idx   : integer := 0;
+    signal dbg_cnt_block : integer := 0;
+    signal dbg_cnt_tail  : integer := 0;
 
 begin
 
@@ -125,11 +129,11 @@ begin
             ST_SYNC_BLOCK, ST_TAIL_CHECK, ST_TAIL_CAPTURE, ST_TAIL_ASSEMBLY);
         variable fsm : fsm_states_slv := ST_TAIL_BLOCK;
         variable bit_idx : integer range 0 to NUM_BITS-1 := 0;
-        variable cnt_block : integer range 0 to BLOCK_SIZE := 0;
+        variable cnt_block : integer range 0 to BLOCK_SIZE := BLOCK_SIZE;
         variable cnt_tail  : integer range 0 to TAIL_SIZE  := 0;
     begin
     if(AXIS_ARESETN = '0') then
-        cnt_block := 0;
+        cnt_block := BLOCK_SIZE;
         cnt_tail  := 0;
         bit_idx   := 0;
         fsm       := ST_TAIL_BLOCK;
@@ -172,8 +176,8 @@ begin
             if(bit_idx = NUM_BITS-1) then
                 cnt_block := cnt_block + 1;
                 bit_idx   := 0;
-                fsm       := ST_SYNC_BLOCK;
                 new_word_ready <= '1';
+                fsm       := ST_SYNC_BLOCK;
             else
                 bit_idx   := bit_idx + 1;
                 fsm       := ST_BLOCK_CHECK;
@@ -194,7 +198,6 @@ begin
         when ST_TAIL_CAPTURE =>
             s_user_rdy <= '0';
             if(s_user_dvalid = '1') then
-                bit_idx := bit_idx + 1;
                 fsm     := ST_TAIL_ASSEMBLY;
             end if;
 
@@ -204,6 +207,7 @@ begin
                 fsm := ST_TAIL_BLOCK;
                 bit_idx := 0;
             else
+                bit_idx := bit_idx + 1;
                 fsm := ST_TAIL_CHECK;
             end if;
 
@@ -212,6 +216,11 @@ begin
             fsm := ST_TAIL_BLOCK;
 
         end case;
+
+        dbg_cnt_tail  <= cnt_tail;
+        dbg_cnt_block <= cnt_block;
+        dbg_bit_idx   <= bit_idx;
+
     end if;
     end process slave_proc;
 
@@ -219,7 +228,7 @@ begin
     -- Axi-Stream Master Controller
     ----------------------------------------------------------------
     master_proc : process(AXIS_ACLK, AXIS_ARESETN)
-        type fsm_states_mstr is (ST_IDLE, ST_ACTIVE);
+        type fsm_states_mstr is (ST_IDLE, ST_ACTIVE, ST_WAIT);
         variable fsm : fsm_states_mstr := ST_IDLE;
     begin
     if(AXIS_ARESETN = '0') then
@@ -232,7 +241,6 @@ begin
         case(fsm) is
 
         when ST_IDLE =>
-            m_user_dvalid <= '0';
             if(new_word_ready = '1') then
                 m_user_data  <= new_word;
                 m_axis_last <= last_word_block;
@@ -244,7 +252,13 @@ begin
             word_accessed <= '0';
             if(m_axis_rdy = '1') then
                 m_user_dvalid <= '1';
-                fsm           := ST_IDLE;
+                fsm           := ST_WAIT;
+            end if;
+
+        when ST_WAIT =>
+            m_user_dvalid <= '0';
+            if(m_user_txdone = '1') then
+                fsm := ST_IDLE;
             end if;
 
         when others =>
