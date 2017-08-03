@@ -33,7 +33,8 @@ entity viterbi_input_buffer_v1_0 is
     generic (
     WORD_SIZE_OUT  : integer := 16;
     WORD_SIZE_IN   : integer := 8;
-    PRIME_SIZE      : integer := 25
+    PRIME_SIZE     : integer := 25;
+    BLOCK_SIZE     : integer := 255
     );
     port (
     AXIS_ACLK : in std_logic;
@@ -45,7 +46,8 @@ entity viterbi_input_buffer_v1_0 is
     
     M_AXIS_TVALID : out std_logic;
     M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
-    M_AXIS_TREADY : in std_logic
+    M_AXIS_TREADY : in std_logic;
+    M_AXIS_BLOCK_IN : out std_logic_vector(7 downto 0)
     );
 end viterbi_input_buffer_v1_0;
 
@@ -68,6 +70,7 @@ architecture behavorial of viterbi_input_buffer_v1_0 is
     signal current_word     : std_logic_vector(WORD_SIZE_IN-1 downto 0) := (others => '0');
     signal word_accessed  : std_logic := '0'; -- 1 when the master interface copies it to it's buffer
     signal new_word_ready : std_logic := '0'; -- 1 when a new word is available for the master interface
+    signal s_block_in     : std_logic := '0';
 
     -- for every byte there are 4 transactions occuring
     constant PRIME_XACTIONS  : integer := PRIME_SIZE*4;
@@ -76,6 +79,7 @@ architecture behavorial of viterbi_input_buffer_v1_0 is
      --signal dbg_bit_idx_0  : integer := 0;
      --signal dbg_bit_idx_1  : integer := 0;
      --signal dbg_byte_cnt   : integer := 0;
+     signal dbg_block_cnt  : integer := 0;
 
 begin
 
@@ -169,6 +173,7 @@ begin
         variable bit_idx_0  : integer range 0 to 6 := 0;
         variable bit_idx_1  : integer range 1 to 7 := 1;
         variable byte_cnt   : integer range 0 to WORD_SZ := 0;
+        variable block_cnt  : integer range 0 to BLOCK_SIZE := 0;
     begin
     if(AXIS_ARESETN = '0') then
         m_user_data   <= (others => '0');
@@ -179,6 +184,8 @@ begin
         bit_idx_0 := 0;
         bit_idx_1 := 1;
         byte_cnt  := 0;
+        block_cnt := 0;
+        M_AXIS_BLOCK_IN <= (others => '0');
     elsif(rising_edge(AXIS_ACLK)) then
         case(fsm) is
 
@@ -201,6 +208,11 @@ begin
         when ST_BLOCK_SEND =>
             word_accessed <= '0';
             if(m_axis_rdy = '1') then
+                if(block_cnt = 0) then
+                    M_AXIS_BLOCK_IN(0) <= '1';
+                else
+                    M_AXIS_BLOCK_IN(0) <= '0';
+                end if;
                 m_user_data(0) <= current_word(bit_idx_0);
                 m_user_data(8) <= current_word(bit_idx_1);
                 m_user_dvalid  <= '1';
@@ -220,6 +232,11 @@ begin
                     bit_idx_1 := bit_idx_1 + 2;
                     byte_cnt := byte_cnt + 1;
                     fsm := ST_BLOCK_SEND;
+                end if;
+                if(block_cnt = BLOCK_SIZE-1) then
+                    block_cnt := 0;
+                else
+                    block_cnt := block_cnt + 1;
                 end if;
             end if;
 
@@ -252,6 +269,7 @@ begin
          --dbg_cnt_prime <= cnt_prime;
          --dbg_bit_idx_1 <= bit_idx_1;
          --dbg_bit_idx_0 <= bit_idx_0;
+         dbg_block_cnt <= block_cnt;
 
     end if;
     end process master_proc;

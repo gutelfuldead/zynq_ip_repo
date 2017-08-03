@@ -132,7 +132,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ac15871a</spirit:value>
+            <spirit:value>66c741eb</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -148,7 +148,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ac15871a</spirit:value>
+            <spirit:value>66c741eb</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -162,7 +162,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>68b230f9</spirit:value>
+            <spirit:value>5a2e4a7c</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -191,7 +191,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>a81688d8</spirit:value>
+            <spirit:value>53179202</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -309,6 +309,23 @@
           </spirit:wireTypeDefs>
         </spirit:wire>
       </spirit:port>
+      <spirit:port>
+        <spirit:name>M_AXIS_BLOCK_IN</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">7</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_vhdlsynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_vhdlbehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
     </spirit:ports>
     <spirit:modelParameters>
       <spirit:modelParameter xsi:type="spirit:nameValueTypeType" spirit:dataType="integer">
@@ -325,6 +342,11 @@
         <spirit:name>PRIME_SIZE</spirit:name>
         <spirit:displayName>Prime Size</spirit:displayName>
         <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.PRIME_SIZE">25</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="integer">
+        <spirit:name>BLOCK_SIZE</spirit:name>
+        <spirit:displayName>Block Size</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.BLOCK_SIZE">255</spirit:value>
       </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
@@ -355,7 +377,7 @@
       <spirit:file>
         <spirit:name>hdl/viterbi_input_buffer_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_6f65f165</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_3a7a3566</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -388,7 +410,7 @@
       <spirit:file>
         <spirit:name>xgui/viterbi_input_buffer_v1_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_68b230f9</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_5a2e4a7c</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -428,6 +450,11 @@
       <spirit:displayName>Prime Size</spirit:displayName>
       <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.PRIME_SIZE">25</spirit:value>
     </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>BLOCK_SIZE</spirit:name>
+      <spirit:displayName>Block Size</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.BLOCK_SIZE">255</spirit:value>
+    </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
     <xilinx:coreExtensions>
@@ -438,8 +465,8 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>viterbi_input_buffer_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>8</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-08-01T03:26:44Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>11</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2017-08-01T16:57:31Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="user.org:user:viterbi_input_buffer:1.0_ARCHIVE_LOCATION">/home/afx/gits/zynq_ip_repo/viterbi_input_buffer_1.0</xilinx:tag>
       </xilinx:tags>
@@ -447,10 +474,10 @@
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2015.4</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="f6150f02"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="d5b02870"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="36d62397"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="dae70e40"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="8020500f"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="410e9f51"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="85726270"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="1dab52de"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="e9c8cb4f"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

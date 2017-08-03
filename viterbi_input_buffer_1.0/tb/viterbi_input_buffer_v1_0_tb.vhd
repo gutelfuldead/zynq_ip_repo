@@ -29,7 +29,8 @@ architecture arch_tb of viterbi_input_buffer_v1_0_tb is
     
     M_AXIS_TVALID : out std_logic;
     M_AXIS_TDATA  : out std_logic_vector(WORD_SIZE_OUT-1 downto 0);
-    M_AXIS_TREADY : in std_logic
+    M_AXIS_TREADY : in std_logic;
+    M_AXIS_BLOCK_IN : out std_logic_vector(7 downto 0)
     );
     end component viterbi_input_buffer_v1_0;
 
@@ -45,6 +46,7 @@ architecture arch_tb of viterbi_input_buffer_v1_0_tb is
     signal M_TDATA  : std_logic_vector(WORD_SIZE_OUT-1 downto 0)  := (others => '0');
     signal M_TVALID : std_logic := '0';
     signal M_TREADY : std_logic := '0';
+    signal M_BLOCK_IN : std_logic_vector(7 downto 0) := (others => '0');
 
     signal new_msg : std_logic_vector(WORD_SIZE_OUT-1 downto 0) := (others => '0');
 
@@ -64,7 +66,8 @@ begin
         S_AXIS_TVALID  => S_TVALID,
         M_AXIS_TVALID  => M_TVALID,
         M_AXIS_TDATA   => M_TDATA,
-        M_AXIS_TREADY  => M_TREADY
+        M_AXIS_TREADY  => M_TREADY,
+        M_AXIS_BLOCK_IN => M_BLOCK_IN
         );
 
     clk_process : process

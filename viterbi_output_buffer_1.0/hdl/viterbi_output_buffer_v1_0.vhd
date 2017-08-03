@@ -7,6 +7,7 @@
 -- Target Devices: Zynq7020
 -- Tool Versions: Vivado 2015.4
 -- Description: 
+--
 --  This core connects to the output of the Xilinx Viterbi Decoder Core. In order to use
 --  the Viterbi Core after every block of data has passed through it it needs to be primed
 --  with 25 bytes of zeros. These zero bytes need to be flushed out from the core. This 
