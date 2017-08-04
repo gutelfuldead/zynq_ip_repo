@@ -122,4 +122,24 @@ package generic_pkg is
 		);
 	end component pulse_generator;
 
+	-----------------------------------------------------
+	-- spi master interface (uni-directional xactions) --
+	-----------------------------------------------------
+	component spi_master is
+        generic (
+            INPUT_CLK_MHZ : integer := 100;
+            SPI_CLK_MHZ   : integer := 10;
+            DSIZE         : integer := 8
+        );
+        Port ( clk : in STD_LOGIC;
+               reset : in STD_LOGIC;
+               sclk : out STD_LOGIC;
+               sclk_en : out STD_LOGIC;
+               mosi : out STD_LOGIC;
+               din  : in std_logic_vector(DSIZE-1 downto 0);
+               rdy  : out std_logic;
+               dvalid : in std_logic 
+               );
+    end component spi_master;
+
 end generic_pkg;
