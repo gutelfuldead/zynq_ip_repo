@@ -8,6 +8,7 @@ SRC2=generic_pkg.vhd
 SRC3=pulse_generator.vhd
 SRC4=bram_fifo_controller.vhd
 SRC5=spi_master.vhd
+SRC6=spi_slave.vhd
 
 # readable names of axi ip cores for messages
 NM0=axi_master_stream_fifo_1.0
@@ -25,6 +26,7 @@ NM11=viterbi_output_buffer_1.0
 NM12=CE_input_Buf_1.0
 NM13=CE_output_buf_1.0
 NM14=axis_to_spi_1.0
+NM15=spi_to_axis_1.0
 
 # destination of cores to copy into
 DST0=../$NM0/src
@@ -42,6 +44,7 @@ DST11=../$NM11/src
 DST12=../$NM12/src
 DST13=../$NM13/src
 DST14=../$NM14/src
+DST15=../$NM15/src
 
 # update all IP source folders
 echo "Updating $NM0 with $SRC0 and $SRC2"
@@ -88,3 +91,6 @@ cp $SRC0 $SRC1 $SRC2 $DST13
 
 echo "Updating $NM14 with $SRC1, $SRC2, $SRC5"
 cp $SRC1 $SRC2 $SRC5 $DST14
+
+echo "Updating $NM15 with $SRC0, $SRC2, $SRC6"
+cp $SRC0 $SRC2 $SRC6 $DST15
