@@ -85,11 +85,11 @@ begin
     when ST_ACTIVE =>
     if(bit_idx = DSIZE) then
       if(sclk_en = '0') then
-      fsm <= ST_IDLE;
-      dvalid <= '1';
-      for i in 0 to DSIZE-1 loop
-        dout(i) <= mosi_reg(i);
-      end loop;
+          fsm <= ST_IDLE;
+          dvalid <= '1';
+          for i in 0 to DSIZE-1 loop
+            dout(i) <= mosi_reg(i);
+          end loop;
       end if;
     -- give the signal time to settle
     elsif(sclk_delay_one = '1' and sclk_delay_two = '0' and sclk = '1') then

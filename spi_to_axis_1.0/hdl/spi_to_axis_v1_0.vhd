@@ -88,6 +88,7 @@ begin
 		new_word_rdy <= '0';
 	elsif(rising_edge(M_AXIS_ACLK)) then
 	case(fsm) is
+	
 		when ST_IDLE =>
 			if(spi_dvalid = '1') then
 				new_word <= spi_dout;
@@ -117,6 +118,7 @@ begin
 		new_word_accessed <= '0';
 	elsif(rising_edge(M_AXIS_ACLK)) then
 	case(fsm) is
+	
 		when ST_IDLE =>
 			if(new_word_rdy = '1') then
 				new_word_accessed <= '1';

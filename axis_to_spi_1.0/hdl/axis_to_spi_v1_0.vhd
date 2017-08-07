@@ -116,7 +116,7 @@ begin
    end case;
    end if;
    end process axis_ctrl;
-   
+
    -- spi controller
    spi_ctrl : process(S_AXIS_ACLK,reset)
         type states is (ST_IDLE, ST_ACTIVE);

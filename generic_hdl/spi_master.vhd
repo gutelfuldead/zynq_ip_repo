@@ -50,9 +50,7 @@ architecture Behavioral of spi_master is
     signal fsm : states := ST_IDLE;
     
     type data_array is array (DSIZE-1 downto 0) of std_logic;
-    signal mosi_shift_reg : data_array;
-    signal sclk_toggle : std_logic := '0';
-    
+    signal mosi_shift_reg : data_array;    
 
 begin
 

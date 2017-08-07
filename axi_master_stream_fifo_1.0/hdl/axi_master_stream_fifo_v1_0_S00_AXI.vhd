@@ -126,8 +126,6 @@ architecture arch_imp of axi_master_stream_fifo_v1_0_S00_AXI is
 	signal reg_data_out	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 	signal byte_index	: integer;
 
-	signal write_en_q : std_logic := '0';
-
 begin
 	-- I/O Connections assignments
 
