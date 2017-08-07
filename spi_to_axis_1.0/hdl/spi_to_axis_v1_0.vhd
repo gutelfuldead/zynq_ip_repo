@@ -109,7 +109,7 @@ begin
 	end process spi_read;
 
 	axi_write : process(M_AXIS_ACLK, reset)
-		type states is (ST_IDLE, ST_ACTIVE);
+		type states is (ST_IDLE, ST_ACTIVE, ST_WAIT);
 		variable fsm : states := ST_IDLE;
 	begin
 	if(reset = '1') then
