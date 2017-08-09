@@ -45,6 +45,22 @@ begin
 
 	reset <= not M_AXIS_ARESETN;
 
+	spi_slave_inst : spi_slave
+	generic map (
+	INPUT_CLK_MHZ => INPUT_CLK_MHZ,
+	SPI_CLK_MHZ   => SPI_CLK_MHZ,
+	DSIZE         => DSIZE
+	)
+	port map ( 
+	clk      => M_AXIS_ACLK,
+	reset    => reset,
+	sclk     => sclk,
+	sclk_en  => sclk_en,
+	mosi     => mosi,
+	dout     => spi_dout,
+	dvalid   => spi_dvalid 
+	);
+
 	axi_master_inst : axi_master_stream
 	generic map ( C_M_AXIS_TDATA_WIDTH  => DSIZE )
 	port map (
@@ -60,22 +76,6 @@ begin
 	M_AXIS_TSTRB    => open,
 	M_AXIS_TLAST    => open,
 	M_AXIS_TREADY   => M_AXIS_TREADY
-	);
-
-	spi_slave_inst : spi_slave
-	generic map (
-	INPUT_CLK_MHZ => INPUT_CLK_MHZ,
-	SPI_CLK_MHZ   => SPI_CLK_MHZ,
-	DSIZE         => DSIZE
-	)
-	Port map ( 
-	clk      => M_AXIS_ACLK,
-	reset    => reset,
-	sclk     => sclk,
-	sclk_en  => sclk_en,
-	mosi     => mosi,
-	dout     => spi_dout,
-	dvalid   => spi_dvalid 
 	);
 
 	spi_read : process(M_AXIS_ACLK, reset)
@@ -112,17 +112,21 @@ begin
 	axi_write : process(M_AXIS_ACLK, reset)
 		type states is (ST_IDLE, ST_ACTIVE, ST_WAIT);
 		variable fsm : states := ST_IDLE;
+		variable temp_word : std_logic_vector(DSIZE-1 downto 0) := (others => '0');
 	begin
 	if(reset = '1') then
 		fsm := ST_IDLE;
 		new_word_accessed <= '0';
+		user_dvalid <= '0';
+		user_din <= (others => '0');
+		temp_word := (others => '0');
 	elsif(rising_edge(M_AXIS_ACLK)) then
 	case(fsm) is
 	
 		when ST_IDLE =>
 			if(new_word_rdy = '1') then
 				new_word_accessed <= '1';
-				user_din <= new_word;
+				temp_word := new_word;
 				fsm := ST_ACTIVE;
 			end if;
 
@@ -130,6 +134,7 @@ begin
 			new_word_accessed <= '0';
 			if(axis_rdy = '1') then
 				user_dvalid <= '1';
+				user_din <= temp_word;
 				fsm := ST_WAIT;
 			end if;
 

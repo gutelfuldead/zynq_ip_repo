@@ -46,11 +46,13 @@ architecture tb of axis_to_spi_to_spi_to_axis_tb is
 
 	constant DSIZE  : integer := 8;
 	signal sclk, sclk_en, mosi : std_logic := '0';
-	signal clk, aresetn, reset : std_logic := '0';
+	signal clk, aresetn : std_logic := '0';
 	signal S_AXIS_TREADY, S_AXIS_TVALID : std_logic := '0';
 	signal M_AXIS_TVALID, M_AXIS_TREADY : std_logic := '0';
 	signal S_AXIS_TDATA, M_AXIS_TDATA : std_logic_vector(DSIZE-1 downto 0) := (others => '0');
     constant clk_period : time := 10 ns; -- 100 MHz clock
+
+    signal dout : std_logic_vector(DSIZE-1 downto 0) := (others => '0');
 
 begin
 
@@ -87,7 +89,7 @@ begin
     end process clk_gen;
     
     rst : process(clk)
-        constant RESET_CYCLES : integer := 2000;
+        constant RESET_CYCLES : integer := 200000;
         variable cnt : integer range 0 to RESET_CYCLES;
     begin
     if(rising_edge(clk)) then
@@ -131,6 +133,7 @@ begin
     	when ST_IDLE =>
     		if(M_AXIS_TVALID = '1') then
     			M_AXIS_TREADY <= '1';
+    			dout <= M_AXIS_TDATA;
     			fsm := ST_SYNC;
 			end if;
 

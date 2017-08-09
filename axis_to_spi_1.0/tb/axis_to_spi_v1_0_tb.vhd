@@ -8,12 +8,16 @@ end axis_to_spi_v1_0_tb;
 
 architecture Behavioral of axis_to_spi_v1_0_tb is
 
+    constant INPUT_CLK_MHZ : integer := 100;
+    constant SPI_CLK_MHZ   : integer := 10;
+    constant DATA_WIDTH    : integer := 8;
+
     component axis_to_spi_v1_0 is
-	generic (
-    INPUT_CLK_MHZ : integer := 100;
-    SPI_CLK_MHZ   : integer := 10;
-    DATA_WIDTH    : integer := 8
-	);
+--	generic (
+--    INPUT_CLK_MHZ : integer := 100;
+--    SPI_CLK_MHZ   : integer := 10;
+--    DATA_WIDTH    : integer := 8
+--	);
 	port (
 	sclk : out STD_LOGIC;
     sclk_en : out STD_LOGIC;
@@ -26,9 +30,6 @@ architecture Behavioral of axis_to_spi_v1_0_tb is
 	);
     end component axis_to_spi_v1_0;
     
-    constant INPUT_CLK_MHZ : integer := 100;
-    constant SPI_CLK_MHZ   : integer := 10;
-    constant DATA_WIDTH    : integer := 8;
     signal sclk, sclk_en, mosi, clk, aresetn, tready, tvalid : std_logic := '0';
     signal tdata : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
     constant clk_period : time := 10 ns; -- 100 MHz clock
@@ -37,11 +38,11 @@ architecture Behavioral of axis_to_spi_v1_0_tb is
 begin
 
     DUT : axis_to_spi_v1_0
-    generic map(
-        INPUT_CLK_MHZ => INPUT_CLK_MHZ,
-        SPI_CLK_MHZ   => SPI_CLK_MHZ,
-        DATA_WIDTH    => DATA_WIDTH
-    )
+--    generic map(
+--        INPUT_CLK_MHZ => INPUT_CLK_MHZ,
+--        SPI_CLK_MHZ   => SPI_CLK_MHZ,
+--        DATA_WIDTH    => DATA_WIDTH
+--    )
     port map(
         sclk => sclk,
         sclk_en => sclk_en,

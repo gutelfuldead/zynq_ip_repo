@@ -48,10 +48,9 @@ architecture Behavioral of spi_master is
     
     type states is (ST_IDLE, ST_ACTIVE, ST_LEAD_IN, ST_SYNC);
     signal fsm : states := ST_IDLE;
-    
-    type data_array is array (DSIZE-1 downto 0) of std_logic;
-    signal mosi_shift_reg : data_array;    
 
+    signal mosi_shift_reg : std_logic_vector(DSIZE-1 downto 0);
+    
 begin
 
     main : process(clk)
@@ -70,6 +69,10 @@ begin
         bit_idx  := 0;
         clk_cnt  := 0;
         sclk_tmp := '0';
+        sclk_prev := '0';
+        transaction_done := '0';
+        sync_cnt := 0;
+        fsm <= ST_IDLE;
     elsif(rising_edge(clk)) then
     case(fsm) is
     
@@ -81,14 +84,13 @@ begin
         mosi <= '0';
         if(dvalid = '1') then
             rdy     <= '0';
-            for i in 0 to DSIZE-1 loop
-                mosi_shift_reg(i) <= din(i);
-            end loop;
-        fsm <= ST_LEAD_IN;
+            mosi_shift_reg <= din;
+            fsm <= ST_LEAD_IN;
         end if;      
         
     when ST_LEAD_IN =>
         sclk_en <= '1';
+        rdy <= '0';
         if(clk_cnt = CLK_RATIO/2) then
             clk_cnt := 0;
             fsm <= ST_ACTIVE;
