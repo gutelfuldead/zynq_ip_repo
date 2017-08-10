@@ -27,6 +27,7 @@ NM12=CE_input_Buf_1.0
 NM13=CE_output_buf_1.0
 NM14=axis_to_spi_1.0
 NM15=spi_to_axis_1.0
+NM16=axis_data_buf_1.0
 
 # destination of cores to copy into
 DST0=../$NM0/src
@@ -45,6 +46,7 @@ DST12=../$NM12/src
 DST13=../$NM13/src
 DST14=../$NM14/src
 DST15=../$NM15/src
+DST16=../$NM16/src
 
 # update all IP source folders
 echo "Updating $NM0 with $SRC0 and $SRC2"
@@ -94,3 +96,6 @@ cp $SRC1 $SRC2 $SRC5 $DST14
 
 echo "Updating $NM15 with $SRC0, $SRC2, $SRC6"
 cp $SRC0 $SRC2 $SRC6 $DST15
+
+echo "Updating $NM16 with $SRC0, $SRC1, $SRC2, $SRC4"
+cp $SRC0 $SRC1 $SRC2 $SRC4 $DST16
