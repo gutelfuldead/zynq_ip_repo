@@ -11,13 +11,16 @@ end CE_input_Buf_v1_0_tb;
 
 architecture arch_tb of CE_input_Buf_v1_0_tb is
 
+    constant WORD_SIZE_OUT : integer := 8;
+    constant WORD_SIZE_IN  : integer := 8;
+
     component CE_input_Buf_v1_0 is
-        generic (
-        WORD_SIZE_OUT  : integer := 8;
-        WORD_SIZE_IN   : integer := 8;
-        TAIL_SIZE      : integer := 25;
-        BLOCK_SIZE     : integer := 255
-        );
+--        generic (
+--        WORD_SIZE_OUT  : integer := 8;
+--        WORD_SIZE_IN   : integer := 8;
+--        TAIL_SIZE      : integer := 25;
+--        BLOCK_SIZE     : integer := 255
+--        );
         port (
         AXIS_ACLK : in std_logic;
         AXIS_ARESETN    : in std_logic;
@@ -32,9 +35,6 @@ architecture arch_tb of CE_input_Buf_v1_0_tb is
         M_AXIS_TREADY : in std_logic
         );
     end component CE_input_Buf_v1_0;
-
-    constant WORD_SIZE_OUT : integer := 8;
-    constant WORD_SIZE_IN  : integer := 8;
 
     constant clk_period : time := 10 ns; -- 100 MHz clock
 
@@ -54,12 +54,12 @@ architecture arch_tb of CE_input_Buf_v1_0_tb is
 begin
 
     DUT : CE_input_Buf_v1_0
-    generic map(
-    WORD_SIZE_OUT => WORD_SIZE_OUT,
-    WORD_SIZE_IN  => WORD_SIZE_IN,
-    TAIL_SIZE     => 25,
-    BLOCK_SIZE    => 255
-    )
+--    generic map(
+--    WORD_SIZE_OUT => WORD_SIZE_OUT,
+--    WORD_SIZE_IN  => WORD_SIZE_IN,
+--    TAIL_SIZE     => 25,
+--    BLOCK_SIZE    => 255
+--    )
     port map(
         AXIS_ACLK    => clk,
         AXIS_ARESETN => reset,
