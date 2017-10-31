@@ -111,16 +111,14 @@ u32 ASSF_read_data(const u32 baseaddr, u32 *datout)
 	if(ASSF_poll_bram_empty(baseaddr))
 		return EASSF_FIFO_EMPTY;
 	ASSF_en_read_en(baseaddr);
+	ASSF_den_read_en(baseaddr);		
 	XTime start = ASSF_get_time();
 	while(ASSF_poll_dout_valid(baseaddr) == 0){
 		if(ASSF_elapsed_time_us(start) > ASSF_POLL_VALID_MAX){
-			ASSF_den_read_en(baseaddr);		
 			return EASSF_VALID_NOT_ASSERTED;
 		}
 	}
 	*datout = AXI_SLAVE_STREAM_FIFO_mReadReg(baseaddr, ASSF_DATA_OUT_REG_OFFSET);
-	ASSF_den_read_en(baseaddr);
-	ASSF_read_done(baseaddr);
 	return XST_SUCCESS;
 }
 

@@ -33,12 +33,8 @@ entity axi_slave_stream_fifo_v1_0 is
 		rstb  : out std_logic;
 
 		-- AXIS slave ports
-		S_AXIS_ACLK	: in std_logic;
-		S_AXIS_ARESETN	: in std_logic;
 		S_AXIS_TREADY	: out std_logic;
 		S_AXIS_TDATA	: in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-		--S_AXIS_TSTRB	: in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-		--S_AXIS_TLAST	: in std_logic;
 		S_AXIS_TVALID	: in std_logic;
 
 		-- Ports of Axi Slave Bus Interface S00_AXI
@@ -122,14 +118,12 @@ architecture arch_imp of axi_slave_stream_fifo_v1_0 is
         dina  : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
         ena   : out STD_LOGIC;
         wea   : out STD_LOGIC;
-        clka  : out std_logic;
         rsta  : out std_logic;
         
         -- BRAM read port lines
         addrb : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
         doutb : in STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
         enb   : out STD_LOGIC;
-        clkb  : out std_logic;
         rstb  : out std_logic;
         
         --AXIL Read Control Ports
@@ -137,12 +131,8 @@ architecture arch_imp of axi_slave_stream_fifo_v1_0 is
         axil_read_done : in std_logic;  -- acknowledgment from axi4-lite iface data has been read
         
         -- AXIS Slave Stream Ports
-        S_AXIS_ACLK : in std_logic;
-        S_AXIS_ARESETN  : in std_logic;
         S_AXIS_TREADY   : out std_logic;
         S_AXIS_TDATA    : in std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        --S_AXIS_TSTRB    : in std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-        --S_AXIS_TLAST    : in std_logic;
         S_AXIS_TVALID   : in std_logic;
 
         -- fifo control lines
@@ -227,23 +217,17 @@ axi_slave_stream_fifo_v1_0_S00_AXI_inst : axi_slave_stream_fifo_v1_0_S00_AXI
         dina  => dina,
         ena   => ena,
         wea   => wea,
-        clka  => open,
         rsta  => rsta,
         
         -- BRAM read port lines
         addrb => addrb,
         doutb => doutb,
         enb   => enb,
-        clkb  => open,
         rstb  => rstb,
 
         -- AXIS Slave Stream Ports
-        S_AXIS_ACLK    => S_AXIS_ACLK,
-        S_AXIS_ARESETN => S_AXIS_ARESETN,
         S_AXIS_TREADY  => S_AXIS_TREADY,
         S_AXIS_TDATA   => S_AXIS_TDATA,
-        --S_AXIS_TSTRB   => S_AXIS_TSTRB,
-        --S_AXIS_TLAST   => S_AXIS_TLAST,
         S_AXIS_TVALID  => S_AXIS_TVALID,
         
         -- axil done line

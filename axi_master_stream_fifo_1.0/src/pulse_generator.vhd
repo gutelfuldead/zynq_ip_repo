@@ -34,7 +34,7 @@ end pulse_generator;
 
 architecture arch_imp of pulse_generator is
 
-  signal q_sig : std_logic := '0';
+  signal q_sig : std_logic := '1';
 
 begin
   

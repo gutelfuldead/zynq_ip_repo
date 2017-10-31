@@ -36,8 +36,6 @@ entity axi_master_stream_fifo_v1_0 is
         rstb  : out std_logic;
         
         -- AXI Master Stream Ports
-        M_AXIS_ACLK	    : in std_logic;
-        M_AXIS_ARESETN    : in std_logic;
         M_AXIS_TVALID    : out std_logic;
         M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
         M_AXIS_TREADY    : in std_logic;
@@ -124,23 +122,17 @@ architecture arch_imp of axi_master_stream_fifo_v1_0 is
         dina  : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
         ena   : out STD_LOGIC;
         wea   : out STD_LOGIC;
-        clka  : out std_logic;
         rsta  : out std_logic;
         
         -- BRAM read port lines
         addrb : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
         doutb : in STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
         enb   : out STD_LOGIC;
-        clkb  : out std_logic;
         rstb  : out std_logic;
 
         -- AXI Master Stream Ports
-        M_AXIS_ACLK     : in std_logic;
-        M_AXIS_ARESETN  : in std_logic;
         M_AXIS_TVALID   : out std_logic;
         M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        --M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-        M_AXIS_TLAST    : out std_logic;
         M_AXIS_TREADY   : in std_logic;
 
         -- fifo control lines
@@ -226,23 +218,17 @@ axi_master_stream_fifo_v1_0_S00_AXI_inst : axi_master_stream_fifo_v1_0_S00_AXI
         dina  => dina,
         ena   => ena,
         wea   => wea,
-        clka  => open,
         rsta  => rsta,
         
         -- BRAM read port lines
         addrb => addrb,
         doutb => doutb,
         enb   => enb,
-        clkb  => open,
         rstb  => rstb,
 
         -- AXI Master Stream Ports
-        M_AXIS_ACLK     => M_AXIS_ACLK,
-        M_AXIS_ARESETN  => M_AXIS_ARESETN,
         M_AXIS_TVALID   => M_AXIS_TVALID,
         M_AXIS_TDATA    => M_AXIS_TDATA,
-        --M_AXIS_TSTRB    => M_AXIS_TSTRB,
-        --M_AXIS_TLAST    => M_AXIS_TLAST,
         M_AXIS_TREADY   => M_AXIS_TREADY,
 
         -- control lines

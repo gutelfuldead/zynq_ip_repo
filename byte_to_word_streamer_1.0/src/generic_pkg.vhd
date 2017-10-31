@@ -66,6 +66,41 @@ package generic_pkg is
            );
 	end component BRAM_FIFO_CONTROLLER;
 
+  component BRAM_FIFO_CONTROLLER_v2 is
+      generic (
+             BRAM_ADDR_WIDTH  : integer := 10;
+             BRAM_DATA_WIDTH  : integer := 32 );
+      Port ( 
+             -- BRAM write port lines
+             addra : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
+             dina  : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
+             ena   : out STD_LOGIC;
+             wea   : out STD_LOGIC;
+             rsta  : out std_logic;
+         
+             -- BRAM read port lines
+             addrb : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
+             doutb : in STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
+             enb   : out STD_LOGIC;
+             rstb  : out std_logic;
+             
+             -- Core logic
+             clk     : in std_logic;
+             reset     : in  STD_LOGIC;
+             WriteEn : in  STD_LOGIC;
+             DataIn  : in  STD_LOGIC_VECTOR (BRAM_DATA_WIDTH - 1 downto 0);
+             ReadEn  : in  STD_LOGIC;
+             DataOut : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH - 1 downto 0);
+             DataOutValid : out std_logic;
+             Empty   : out STD_LOGIC;
+             Full    : out STD_LOGIC;
+             ProgFullPulse : out STD_LOGIC;
+             SetProgFull : in std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+             Occupancy : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0)
+             );
+  end component BRAM_FIFO_CONTROLLER_v2;
+
+
     ------------------------------------------
     -- Generic AXI4-Stream Master Interface --
     ------------------------------------------

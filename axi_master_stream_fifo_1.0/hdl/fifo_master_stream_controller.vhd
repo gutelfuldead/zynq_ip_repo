@@ -40,23 +40,17 @@ entity FIFO_MASTER_STREAM_CONTROLLER is
         dina  : out STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
         ena   : out STD_LOGIC;
         wea   : out STD_LOGIC;
-        clka  : out std_logic;
         rsta  : out std_logic;
         
         -- BRAM read port lines
         addrb : out STD_LOGIC_VECTOR (BRAM_ADDR_WIDTH-1 downto 0);
         doutb : in STD_LOGIC_VECTOR (BRAM_DATA_WIDTH-1 downto 0);
         enb   : out STD_LOGIC;
-        clkb  : out std_logic;
         rstb  : out std_logic;
 
         -- AXI Master Stream Ports
-        M_AXIS_ACLK	    : in std_logic;
-        M_AXIS_ARESETN  : in std_logic;
         M_AXIS_TVALID   : out std_logic;
         M_AXIS_TDATA    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
-        --M_AXIS_TSTRB    : out std_logic_vector((BRAM_DATA_WIDTH/8)-1 downto 0);
-        M_AXIS_TLAST    : out std_logic;
         M_AXIS_TREADY   : in std_logic;
 
         -- fifo control lines
@@ -76,25 +70,15 @@ end FIFO_MASTER_STREAM_CONTROLLER;
 architecture Behavorial of FIFO_MASTER_STREAM_CONTROLLER is
 
     -- fifo status, control, and data signals
-    signal sig_fifo_dout       : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
-    signal sig_fifo_dvalid     : std_logic := '0'; 
-    signal sig_fifo_read_en    : std_logic := '0';
-    signal sig_fifo_read_ready : std_logic := '0';
-    signal sig_fifo_write_ready : std_logic := '0';
-    signal sig_fifo_empty : std_logic := '1';
-    signal sig_fifo_occupancy  : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0) := (others => '0');
-    
-    -- axi-stream signals
-    signal sig_axis_din    : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0) := (others => '0');
-    signal sig_axis_dvalid : std_logic := '0';
-    signal sig_axis_txdone : std_logic := '0';
-    signal sig_axis_rdy    : std_logic := '0';
-    signal sig_axis_last   : std_logic := '0';
-
+    signal ReadEn  :   STD_LOGIC;
+    signal DataOut :  STD_LOGIC_VECTOR (BRAM_DATA_WIDTH - 1 downto 0);
+    signal Empty   :  STD_LOGIC;
+    signal Full    :  STD_LOGIC;
+    signal DataOutValid : std_logic;
 begin
 
     -- Instantiation of FIFO Controller
-    BRAM_FIFO_CONTROLLER_inst : BRAM_FIFO_CONTROLLER
+    BRAM_FIFO_CONTROLLER_v2_inst : BRAM_FIFO_CONTROLLER_v2
         generic map( 
             BRAM_ADDR_WIDTH => BRAM_ADDR_WIDTH,
             BRAM_DATA_WIDTH => BRAM_DATA_WIDTH)
@@ -103,49 +87,29 @@ begin
             dina  => dina,
             ena   => ena,
             wea   => wea,
-            clka  => clka, -- instantiated with BUFR top level
             rsta  => rsta,
             addrb => addrb,
             doutb => doutb,
             enb   => enb,
-            clkb  => clkb, -- instantiated with BUFR top level
             rstb  => rstb,
             
             clk        => clk,
-            clkEn      => clkEn,
-            write_en   => fifo_write_en,
             reset      => reset,
-            din        => fifo_din,
-            read_en    => sig_fifo_read_en,
-            read_ready => sig_fifo_read_ready,
-            write_ready => fifo_ready,
-            dout       => sig_fifo_dout,
-            dvalid     => sig_fifo_dvalid,
-            full       => fifo_full,
-            empty      => fifo_empty,
-            occupancy  => sig_fifo_occupancy
+            WriteEn    => fifo_write_en,
+            DataIn     => fifo_din,
+            ReadEn     => ReadEn,
+            DataOut    => DataOut,
+            DataOutValid => DataOutValid,
+            Empty      => Empty,
+            Full       => Full,
+            SetProgFull => (others => '1'),
+            ProgFullPulse => open,
+            Occupancy => fifo_occupancy
         );
 
-    fifo_occupancy <= sig_fifo_occupancy;
-
-    -- Instantiation of Master Stream Interface
-    axi_master_stream_inst : AXI_MASTER_STREAM
-        generic map( C_M_AXIS_TDATA_WIDTH => BRAM_DATA_WIDTH)
-        port map(
-            user_din        => sig_axis_din,
-            user_dvalid     => sig_axis_dvalid,
-            user_txdone     => sig_axis_txdone,
-            axis_rdy        => sig_axis_rdy,
-            axis_last       => sig_axis_last,
-            M_AXIS_ACLK     => M_AXIS_ACLK,
-            M_AXIS_ARESETN  => M_AXIS_ARESETN,
-            M_AXIS_TVALID   => M_AXIS_TVALID,
-            M_AXIS_TDATA    => M_AXIS_TDATA,
-            M_AXIS_TSTRB    => open,
-            M_AXIS_TLAST    => M_AXIS_TLAST,
-            M_AXIS_TREADY   => M_AXIS_TREADY
-        );
-
+    fifo_full <= Full;
+    fifo_empty <= Empty;
+    fifo_ready <= '1' when (Full = '0') else '0';
     --------------------------------------------------------------------------
     -- Stream and FIFO read controller (Async. Reset)
     --------------------------------------------------------------------------
@@ -155,51 +119,57 @@ begin
     -- FIFO address data
     --------------------------------------------------------------------------
     axis_read_ctrl : process(clk, reset) 
-        type state is (ST_IDLE, ST_ACTIVE, ST_WORKING);
+        type state is (ST_IDLE, ST_GET_DATA, ST_CHECK_FIFO, ST_AXIS);
         variable fsm : state := ST_IDLE;
     begin
     if(reset = '1') then
         if(USE_WRITE_COMMIT = "ENABLE") then
             fsm := ST_IDLE;
         else
-            fsm := ST_WORKING;
+            fsm := ST_CHECK_FIFO;
         end if;
-        sig_axis_dvalid <= '0';
-        sig_fifo_read_en <= '0';
-        sig_axis_last <= '0';
+        ReadEn <= '0';
+        M_AXIS_TDATA <= (others => '0');
+        M_AXIS_TVALID <= '0';
     elsif(rising_edge(clk)) then
         if(clkEn = '1') then
             case(fsm) is
 
             when ST_IDLE =>
-                sig_axis_dvalid <= '0';
-                if(write_commit = '1') then
-                    fsm := ST_WORKING;
+                if(USE_WRITE_COMMIT = "ENABLE") then
+                    if(write_commit = '1') then
+                        fsm := ST_CHECK_FIFO;
+                    end if;
+                else
+                    fsm := ST_CHECK_FIFO;
                 end if;
 
-            when ST_WORKING =>
-                sig_axis_dvalid <= '0';   
-                if(sig_axis_rdy = '1' and sig_fifo_read_ready = '1') then
-                    sig_fifo_read_en <= '1';
-                    fsm := ST_ACTIVE;
+            when ST_CHECK_FIFO =>
+                if(Empty = '0') then
+                    ReadEn <= '1';
+                    fsm := ST_GET_DATA;
                 end if;
             
-            when ST_ACTIVE =>
-                sig_fifo_read_en <= '0';
-                if(sig_fifo_dvalid = '1') then
-                    sig_axis_din    <= sig_fifo_dout;
-                    sig_axis_dvalid <= '1'; 
+            when ST_GET_DATA =>
+                ReadEn <= '0';
+                if(DataOutValid = '1') then
+                    M_AXIS_TDATA    <= DataOut;
+                    M_AXIS_TVALID   <= '1';
+                    fsm := ST_AXIS;
+                end if;
+
+            when ST_AXIS =>
+                if(M_AXIS_TREADY = '1') then
+                    M_AXIS_TDATA    <= (others => '0');
+                    M_AXIS_TVALID   <= '0';
                     if(USE_WRITE_COMMIT = "ENABLE") then
-                        if(unsigned(sig_fifo_occupancy) = 1) then
-                            sig_axis_last <= '1';
+                        if(Empty = '1') then
                             fsm := ST_IDLE;
                         else
-                            fsm := ST_WORKING;
-                            sig_axis_last <= '0';
+                            fsm := ST_CHECK_FIFO;
                         end if;
                     else
-                        fsm := ST_WORKING;
-                        sig_axis_last <= '0';
+                        fsm := ST_CHECK_FIFO;
                     end if;
                 end if;
 

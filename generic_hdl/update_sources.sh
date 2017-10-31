@@ -9,6 +9,7 @@ SRC3=pulse_generator.vhd
 SRC4=bram_fifo_controller.vhd
 SRC5=spi_master.vhd
 SRC6=spi_slave.vhd
+SRC7=bram_fifo_controller_v2.vhd
 
 # readable names of axi ip cores for messages
 NM0=axi_master_stream_fifo_1.0
@@ -49,11 +50,11 @@ DST15=../$NM15/src
 DST16=../$NM16/src
 
 # update all IP source folders
-echo "Updating $NM0 with $SRC0 and $SRC2"
-cp $SRC0 $SRC2 $DST0
+echo "Updating $NM0 with $SRC2, $SRC3 and $SRC7"
+cp $SRC2 $SRC7 $SRC3 $DST0
 
-echo "Updating $NM1 with $SRC1 and $SRC2"
-cp $SRC1 $SRC2 $DST1
+echo "Updating $NM1 with $SRC2, $SRC3 and $SRC7"
+cp $SRC2 $SRC7 $SRC3 $DST1
 
 echo "Updating $NM2 with $SRC0, $SRC1, $SRC2"
 cp $SRC0 $SRC1 $SRC2 $DST2
