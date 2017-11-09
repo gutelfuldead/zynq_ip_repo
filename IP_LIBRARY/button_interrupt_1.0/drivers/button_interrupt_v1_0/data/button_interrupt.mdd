@@ -1,0 +1,10 @@
+
+
+OPTION psf_version = 2.1;
+
+BEGIN DRIVER button_interrupt
+	OPTION supported_peripherals = (button_interrupt);
+	OPTION copyfiles = all;
+	OPTION VERSION = 1.0;
+	OPTION NAME = button_interrupt;
+END DRIVER
