@@ -1,0 +1,10 @@
+
+
+OPTION psf_version = 2.1;
+
+BEGIN DRIVER simple_rx_fifo
+	OPTION supported_peripherals = (simple_rx_fifo);
+	OPTION copyfiles = all;
+	OPTION VERSION = 1.0;
+	OPTION NAME = simple_rx_fifo;
+END DRIVER

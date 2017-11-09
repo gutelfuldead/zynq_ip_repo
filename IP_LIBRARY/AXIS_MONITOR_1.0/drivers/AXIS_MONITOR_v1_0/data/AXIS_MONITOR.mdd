@@ -1,0 +1,10 @@
+
+
+OPTION psf_version = 2.1;
+
+BEGIN DRIVER AXIS_MONITOR
+	OPTION supported_peripherals = (AXIS_MONITOR);
+	OPTION copyfiles = all;
+	OPTION VERSION = 1.0;
+	OPTION NAME = AXIS_MONITOR;
+END DRIVER
