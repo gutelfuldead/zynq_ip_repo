@@ -1,0 +1,3 @@
+# This file is automatically written.  Do not modify.
+proc gen_USERPARAMETER_txclkfreq_ENABLEMENT {tximpl_fast } {expr $tximpl_fast == true}
+proc gen_USERPARAMETER_rxchunk_fast_ENABLEMENT {rximpl_fast } {expr $rximpl_fast == true}
