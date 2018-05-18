@@ -16,8 +16,7 @@ package axistream_spw_lite_v1_0_pkg is
 		rxchunk_fast        : integer range 1 to 4 := 1;
 		rxfifosize_bits     : integer range 6 to 14 := 11; -- 11 (2 kByte)
 		txfifosize_bits     : integer range 2 to 14 := 11; -- 11 (2 kByte)
-		txdivcnt            : std_logic_vector(7 downto 0) := x"04";
-		debug_loopback_mode : boolean := false
+		txdivcnt            : std_logic_vector(7 downto 0) := x"04"
 	);
 	port (
 		aclk          : in std_logic;
@@ -82,8 +81,7 @@ entity axistream_spw_lite_v1_0 is
         -- During link setup, the transmission rate is always 10 Mbit/s.
 		txdivcnt : std_logic_vector(7 downto 0) := x"04";
 		rximpl_fast         : boolean := false; -- true to use rx_clk 
-		tximpl_fast         : boolean := false; -- true to use tx_clk
-		debug_loopback_mode : boolean := false
+		tximpl_fast         : boolean := false  -- true to use tx_clk
 	);
 	port (
 		aclk          : in std_logic;
@@ -142,12 +140,6 @@ architecture arch_imp of axistream_spw_lite_v1_0 is
     signal spw_erresc : std_logic := '0';
     signal spw_errcred : std_logic := '0';
 
-    -- data connections
-    signal s_di : std_logic;
-    signal s_si : std_logic;
-    signal s_do : std_logic;
-    signal s_so : std_logic;
-
     -- AXIS Slave signals
 	type s_axis_proc_states is (ST_ACTIVE, ST_SYNC, ST_EOP);
 	signal fsm_s_axis_proc_states : s_axis_proc_states;
@@ -164,7 +156,7 @@ architecture arch_imp of axistream_spw_lite_v1_0 is
 	signal rxbuf_0 : SPW_RXBUF_T;
 	signal rxbuf_1 : SPW_RXBUF_T;
 
-	type m_axis_proc_states is (ST_READ_SPW_WORDS, ST_SPW_WORD_SYNC, ST_SEND_AXIS, ST_END_AXIS);
+	type m_axis_proc_states is (ST_READ_SPW_WORDS, ST_SPW_WORD_SYNC, ST_SEND_AXIS);
 	signal fsm_m_axis_proc_states : m_axis_proc_states := ST_READ_SPW_WORDS;
 
 	function reset_spw_buf_t(noop : std_logic) return SPW_RXBUF_T is
@@ -194,14 +186,6 @@ begin
 	reset <= (not aresetn) or spw_errdisc or spw_errpar or spw_erresc or spw_errcred;
 	rx_error <= '1' when (spw_running = '0' or rxbuf_0.eep or rxbuf_1.eep) else '0';
     spw_linkstart <= '0' when reset = '1' else '1';
-
------------------------------------------------------------------------------------------------
-
-    -- assign nets in loopback mode when debug_loopback_mode is true 
-    s_di <= s_do when debug_loopback_mode else spw_di;
-    s_si <= s_so when debug_loopback_mode else spw_si;
-    spw_do <= s_do when debug_loopback_mode else '0';
-    spw_so <= s_so when debug_loopback_mode else '0';
 
 -----------------------------------------------------------------------------------------------
 
@@ -251,6 +235,13 @@ begin
 					spw_txflag  <= '1';
 				end if;
 
+			when others =>
+				fsm           := ST_ACTIVE;
+				s_axis_tready <= '0';
+				spw_txwrite   <= '0';
+				spw_txflag    <= '0';
+				spw_txdata    <= (others => '0');
+				tx_eop        <= false;
 
 		end case;
 		fsm_s_axis_proc_states <= fsm;
@@ -286,9 +277,6 @@ begin
 		case (fsm) is
 
 			when ST_READ_SPW_WORDS =>
-				m_axis_tdata  <= (others => '0');
-				m_axis_tvalid <= '0';
-				m_axis_tlast  <= '0';
 				if(spw_rxvalid = '1') then
 					spw_rxread    <= '1';
 					fsm := ST_SPW_WORD_SYNC;
@@ -328,33 +316,33 @@ begin
 					fsm := ST_READ_SPW_WORDS;
 				else
 					fsm := ST_SEND_AXIS;
+					m_axis_tdata  <= rxbuf_0.byte;
+					m_axis_tvalid <= '1';
+					if(rxbuf_1.eop) then
+						m_axis_tlast  <= '1';
+						rxbuf_0       <= reset_spw_buf_t('0');
+						rxbuf_1       <= reset_spw_buf_t('0');
+					else
+						m_axis_tlast  <= '0';
+						rxbuf_0       <= copy_spw_buf_t(rxbuf_1);
+					end if;
 				end if;
 			
-
 			when ST_SEND_AXIS =>
-				if(m_axis_tready = '1') then
-					fsm := ST_END_AXIS;
-				else
-					fsm := ST_READ_SPW_WORDS;					
-				end if;
-				m_axis_tdata  <= rxbuf_0.byte;
-				m_axis_tvalid <= '1';
-				if(rxbuf_1.eop) then
-					m_axis_tlast  <= '1';
-					rxbuf_0       <= reset_spw_buf_t('0');
-					rxbuf_1       <= reset_spw_buf_t('0');
-				else
-					m_axis_tlast  <= '0';
-					rxbuf_0 <= copy_spw_buf_t(rxbuf_1);
-				end if;
-
-			when ST_END_AXIS =>
 				if(m_axis_tready = '1') then
 					fsm := ST_READ_SPW_WORDS;
 					m_axis_tdata  <= (others => '0');
 					m_axis_tvalid <= '0';
 					m_axis_tlast  <= '0';
 				end if;
+
+			when others =>
+				fsm           := ST_READ_SPW_WORDS;
+				rxbuf_0       <= reset_spw_buf_t('0');
+				rxbuf_1       <= reset_spw_buf_t('0');
+				m_axis_tdata  <= (others => '0');
+				m_axis_tvalid <= '0';
+				m_axis_tlast  <= '0';
 
 		end case;
 		fsm_m_axis_proc_states <= fsm;
@@ -418,10 +406,10 @@ txrx_fast_gen : if rximpl_fast and tximpl_fast generate
         errpar     => spw_errpar,
         erresc     => spw_erresc,
         errcred    => spw_errcred,
-        spw_di     => s_di,
-        spw_si     => s_si,
-        spw_do     => s_do,
-        spw_so     => s_so
+        spw_di     => spw_di,
+        spw_si     => spw_si,
+        spw_do     => spw_do,
+        spw_so     => spw_so
     );
 end generate txrx_fast_gen;
 
@@ -470,10 +458,10 @@ rx_fast_gen   : if rximpl_fast and not tximpl_fast generate
         errpar     => spw_errpar,
         erresc     => spw_erresc,
         errcred    => spw_errcred,
-        spw_di     => s_di,
-        spw_si     => s_si,
-        spw_do     => s_do,
-        spw_so     => s_so
+        spw_di     => spw_di,
+        spw_si     => spw_si,
+        spw_do     => spw_do,
+        spw_so     => spw_so
     );
 end generate rx_fast_gen;
 
@@ -522,10 +510,10 @@ tx_fast_gen   : if not rximpl_fast and tximpl_fast generate
         errpar     => spw_errpar,
         erresc     => spw_erresc,
         errcred    => spw_errcred,
-        spw_di     => s_di,
-        spw_si     => s_si,
-        spw_do     => s_do,
-        spw_so     => s_so
+        spw_di     => spw_di,
+        spw_si     => spw_si,
+        spw_do     => spw_do,
+        spw_so     => spw_so
     );
 end generate tx_fast_gen;
 
@@ -574,10 +562,10 @@ generic_gen   : if not rximpl_fast and not tximpl_fast generate
         errpar     => spw_errpar,
         erresc     => spw_erresc,
         errcred    => spw_errcred,
-        spw_di     => s_di,
-        spw_si     => s_si,
-        spw_do     => s_do,
-        spw_so     => s_so
+        spw_di     => spw_di,
+        spw_si     => spw_si,
+        spw_do     => spw_do,
+        spw_so     => spw_so
     );
 end generate generic_gen;
 

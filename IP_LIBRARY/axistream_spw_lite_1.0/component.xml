@@ -3,7 +3,7 @@
   <spirit:vendor>gutelfuldead</spirit:vendor>
   <spirit:library>user</spirit:library>
   <spirit:name>axistream_spw_lite</spirit:name>
-  <spirit:version>1.0</spirit:version>
+  <spirit:version>2.0</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>s_axis</spirit:name>
@@ -207,7 +207,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d342428b</spirit:value>
+            <spirit:value>d6e69092</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -223,7 +223,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d342428b</spirit:value>
+            <spirit:value>d6e69092</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -237,7 +237,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>837fb479</spirit:value>
+            <spirit:value>a72bdfb1</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -266,7 +266,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>aa8cb689</spirit:value>
+            <spirit:value>e4b0e5b0</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -520,7 +520,7 @@
       <spirit:modelParameter xsi:type="spirit:nameValueTypeType" spirit:dataType="signed">
         <spirit:name>sysfreq</spirit:name>
         <spirit:displayName>Sysfreq</spirit:displayName>
-        <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.sysfreq">100000000.0</spirit:value>
+        <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.sysfreq">100000000</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="signed">
         <spirit:name>txclkfreq</spirit:name>
@@ -560,11 +560,6 @@
         <spirit:name>txdivcnt</spirit:name>
         <spirit:displayName>Txdivcnt</spirit:displayName>
         <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txdivcnt" spirit:bitStringLength="8">&quot;00000100&quot;</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="boolean">
-        <spirit:name>debug_loopback_mode</spirit:name>
-        <spirit:displayName>Debug Loopback Mode</spirit:displayName>
-        <spirit:value spirit:format="bool" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.debug_loopback_mode">false</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="boolean">
         <spirit:name>rximpl_fast</spirit:name>
@@ -631,7 +626,7 @@
       <spirit:file>
         <spirit:name>hdl/axistream_spw_lite_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_4285f707</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_1e3169d2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -695,9 +690,9 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/axistream_spw_lite_v1_0.tcl</spirit:name>
+        <spirit:name>xgui/axistream_spw_lite_v2_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_837fb479</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_a72bdfb1</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -736,7 +731,7 @@
     <spirit:parameter>
       <spirit:name>sysfreq</spirit:name>
       <spirit:displayName>Sysfreq</spirit:displayName>
-      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.sysfreq">100000000.0</spirit:value>
+      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.sysfreq">100000000</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>txclkfreq</spirit:name>
@@ -778,11 +773,6 @@
       <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.txdivcnt" spirit:bitStringLength="8">&quot;00000100&quot;</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
-      <spirit:name>debug_loopback_mode</spirit:name>
-      <spirit:displayName>Debug Loopback Mode</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.debug_loopback_mode">false</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
       <spirit:name>rximpl_fast</spirit:name>
       <spirit:displayName>Rximpl Fast</spirit:displayName>
       <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.rximpl_fast">false</spirit:value>
@@ -802,19 +792,23 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axistream_spw_lite_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>2</xilinx:coreRevision>
+      <xilinx:coreRevision>1</xilinx:coreRevision>
       <xilinx:upgrades>
         <xilinx:canUpgradeFrom>gutelfuldead:user:axistream_spw_lite:1.0</xilinx:canUpgradeFrom>
       </xilinx:upgrades>
-      <xilinx:coreCreationDateTime>2018-05-18T22:51:02Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2018-05-18T23:38:08Z</xilinx:coreCreationDateTime>
+      <xilinx:tags>
+        <xilinx:tag xilinx:name="gutelfuldead:user:axistream_spw_lite:1.0_ARCHIVE_LOCATION">/home_extended/gits/zynq_ip_repo/IP_LIBRARY/axistream_spw_lite_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="gutelfuldead:user:axistream_spw_lite:2.0_ARCHIVE_LOCATION">/home_extended/gits/zynq_ip_repo/IP_LIBRARY/axistream_spw_lite_1.0</xilinx:tag>
+      </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2015.4</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="1ca16fa0"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="192462f0"/>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="0820eea9"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="260122ba"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="f13d3c45"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="16da1dd4"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="27d8535f"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="c3efc7a0"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="aa6ce542"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

@@ -16,8 +16,7 @@ entity axistream_spw_lite_v1_0_tb is
 		txfifosize_bits : integer range 2 to 14 := 11; -- 11 (2 kByte)
 		txdivcnt : std_logic_vector(7 downto 0) := x"04";
 		rximpl_fast         : boolean := false; -- true to use rx_clk 
-		tximpl_fast         : boolean := false; -- true to use tx_clk
-		debug_loopback_mode : boolean := true
+		tximpl_fast         : boolean := false -- true to use tx_clk
 	);
 end axistream_spw_lite_v1_0_tb;
 
@@ -31,8 +30,6 @@ architecture arch_imp of axistream_spw_lite_v1_0_tb is
 	signal aresetn : std_logic := '0';
 
     -- data connections
-    signal s_di : std_logic := '0';
-    signal s_si : std_logic := '0';
     signal s_do : std_logic := '0';
     signal s_so : std_logic := '0';
 
@@ -53,6 +50,7 @@ architecture arch_imp of axistream_spw_lite_v1_0_tb is
     signal word_in  : unsigned(7 downto 0) := (others => '0');
     signal word_out : unsigned(7 downto 0) := (others => '0');
     signal expected_word : unsigned(7 downto 0) := (others => '0');
+    signal TLAST_NOT_ASSERTED : std_logic := '0';
     signal INVALID_WORD_RECEIVED : std_logic := '0';
 
 begin
@@ -92,8 +90,7 @@ begin
 		tximpl_fast         => tximpl_fast,
 		rxfifosize_bits     => rxfifosize_bits,
 		txfifosize_bits     => txfifosize_bits,
-		txdivcnt            => txdivcnt,
-		debug_loopback_mode => debug_loopback_mode
+		txdivcnt            => txdivcnt
 	)
 	port map (
 		aclk    => aclk,
@@ -101,8 +98,8 @@ begin
 		rx_clk  => rxclk,
 		tx_clk  => txclk,
 
-        spw_di => s_di,
-        spw_si => s_si,
+        spw_di => s_do,
+        spw_si => s_so,
         spw_do => s_do,
         spw_so => s_so,
 
@@ -134,6 +131,10 @@ begin
 			if(unsigned(m_axis_tdata) /= expected_word) then
 				report "INVALID WORD RECEIVED" severity warning;
 				INVALID_WORD_RECEIVED <= '1';
+			end if;
+			if(unsigned(m_axis_tdata) = 255 and m_axis_tlast = '0' and m_axis_tvalid = '1') then
+				report "TLAST NOT ASSERTED" severity warning;
+				TLAST_NOT_ASSERTED <= '1';
 			end if;
 		end if;
 	end if;
