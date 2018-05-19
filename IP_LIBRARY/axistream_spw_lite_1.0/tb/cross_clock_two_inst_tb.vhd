@@ -106,14 +106,6 @@ begin
         wait for rxclk_period_i0/2;
     end process rxclk_i0_gen;
 
-    reset_i0_gen : process
-    begin
-        aresetn_i0 <= '0';
-        wait for aclk_period_i0*5;
-        aresetn_i0 <= '1';
-        wait for 1000 ms;
-    end process reset_i0_gen;
-
 ------- INSTANCE 1 CLOCKS
 
     aclk_i1_gen : process
@@ -137,8 +129,10 @@ begin
     reset_i1_gen : process
     begin
         aresetn_i1 <= '0';
+        aresetn_i0 <= '0';
         wait for aclk_period_i1*5;
         aresetn_i1 <= '1';
+        aresetn_i1 <= '0';
         wait for 1000 ms;
     end process reset_i1_gen;
 
