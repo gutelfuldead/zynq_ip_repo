@@ -1,380 +1,380 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-library work;
-use work.spwpkg.all;
+LIBRARY work;
+USE work.spwpkg.ALL;
 
-package axistream_spw_lite_v1_0_pkg is
-	
-	component axistream_spw_lite_v1_0 is
-	generic (
-		sysfreq             : real   := 100000000.0;
-		txclkfreq           : real := 0.0;
-		rximpl_fast         : boolean := false; -- true to use rx_clk 
-		tximpl_fast         : boolean := false; -- true to use tx_clk
-		rxchunk_fast        : integer range 1 to 4 := 1;
-		rxfifosize_bits     : integer range 6 to 14 := 11; -- 11 (2 kByte)
-		txfifosize_bits     : integer range 2 to 14 := 11; -- 11 (2 kByte)
-		txdivcnt            : std_logic_vector(7 downto 0) := x"04"
-	);
-	port (
-		aclk          : in std_logic;
-		aresetn       : in std_logic;
-		rx_clk        : in std_logic;
-		tx_clk        : in std_logic;
+PACKAGE axistream_spw_lite_v1_0_pkg IS
 
-        spw_di        : in std_logic;
-        spw_si        : in std_logic;
-        spw_do        :   out std_logic;
-        spw_so        :   out std_logic;
+    COMPONENT axistream_spw_lite_v1_0 IS
+    GENERIC (
+        sysfreq         : real                         := 100000000.0;
+        txclkfreq       : real                         := 0.0;
+        rximpl_fast     : boolean                      := FALSE; -- TRUE to USE rx_clk
+        tximpl_fast     : boolean                      := FALSE; -- TRUE to USE tx_clk
+        rxchunk_fast    : integer range 1 to 4         := 1;
+        rxfifosize_bits : integer range 6 to 14        := 11; -- 11 (2 kByte)
+        txfifosize_bits : integer range 2 to 14        := 11; -- 11 (2 kByte)
+        txdivcnt        : std_logic_vector(7 DOWNTO 0) := x"04"
+    );
+    PORT (
+        aclk          : IN std_logic;
+        aresetn       : IN std_logic;
+        rx_clk        : IN std_logic;
+        tx_clk        : IN std_logic;
 
-        s_axis_tdata  : in std_logic_vector(7 downto 0);
-        s_axis_tvalid : in std_logic;
-        s_axis_tlast  : in std_logic;
-        s_axis_tready :   out std_logic;
+        spw_di        : IN std_logic;
+        spw_si        : IN std_logic;
+        spw_do        :   OUT std_logic;
+        spw_so        :   OUT std_logic;
 
-        m_axis_tready : in std_logic;
-        m_axis_tdata  :   out std_logic_vector(7 downto 0);
-        m_axis_tvalid :   out std_logic;
-        m_axis_tlast  :   out std_logic;
+        s_axis_tdata  : IN std_logic_vector(7 DOWNTO 0);
+        s_axis_tvalid : IN std_logic;
+        s_axis_tlast  : IN std_logic;
+        s_axis_tready :   OUT std_logic;
 
-        rx_error      :   out std_logic
-	);
-	end component axistream_spw_lite_v1_0;
+        m_axis_tready : IN std_logic;
+        m_axis_tdata  :   OUT std_logic_vector(7 DOWNTO 0);
+        m_axis_tvalid :   OUT std_logic;
+        m_axis_tlast  :   OUT std_logic;
 
-end package axistream_spw_lite_v1_0_pkg;
+        rx_error      :   OUT std_logic
+    );
+    END COMPONENT axistream_spw_lite_v1_0;
+
+END PACKAGE axistream_spw_lite_v1_0_pkg;
 
 -------------------------------------------------------------------------------------------
 
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-library work;
-use work.spwpkg.all;
-use work.axistream_spw_lite_v1_0_pkg.all;
+LIBRARY work;
+USE work.spwpkg.ALL;
+USE work.axistream_spw_lite_v1_0_pkg.ALL;
 
-entity axistream_spw_lite_v1_0 is
-	generic (
-        -- System clock frequency in Hz.
-        -- This must be set to the frequency of "clk". It is used to setup
-        -- counters for reset timing, disconnect timeout and to transmit
+entity axistream_spw_lite_v1_0 IS
+    GENERIC (
+        -- System clock frequency IN Hz.
+        -- This must be set to the frequency OF "clk". It IS used to setup
+        -- counters for reset timing, disconnect timeout AND to transmit
         -- at 10 Mbit/s during the link handshake.
-		sysfreq : real   := 100000000.0;
-        -- Transmit clock frequency in Hz (only if tximpl = impl_fast).
-        -- This must be set to the frequency of "txclk". It is used to
+        sysfreq         : real   := 100000000.0;
+        -- Transmit clock frequency IN Hz (only IF tximpl = impl_fast).
+        -- This must be set to the frequency OF "txclk". It IS used to
         -- transmit at 10 Mbit/s during the link handshake.
-		txclkfreq : real := 0.0;
-        -- Maximum number of bits received per system clock
-        -- (must be 1 in case of impl_generic).
-		rxchunk_fast : integer range 1 to 4 := 1;
-        -- Size of the receive FIFO as the 2-logarithm of the number of bytes.
+        txclkfreq       : real := 0.0;
+        -- Maximum number OF bits received per system clock
+        -- (must be 1 IN CASE OF impl_generic).
+        rxchunk_fast    : integer range 1 to 4 := 1;
+        -- Size OF the receive FIFO as the 2-logarithm OF the number OF bytes.
         -- Must be at least 6 (64 bytes).
-		rxfifosize_bits : integer range 6 to 14 := 11; -- 11 (2 kByte)
-        -- Size of the transmit FIFO as the 2-logarithm of the number of bytes.
-		txfifosize_bits : integer range 2 to 14 := 11; -- 11 (2 kByte)
+        rxfifosize_bits : integer range 6 to 14 := 11; -- 11 (2 kByte)
+        -- Size OF the transmit FIFO as the 2-logarithm OF the number OF bytes.
+        txfifosize_bits : integer range 2 to 14 := 11; -- 11 (2 kByte)
         -- Scaling factor minus 1, used to scale the transmit base clock into
-        -- the transmission bit rate. The system clock (for impl_generic) or
-        -- the txclk (for impl_fast) is divided by (unsigned(txdivcnt) + 1).
-        -- Changing this signal will immediately change the transmission rate.
-        -- During link setup, the transmission rate is always 10 Mbit/s.
-		txdivcnt : std_logic_vector(7 downto 0) := x"04";
-		rximpl_fast         : boolean := false; -- true to use rx_clk 
-		tximpl_fast         : boolean := false  -- true to use tx_clk
-	);
-	port (
-		aclk          : in std_logic;
-		aresetn       : in std_logic;
-		rx_clk        : in std_logic;
-		tx_clk        : in std_logic;
+        -- the transmission bit rate. The system clock (for impl_generic) OR
+        -- the txclk (for impl_fast) IS divided by (unsigned(txdivcnt) + 1).
+        -- Changing this SIGNAL will immediately change the transmission rate.
+        -- During link setup, the transmission rate IS always 10 Mbit/s.
+        txdivcnt        : std_logic_vector(7 DOWNTO 0) := x"04";
+        rximpl_fast     : boolean := FALSE; -- TRUE to USE rx_clk
+        tximpl_fast     : boolean := FALSE  -- TRUE to USE tx_clk
+    );
+    PORT (
+        aclk          : IN std_logic;
+        aresetn       : IN std_logic;
+        rx_clk        : IN std_logic;
+        tx_clk        : IN std_logic;
 
-        spw_di        : in std_logic;
-        spw_si        : in std_logic;
-        spw_do        :   out std_logic;
-        spw_so        :   out std_logic;
+        spw_di        : IN std_logic;
+        spw_si        : IN std_logic;
+        spw_do        :   OUT std_logic;
+        spw_so        :   OUT std_logic;
 
-        s_axis_tdata  : in std_logic_vector(7 downto 0);
-        s_axis_tvalid : in std_logic;
-        s_axis_tlast  : in std_logic;
-        s_axis_tready :   out std_logic;
+        s_axis_tdata  : IN std_logic_vector(7 DOWNTO 0);
+        s_axis_tvalid : IN std_logic;
+        s_axis_tlast  : IN std_logic;
+        s_axis_tready :   OUT std_logic;
 
-        m_axis_tready : in std_logic;
-        m_axis_tdata  :   out std_logic_vector(7 downto 0);
-        m_axis_tvalid :   out std_logic;
-        m_axis_tlast  :   out std_logic;
+        m_axis_tready : IN std_logic;
+        m_axis_tdata  :   OUT std_logic_vector(7 DOWNTO 0);
+        m_axis_tvalid :   OUT std_logic;
+        m_axis_tlast  :   OUT std_logic;
 
-        rx_error      :   out std_logic
-	);
-end axistream_spw_lite_v1_0;
+        rx_error      :   OUT std_logic
+    );
+END axistream_spw_lite_v1_0;
 
-architecture arch_imp of axistream_spw_lite_v1_0 is
+ARCHITECTURE arch_imp OF axistream_spw_lite_v1_0 IS
 
-    constant SPW_EOP : std_logic_vector(7 downto 0) := x"00";
-    constant SPW_EEP : std_logic_vector(7 downto 0) := x"01";
+    CONSTANT SPW_EOP : std_logic_vector(7 DOWNTO 0) := x"00";
+    CONSTANT SPW_EEP : std_logic_vector(7 DOWNTO 0) := x"01";
 
-	signal reset : std_logic := '0'; -- active high
+    SIGNAL reset : std_logic := '0'; -- active high
 
-	-- spacewire tx signals
-	signal spw_txwrite : std_logic := '0';
-	signal spw_txflag  : std_logic := '0';
-	signal spw_txready : std_logic := '0';
-	signal spw_txdata  : std_logic_vector(7 downto 0) := (others => '0');
+    -- spacewire tx signals
+    SIGNAL spw_txwrite : std_logic := '0';
+    SIGNAL spw_txflag  : std_logic := '0';
+    SIGNAL spw_txready : std_logic := '0';
+    SIGNAL spw_txdata  : std_logic_vector(7 DOWNTO 0) := (OTHERS => '0');
 
-	-- spacewire rx signals
-    signal spw_rxvalid : std_logic := '0';
-    signal spw_txhalff : std_logic := '0';
-    signal spw_tick_out : std_logic := '0';
-    signal spw_rxhalff : std_logic := '0';
-    signal spw_rxflag : std_logic := '0';
-	signal spw_rxdata : std_logic_vector(7 downto 0) := (others => '0');
-    signal spw_rxread : std_logic := '0';
+    -- spacewire rx signals
+    SIGNAL spw_rxvalid  : std_logic                    := '0';
+    SIGNAL spw_txhalff  : std_logic                    := '0';
+    SIGNAL spw_tick_out : std_logic                    := '0';
+    SIGNAL spw_rxhalff  : std_logic                    := '0';
+    SIGNAL spw_rxflag   : std_logic                    := '0';
+    SIGNAL spw_rxdata   : std_logic_vector(7 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL spw_rxread   : std_logic                    := '0';
 
     -- spacewire status signals
-    signal spw_linkstart : std_logic := '0';
-    signal spw_started : std_logic := '0';
-    signal spw_connecting : std_logic := '0';
-    signal spw_running : std_logic := '0';
-    signal spw_errdisc : std_logic := '0';
-    signal spw_errpar : std_logic := '0';
-    signal spw_erresc : std_logic := '0';
-    signal spw_errcred : std_logic := '0';
+    SIGNAL spw_linkstart  : std_logic := '0';
+    SIGNAL spw_started    : std_logic := '0';
+    SIGNAL spw_connecting : std_logic := '0';
+    SIGNAL spw_running    : std_logic := '0';
+    SIGNAL spw_errdisc    : std_logic := '0';
+    SIGNAL spw_errpar     : std_logic := '0';
+    SIGNAL spw_erresc     : std_logic := '0';
+    SIGNAL spw_errcred    : std_logic := '0';
 
     -- AXIS Slave signals
-	type s_axis_proc_states is (ST_ACTIVE, ST_SYNC, ST_EOP);
-	signal fsm_s_axis_proc_states : s_axis_proc_states;
-    signal tx_eop : boolean := false;
+    TYPE s_axis_proc_states IS (ST_ACTIVE, ST_SYNC, ST_EOP);
+    SIGNAL fsm_s_axis_proc_states : s_axis_proc_states;
+    SIGNAL tx_eop : boolean := FALSE;
 
-	-- AXIS Master signals and functions
-	type SPW_RXBUF_T is record
-		byte  : std_logic_vector(7 downto 0);
-		eep   : boolean;
-		eop   : boolean;
-		valid : boolean;
-	end record;
+    -- AXIS Master signals AND functions
+    TYPE SPW_RXBUF_T IS RECORD
+        byte  : std_logic_vector(7 DOWNTO 0);
+        eep   : boolean;
+        eop   : boolean;
+        valid : boolean;
+    END RECORD;
 
-	signal rxbuf_0 : SPW_RXBUF_T;
-	signal rxbuf_1 : SPW_RXBUF_T;
+    SIGNAL rxbuf_0 : SPW_RXBUF_T;
+    SIGNAL rxbuf_1 : SPW_RXBUF_T;
 
-	type m_axis_proc_states is (ST_READ_SPW_WORDS, ST_SPW_WORD_SYNC, ST_SEND_AXIS);
-	signal fsm_m_axis_proc_states : m_axis_proc_states := ST_READ_SPW_WORDS;
+    TYPE m_axis_proc_states IS (ST_READ_SPW_WORDS, ST_SPW_WORD_SYNC, ST_SEND_AXIS);
+    SIGNAL fsm_m_axis_proc_states : m_axis_proc_states := ST_READ_SPW_WORDS;
 
-	function reset_spw_buf_t(noop : std_logic) return SPW_RXBUF_T is
-		variable a : SPW_RXBUF_T;
-	begin
-		a.byte  := (others => '0');
-		a.eep   := false;
-		a.eop   := false;
-		a.valid := false;
-		return a;
-	end function;
+    FUNCTION reset_spw_buf_t(noop : std_logic) RETURN SPW_RXBUF_T IS
+        VARIABLE a : SPW_RXBUF_T;
+    BEGIN
+        a.byte  := (OTHERS => '0');
+        a.eep   := FALSE;
+        a.eop   := FALSE;
+        a.valid := FALSE;
+        RETURN a;
+    END FUNCTION;
 
-	function copy_spw_buf_t(BUF_IN : SPW_RXBUF_T) return SPW_RXBUF_T is
-		variable a : SPW_RXBUF_T;
-	begin
-		a.byte  := BUF_IN.byte;
-		a.eep   := BUF_IN.eep;
-		a.eop   := BUF_IN.eop;
-		a.valid := BUF_IN.valid;
-		return a;
-	end function;
-        
-begin
+    FUNCTION copy_spw_buf_t(BUF_IN : SPW_RXBUF_T) RETURN SPW_RXBUF_T IS
+        VARIABLE a : SPW_RXBUF_T;
+    BEGIN
+        a.byte  := BUF_IN.byte;
+        a.eep   := BUF_IN.eep;
+        a.eop   := BUF_IN.eop;
+        a.valid := BUF_IN.valid;
+        RETURN a;
+    END FUNCTION;
 
------------------------------------------------------------------------------------------------
-
-	reset <= (not aresetn) or spw_errdisc or spw_errpar or spw_erresc or spw_errcred;
-	rx_error <= '1' when (spw_running = '0' or rxbuf_0.eep or rxbuf_1.eep) else '0';
-    spw_linkstart <= '0' when reset = '1' else '1';
+BEGIN
 
 -----------------------------------------------------------------------------------------------
 
-	s_axis_proc : process(aclk)
-		variable fsm : s_axis_proc_states := ST_ACTIVE;
-	begin
-	if(reset = '1') then
-		s_axis_tready <= '0';
-		spw_txwrite   <= '0';
-		spw_txflag    <= '0';
-		spw_txdata    <= (others => '0');
-		tx_eop        <= false;
-		fsm           := ST_ACTIVE;
-	elsif(rising_edge(aclk)) then
-	if(spw_running = '1') then
-		case (fsm) is
-
-			when ST_ACTIVE =>
-				if(spw_txready = '1' and s_axis_tvalid = '1') then
-					fsm := ST_SYNC;
-					if(s_axis_tlast = '1') then
-						tx_eop <= true;
-					end if;
-					spw_txdata    <= s_axis_tdata;
-					spw_txwrite   <= '1';
-					spw_txflag    <= '0';
-					s_axis_tready <= '1';
-				end if;
-
-			when ST_SYNC =>
-				s_axis_tready <= '0';
-				spw_txwrite   <= '0';
-				spw_txflag    <= '0';
-				spw_txdata    <= (others => '0');
-				if(tx_eop) then
-					fsm := ST_EOP;
-				else
-					fsm := ST_ACTIVE;				
-				end if;
-
-			when ST_EOP =>
-				tx_eop <= false;
-				if(spw_txready = '1') then
-					fsm := ST_SYNC;
-					spw_txdata  <= SPW_EOP;
-					spw_txwrite <= '1';
-					spw_txflag  <= '1';
-				end if;
-
-			when others =>
-				fsm           := ST_ACTIVE;
-				s_axis_tready <= '0';
-				spw_txwrite   <= '0';
-				spw_txflag    <= '0';
-				spw_txdata    <= (others => '0');
-				tx_eop        <= false;
-
-		end case;
-		fsm_s_axis_proc_states <= fsm;
-	else
-		s_axis_tready <= '0';
-		spw_txwrite   <= '0';
-		spw_txflag    <= '0';
-		spw_txdata    <= (others => '0');
-		tx_eop        <= false;
-		fsm           := ST_ACTIVE;
-	end if;
-	end if;
-	end process s_axis_proc;
+    reset         <= (NOT aresetn) OR spw_errdisc OR spw_errpar OR spw_erresc OR spw_errcred;
+    rx_error      <= '1' WHEN (spw_running = '0' OR rxbuf_0.eep OR rxbuf_1.eep) ELSE '0';
+    spw_linkstart <= '0' WHEN reset = '1' ELSE '1';
 
 -----------------------------------------------------------------------------------------------
--- buffer two bytes so the EOP can be captured to generate the TLAST flag on 
+
+    s_axis_proc : PROCESS(aclk)
+        VARIABLE fsm : s_axis_proc_states := ST_ACTIVE;
+    BEGIN
+    IF (reset = '1') THEN
+        s_axis_tready <= '0';
+        spw_txwrite   <= '0';
+        spw_txflag    <= '0';
+        spw_txdata    <= (OTHERS => '0');
+        tx_eop        <= FALSE;
+        fsm           := ST_ACTIVE;
+    ELSIF (rising_edge(aclk)) THEN
+    IF (spw_running = '1') THEN
+        CASE (fsm) IS
+
+            WHEN ST_ACTIVE =>
+                IF (spw_txready = '1' AND s_axis_tvalid = '1') THEN
+                    fsm := ST_SYNC;
+                    IF (s_axis_tlast = '1') THEN
+                        tx_eop <= TRUE;
+                    END IF;
+                    spw_txdata    <= s_axis_tdata;
+                    spw_txwrite   <= '1';
+                    spw_txflag    <= '0';
+                    s_axis_tready <= '1';
+                END IF;
+
+            WHEN ST_SYNC =>
+                s_axis_tready <= '0';
+                spw_txwrite   <= '0';
+                spw_txflag    <= '0';
+                spw_txdata    <= (OTHERS => '0');
+                IF (tx_eop) THEN
+                    fsm := ST_EOP;
+                ELSE
+                    fsm := ST_ACTIVE;
+                END IF;
+
+            WHEN ST_EOP =>
+                tx_eop <= FALSE;
+                IF (spw_txready = '1') THEN
+                    fsm         := ST_SYNC;
+                    spw_txdata  <= SPW_EOP;
+                    spw_txwrite <= '1';
+                    spw_txflag  <= '1';
+                END IF;
+
+            WHEN OTHERS =>
+                fsm           := ST_ACTIVE;
+                s_axis_tready <= '0';
+                spw_txwrite   <= '0';
+                spw_txflag    <= '0';
+                spw_txdata    <= (OTHERS => '0');
+                tx_eop        <= FALSE;
+
+        END CASE;
+        fsm_s_axis_proc_states <= fsm;
+    ELSE
+        s_axis_tready <= '0';
+        spw_txwrite   <= '0';
+        spw_txflag    <= '0';
+        spw_txdata    <= (OTHERS => '0');
+        tx_eop        <= FALSE;
+        fsm           := ST_ACTIVE;
+    END IF;
+    END IF;
+    END PROCESS s_axis_proc;
+
+-----------------------------------------------------------------------------------------------
+-- buffer two bytes so the EOP can be captured to GENERATE the TLAST flag on
 -- the correct byte
 -----------------------------------------------------------------------------------------------
 
-	m_axis_proc : process(aclk)
-		variable fsm : m_axis_proc_states := ST_READ_SPW_WORDS;
-	begin
-	if(reset = '1') then
-		m_axis_tdata     <= (others => '0');
-		m_axis_tvalid    <= '0';
-		m_axis_tlast     <= '0';
-		rxbuf_0          <= reset_spw_buf_t('0');
-		rxbuf_1          <= reset_spw_buf_t('0');
-		spw_rxread       <= '0';
-		fsm              := ST_READ_SPW_WORDS;
-	elsif(rising_edge(aclk)) then
-	if(spw_running = '1') then
-		case (fsm) is
+    m_axis_proc : PROCESS(aclk)
+        VARIABLE fsm : m_axis_proc_states := ST_READ_SPW_WORDS;
+    BEGIN
+    IF (reset = '1') THEN
+        m_axis_tdata     <= (OTHERS => '0');
+        m_axis_tvalid    <= '0';
+        m_axis_tlast     <= '0';
+        rxbuf_0          <= reset_spw_buf_t('0');
+        rxbuf_1          <= reset_spw_buf_t('0');
+        spw_rxread       <= '0';
+        fsm              := ST_READ_SPW_WORDS;
+    ELSIF (rising_edge(aclk)) THEN
+    IF (spw_running = '1') THEN
+        CASE (fsm) IS
 
-			when ST_READ_SPW_WORDS =>
-				if(spw_rxvalid = '1') then
-					spw_rxread    <= '1';
-					fsm := ST_SPW_WORD_SYNC;
+            WHEN ST_READ_SPW_WORDS =>
+                IF (spw_rxvalid = '1') THEN
+                    spw_rxread <= '1';
+                    fsm        := ST_SPW_WORD_SYNC;
 
-					if(rxbuf_0.valid = false) then
-						rxbuf_0.valid <= true;
-						if(spw_rxflag = '1') then
-							if(spw_rxdata = SPW_EOP) then
-								rxbuf_0.eop <= true;
-							else
-								rxbuf_0.eep <= true;
-							end if;
-						else
-							rxbuf_0.byte <= spw_rxdata;
-						end if;
+                    IF (rxbuf_0.valid = FALSE) THEN
+                        rxbuf_0.valid <= TRUE;
+                        IF (spw_rxflag = '1') THEN
+                            IF (spw_rxdata = SPW_EOP) THEN
+                                rxbuf_0.eop <= TRUE;
+                            ELSE
+                                rxbuf_0.eep <= TRUE;
+                            END IF;
+                        ELSE
+                            rxbuf_0.byte <= spw_rxdata;
+                        END IF;
 
-					else
+                    ELSE
 
-						rxbuf_1.valid <= true;
-						if(spw_rxflag = '1') then
-							if(spw_rxdata = SPW_EOP) then
-								rxbuf_1.eop <= true;
-							else
-								rxbuf_1.eep <= true;
-							end if;
-						else
-							rxbuf_1.byte <= spw_rxdata;
-						end if;
+                        rxbuf_1.valid <= TRUE;
+                        IF (spw_rxflag = '1') THEN
+                            IF (spw_rxdata = SPW_EOP) THEN
+                                rxbuf_1.eop <= TRUE;
+                            ELSE
+                                rxbuf_1.eep <= TRUE;
+                            END IF;
+                        ELSE
+                            rxbuf_1.byte <= spw_rxdata;
+                        END IF;
 
-					end if;
-				
-				end if;
+                    END IF;
 
-			when ST_SPW_WORD_SYNC =>
-				spw_rxread    <= '0';
-				if(rxbuf_1.valid = false) then
-					fsm := ST_READ_SPW_WORDS;
-				else
-					fsm := ST_SEND_AXIS;
-					m_axis_tdata  <= rxbuf_0.byte;
-					m_axis_tvalid <= '1';
-					if(rxbuf_1.eop) then
-						m_axis_tlast  <= '1';
-						rxbuf_0       <= reset_spw_buf_t('0');
-						rxbuf_1       <= reset_spw_buf_t('0');
-					else
-						m_axis_tlast  <= '0';
-						rxbuf_0       <= copy_spw_buf_t(rxbuf_1);
-					end if;
-				end if;
-			
-			when ST_SEND_AXIS =>
-				if(m_axis_tready = '1') then
-					fsm := ST_READ_SPW_WORDS;
-					m_axis_tdata  <= (others => '0');
-					m_axis_tvalid <= '0';
-					m_axis_tlast  <= '0';
-				end if;
+                END IF;
 
-			when others =>
-				fsm           := ST_READ_SPW_WORDS;
-				rxbuf_0       <= reset_spw_buf_t('0');
-				rxbuf_1       <= reset_spw_buf_t('0');
-				m_axis_tdata  <= (others => '0');
-				m_axis_tvalid <= '0';
-				m_axis_tlast  <= '0';
+            WHEN ST_SPW_WORD_SYNC =>
+                spw_rxread    <= '0';
+                IF (rxbuf_1.valid = FALSE) THEN
+                    fsm := ST_READ_SPW_WORDS;
+                ELSE
+                    fsm           := ST_SEND_AXIS;
+                    m_axis_tdata  <= rxbuf_0.byte;
+                    m_axis_tvalid <= '1';
+                    IF (rxbuf_1.eop) THEN
+                        m_axis_tlast  <= '1';
+                        rxbuf_0       <= reset_spw_buf_t('0');
+                        rxbuf_1       <= reset_spw_buf_t('0');
+                    ELSE
+                        m_axis_tlast  <= '0';
+                        rxbuf_0       <= copy_spw_buf_t(rxbuf_1);
+                    END IF;
+                END IF;
 
-		end case;
-		fsm_m_axis_proc_states <= fsm;
-	else
-		fsm           := ST_READ_SPW_WORDS;
-		rxbuf_0       <= reset_spw_buf_t('0');
-		rxbuf_1       <= reset_spw_buf_t('0');
-		m_axis_tdata  <= (others => '0');
-		m_axis_tvalid <= '0';
-		m_axis_tlast  <= '0';
-	end if;
-	end if;
-	end process m_axis_proc;
+            WHEN ST_SEND_AXIS =>
+                IF (m_axis_tready = '1') THEN
+                    fsm           := ST_READ_SPW_WORDS;
+                    m_axis_tdata  <= (OTHERS => '0');
+                    m_axis_tvalid <= '0';
+                    m_axis_tlast  <= '0';
+                END IF;
+
+            WHEN OTHERS =>
+                fsm           := ST_READ_SPW_WORDS;
+                rxbuf_0       <= reset_spw_buf_t('0');
+                rxbuf_1       <= reset_spw_buf_t('0');
+                m_axis_tdata  <= (OTHERS => '0');
+                m_axis_tvalid <= '0';
+                m_axis_tlast  <= '0';
+
+        END CASE;
+        fsm_m_axis_proc_states <= fsm;
+    ELSE
+        fsm           := ST_READ_SPW_WORDS;
+        rxbuf_0       <= reset_spw_buf_t('0');
+        rxbuf_1       <= reset_spw_buf_t('0');
+        m_axis_tdata  <= (OTHERS => '0');
+        m_axis_tvalid <= '0';
+        m_axis_tlast  <= '0';
+    END IF;
+    END IF;
+    END PROCESS m_axis_proc;
 
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
--- Generate Proper Instantiation of spwstream interface
------------------------------------------------------------------------------------------------ 
+-- Generate Proper Instantiation OF spwstream interface
+-----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
 
-txrx_fast_gen : if rximpl_fast and tximpl_fast generate 
-	spwstream_inst_txrx_fast : spwstream
-	generic map (
-        sysfreq   => sysfreq,
-        txclkfreq => txclkfreq,
-        rximpl    => impl_fast,
-        rxchunk   => rxchunk_fast,
-        tximpl    => impl_fast,
+txrx_fast_gen : IF rximpl_fast AND tximpl_fast GENERATE
+    spwstream_inst_txrx_fast : spwstream
+    GENERIC MAP (
+        sysfreq         => sysfreq,
+        txclkfreq       => txclkfreq,
+        rximpl          => impl_fast,
+        rxchunk         => rxchunk_fast,
+        tximpl          => impl_fast,
         rxfifosize_bits => rxfifosize_bits,
         txfifosize_bits => txfifosize_bits
     )
-    port map (
+    PORT MAP (
         clk        => aclk,
         rxclk      => rx_clk,
         txclk      => tx_clk,
@@ -389,11 +389,11 @@ txrx_fast_gen : if rximpl_fast and tximpl_fast generate
         txwrite    => spw_txwrite,
         txflag     => spw_txflag,
         txdata     => spw_txdata,
-        txrdy      => spw_txready, -- out
-        txhalff    => spw_txhalff, -- out
+        txrdy      => spw_txready, -- OUT
+        txhalff    => spw_txhalff, -- OUT
         tick_out   => spw_tick_out,
-        ctrl_out   => open,
-        time_out   => open,
+        ctrl_out   => OPEN,
+        time_out   => OPEN,
         rxvalid    => spw_rxvalid,
         rxhalff    => spw_rxhalff,
         rxflag     => spw_rxflag,
@@ -411,22 +411,22 @@ txrx_fast_gen : if rximpl_fast and tximpl_fast generate
         spw_do     => spw_do,
         spw_so     => spw_so
     );
-end generate txrx_fast_gen;
+END GENERATE txrx_fast_gen;
 
------------------------------------------------------------------------------------------------ 
+-----------------------------------------------------------------------------------------------
 
-rx_fast_gen   : if rximpl_fast and not tximpl_fast generate 
-	spwstream_inst_rx_fast : spwstream
-	generic map (
-        sysfreq   => sysfreq,
-        txclkfreq => txclkfreq,
-        rximpl    => impl_fast,
-        rxchunk   => rxchunk_fast,
-        tximpl    => impl_generic,
+rx_fast_gen   : IF rximpl_fast AND NOT tximpl_fast GENERATE
+    spwstream_inst_rx_fast : spwstream
+    GENERIC MAP (
+        sysfreq         => sysfreq,
+        txclkfreq       => txclkfreq,
+        rximpl          => impl_fast,
+        rxchunk         => rxchunk_fast,
+        tximpl          => impl_generic,
         rxfifosize_bits => rxfifosize_bits,
         txfifosize_bits => txfifosize_bits
     )
-    port map (
+    PORT MAP (
         clk        => aclk,
         rxclk      => rx_clk,
         txclk      => '0',
@@ -441,11 +441,11 @@ rx_fast_gen   : if rximpl_fast and not tximpl_fast generate
         txwrite    => spw_txwrite,
         txflag     => spw_txflag,
         txdata     => spw_txdata,
-        txrdy      => spw_txready, -- out
-        txhalff    => spw_txhalff, -- out
+        txrdy      => spw_txready, -- OUT
+        txhalff    => spw_txhalff, -- OUT
         tick_out   => spw_tick_out,
-        ctrl_out   => open,
-        time_out   => open,
+        ctrl_out   => OPEN,
+        time_out   => OPEN,
         rxvalid    => spw_rxvalid,
         rxhalff    => spw_rxhalff,
         rxflag     => spw_rxflag,
@@ -463,22 +463,22 @@ rx_fast_gen   : if rximpl_fast and not tximpl_fast generate
         spw_do     => spw_do,
         spw_so     => spw_so
     );
-end generate rx_fast_gen;
+END GENERATE rx_fast_gen;
 
------------------------------------------------------------------------------------------------ 
+-----------------------------------------------------------------------------------------------
 
-tx_fast_gen   : if not rximpl_fast and tximpl_fast generate
-	spwstream_inst_tx_fast : spwstream
-	generic map (
-        sysfreq   => sysfreq,
-        txclkfreq => txclkfreq,
-        rximpl    => impl_generic,
-        rxchunk   => rxchunk_fast,
-        tximpl    => impl_fast,
+tx_fast_gen   : IF NOT rximpl_fast AND tximpl_fast GENERATE
+    spwstream_inst_tx_fast : spwstream
+    GENERIC MAP (
+        sysfreq         => sysfreq,
+        txclkfreq       => txclkfreq,
+        rximpl          => impl_generic,
+        rxchunk         => rxchunk_fast,
+        tximpl          => impl_fast,
         rxfifosize_bits => rxfifosize_bits,
         txfifosize_bits => txfifosize_bits
     )
-    port map (
+    PORT MAP (
         clk        => aclk,
         rxclk      => '0',
         txclk      => tx_clk,
@@ -493,11 +493,11 @@ tx_fast_gen   : if not rximpl_fast and tximpl_fast generate
         txwrite    => spw_txwrite,
         txflag     => spw_txflag,
         txdata     => spw_txdata,
-        txrdy      => spw_txready, -- out
-        txhalff    => spw_txhalff, -- out
+        txrdy      => spw_txready, -- OUT
+        txhalff    => spw_txhalff, -- OUT
         tick_out   => spw_tick_out,
-        ctrl_out   => open,
-        time_out   => open,
+        ctrl_out   => OPEN,
+        time_out   => OPEN,
         rxvalid    => spw_rxvalid,
         rxhalff    => spw_rxhalff,
         rxflag     => spw_rxflag,
@@ -515,22 +515,22 @@ tx_fast_gen   : if not rximpl_fast and tximpl_fast generate
         spw_do     => spw_do,
         spw_so     => spw_so
     );
-end generate tx_fast_gen;
+END GENERATE tx_fast_gen;
 
------------------------------------------------------------------------------------------------ 
+-----------------------------------------------------------------------------------------------
 
-generic_gen   : if not rximpl_fast and not tximpl_fast generate 
-	spwstream_inst_generic : spwstream
-	generic map (
-        sysfreq   => sysfreq,
-        txclkfreq => txclkfreq,
-        rximpl    => impl_generic,
-        rxchunk   => rxchunk_fast,
-        tximpl    => impl_generic,
+generic_gen   : IF NOT rximpl_fast AND NOT tximpl_fast GENERATE
+    spwstream_inst_generic : spwstream
+    GENERIC MAP (
+        sysfreq         => sysfreq,
+        txclkfreq       => txclkfreq,
+        rximpl          => impl_generic,
+        rxchunk         => rxchunk_fast,
+        tximpl          => impl_generic,
         rxfifosize_bits => rxfifosize_bits,
         txfifosize_bits => txfifosize_bits
     )
-    port map (
+    PORT MAP (
         clk        => aclk,
         rxclk      => '0',
         txclk      => '0',
@@ -545,11 +545,11 @@ generic_gen   : if not rximpl_fast and not tximpl_fast generate
         txwrite    => spw_txwrite,
         txflag     => spw_txflag,
         txdata     => spw_txdata,
-        txrdy      => spw_txready, -- out
-        txhalff    => spw_txhalff, -- out
+        txrdy      => spw_txready, -- OUT
+        txhalff    => spw_txhalff, -- OUT
         tick_out   => spw_tick_out,
-        ctrl_out   => open,
-        time_out   => open,
+        ctrl_out   => OPEN,
+        time_out   => OPEN,
         rxvalid    => spw_rxvalid,
         rxhalff    => spw_rxhalff,
         rxflag     => spw_rxflag,
@@ -567,6 +567,6 @@ generic_gen   : if not rximpl_fast and not tximpl_fast generate
         spw_do     => spw_do,
         spw_so     => spw_so
     );
-end generate generic_gen;
+END GENERATE generic_gen;
 
-end arch_imp;
+END arch_imp;
