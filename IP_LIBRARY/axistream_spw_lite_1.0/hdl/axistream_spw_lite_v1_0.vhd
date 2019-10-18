@@ -147,7 +147,7 @@ architecture arch_imp of axistream_spw_lite_v1_0 is
 
     -- AXIS Master signals and functions
     type SPW_RXBUF_T is record
-        byte  : std_logic_vector(7 downto 0) := (others => '0');
+        byte  : std_logic_vector(7 downto 0);
         eep   : boolean;
         eop   : boolean;
         valid : boolean;
