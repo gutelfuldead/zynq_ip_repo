@@ -9,8 +9,8 @@ package axistream_spw_lite_v1_0_pkg is
 
     component axistream_spw_lite_v1_0 is
     generic (
-        sysfreq         : real                         := 100000000.0;
-        txclkfreq       : real                         := 0.0;
+        sysfreq         : integer := 100000000;
+        txclkfreq       : integer := 0;
         rximpl_fast     : boolean                      := false; -- true to use rx_clk
         tximpl_fast     : boolean                      := false; -- true to use tx_clk
         rxchunk_fast    : integer range 1 to 4         := 1;
@@ -61,11 +61,11 @@ entity axistream_spw_lite_v1_0 is
         -- This must be set to the frequency of "clk". It is used to setup
         -- counters for reset timing, disconnect timeout and to transmit
         -- at 10 Mbit/s during the link handshake.
-        sysfreq         : real   := 100000000.0;
+        sysfreq         : integer := 100000000;
         -- Transmit clock frequency in    Hz (only if tximpl = impl_fast).
         -- This must be set to the frequency of "txclk". It is used to
         -- transmit at 10 Mbit/s during the link handshake.
-        txclkfreq       : real := 0.0;
+        txclkfreq       : integer := 0;
         -- Maximum number of bits received per system clock
         -- (must be 1 in    case of impl_generic).
         rxchunk_fast    : integer range 1 to 4 := 1;

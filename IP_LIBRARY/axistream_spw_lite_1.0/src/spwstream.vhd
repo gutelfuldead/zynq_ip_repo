@@ -27,12 +27,12 @@ entity spwstream is
         -- This must be set to the frequency of "clk". It is used to setup
         -- counters for reset timing, disconnect timeout and to transmit
         -- at 10 Mbit/s during the link handshake.
-        sysfreq:        real;
+        sysfreq:        integer;
 
         -- Transmit clock frequency in Hz (only if tximpl = impl_fast).
         -- This must be set to the frequency of "txclk". It is used to
         -- transmit at 10 Mbit/s during the link handshake.
-        txclkfreq:      real := 0.0;
+        txclkfreq:      integer:= 0;
 
         -- Selection of a receiver front-end implementation.
         rximpl:         spw_implementation_type := impl_generic;
@@ -188,20 +188,23 @@ end entity spwstream;
 
 architecture spwstream_arch of spwstream is
 
+    constant rsysfreq : real := real(sysfreq);
+    constant rtxclkfreq : real := real(txclkfreq);
+
     -- Convert boolean to std_logic.
     type bool_to_logic_type is array(boolean) of std_ulogic;
     constant bool_to_logic: bool_to_logic_type := (false => '0', true => '1');
 
     -- Reset time (6.4 us) in system clocks
-    constant reset_time:        integer := integer(sysfreq * 6.4e-6);
+    constant reset_time:        integer := integer(rsysfreq * 6.4e-6);
 
     -- Disconnect time (850 ns) in system clocks
-    constant disconnect_time:   integer := integer(sysfreq * 850.0e-9);
+    constant disconnect_time:   integer := integer(rsysfreq * 850.0e-9);
 
     -- Initial tx clock scaler (10 Mbit).
     type impl_to_real_type is array(spw_implementation_type) of real;
     constant tximpl_to_txclk_freq: impl_to_real_type :=
-        (impl_generic => sysfreq, impl_fast => txclkfreq);
+        (impl_generic => rsysfreq, impl_fast => rtxclkfreq);
     constant effective_txclk_freq: real := tximpl_to_txclk_freq(tximpl);
     constant default_divcnt:    std_logic_vector(7 downto 0) :=
         std_logic_vector(to_unsigned(integer(effective_txclk_freq / 10.0e6 - 1.0), 8));
@@ -451,7 +454,7 @@ begin
         v_tmptxroom := unsigned(r.txfifo_raddr) - unsigned(v.txfifo_waddr) - 1;
         v.txfull    := bool_to_logic(v_tmptxroom = 0);
         v.txhalff   := not v_tmptxroom(v_tmptxroom'high);
- 
+
         -- If the link is lost, set a flag to discard the current packet.
         if linko.running = '0' then
             v.rxeep     := v.rxeep or v.rxpacket;       -- use new value of rxpacket

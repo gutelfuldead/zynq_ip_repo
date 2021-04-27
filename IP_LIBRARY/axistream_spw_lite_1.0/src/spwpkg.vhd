@@ -230,8 +230,8 @@ package spwpkg is
     -- Character-stream interface
     component spwstream is
         generic (
-            sysfreq:        real;                           -- clk freq in Hz
-            txclkfreq:      real := 0.0;                    -- txclk freq in Hz
+            sysfreq:        integer;                           -- clk freq in Hz
+            txclkfreq:      integer := 0;                    -- txclk freq in Hz
             rximpl:         spw_implementation_type := impl_generic;
             rxchunk:        integer range 1 to 4 := 1;      -- max bits per clk
             tximpl:         spw_implementation_type := impl_generic;
@@ -248,7 +248,7 @@ package spwpkg is
             linkdis:    in  std_logic;          -- stop link
             txdivcnt:   in  std_logic_vector(7 downto 0);   -- tx scale factor
             tick_in:    in  std_logic;          -- request timecode xmit
-            ctrl_in:    in  std_logic_vector(1 downto 0);   
+            ctrl_in:    in  std_logic_vector(1 downto 0);
             time_in:    in  std_logic_vector(5 downto 0);
             txwrite:    in  std_logic;          -- request character xmit
             txflag:     in  std_logic;          -- control flag of tx char

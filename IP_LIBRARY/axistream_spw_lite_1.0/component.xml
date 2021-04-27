@@ -207,7 +207,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d6e69092</spirit:value>
+            <spirit:value>715f23c9</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -223,7 +223,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d6e69092</spirit:value>
+            <spirit:value>715f23c9</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -266,7 +266,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>3dde04d7</spirit:value>
+            <spirit:value>84cb6744</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -517,15 +517,15 @@
       </spirit:port>
     </spirit:ports>
     <spirit:modelParameters>
-      <spirit:modelParameter xsi:type="spirit:nameValueTypeType" spirit:dataType="signed">
+      <spirit:modelParameter xsi:type="spirit:nameValueTypeType" spirit:dataType="integer">
         <spirit:name>sysfreq</spirit:name>
         <spirit:displayName>Sysfreq</spirit:displayName>
-        <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.sysfreq">100000000</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.sysfreq">100000000</spirit:value>
       </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="signed">
+      <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>txclkfreq</spirit:name>
         <spirit:displayName>Txclkfreq</spirit:displayName>
-        <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txclkfreq">0</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txclkfreq">0</spirit:value>
         <spirit:vendorExtensions>
           <xilinx:parameterInfo>
             <xilinx:enablement>
@@ -537,7 +537,7 @@
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>rxchunk_fast</spirit:name>
         <spirit:displayName>Rxchunk Fast</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.rxchunk_fast" spirit:maximum="4" spirit:rangeType="long">1</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.rxchunk_fast" spirit:minimum="1" spirit:maximum="4" spirit:rangeType="long">1</spirit:value>
         <spirit:vendorExtensions>
           <xilinx:parameterInfo>
             <xilinx:enablement>
@@ -549,12 +549,12 @@
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>rxfifosize_bits</spirit:name>
         <spirit:displayName>Rxfifosize Bits</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.rxfifosize_bits" spirit:maximum="14" spirit:rangeType="long">11</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.rxfifosize_bits" spirit:minimum="6" spirit:maximum="14" spirit:rangeType="long">11</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>txfifosize_bits</spirit:name>
         <spirit:displayName>Txfifosize Bits</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txfifosize_bits" spirit:maximum="14" spirit:rangeType="long">11</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txfifosize_bits" spirit:minimum="2" spirit:maximum="14" spirit:rangeType="long">11</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="std_logic_vector(7 downto 0)">
         <spirit:name>txdivcnt</spirit:name>
@@ -586,47 +586,58 @@
       <spirit:file>
         <spirit:name>src/syncdff.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwram.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwpkg.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwxmit_fast.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwxmit.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwrecvfront_generic.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwrecvfront_fast.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwrecv.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwlink.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/spwstream.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/axistream_spw_lite_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_1e3169d2</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_bf6736f2</spirit:userFileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -708,18 +719,20 @@
       <spirit:file>
         <spirit:name>tb/axistream_spw_lite_v1_0_tb.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_testbench</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>tb/cross_clock_two_inst_tb_behav.wcfg</spirit:name>
         <spirit:fileType>unknown</spirit:fileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_testbench</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>tb/axistream_spw_lite_v1_0_tb_behav.wcfg</spirit:name>
         <spirit:fileType>unknown</spirit:fileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>tb/cross_clock_two_inst_tb.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_testbench</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -739,16 +752,16 @@
     <spirit:parameter>
       <spirit:name>sysfreq</spirit:name>
       <spirit:displayName>Sysfreq</spirit:displayName>
-      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.sysfreq">100000000</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.sysfreq">100000000</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>txclkfreq</spirit:name>
       <spirit:displayName>Txclkfreq</spirit:displayName>
-      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.txclkfreq">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.txclkfreq">0</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:id="PARAM_ENABLEMENT.txclkfreq">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.txclkfreq">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:parameterInfo>
       </spirit:vendorExtensions>
@@ -760,7 +773,7 @@
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:id="PARAM_ENABLEMENT.rxchunk_fast">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.rxchunk_fast">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:parameterInfo>
       </spirit:vendorExtensions>
@@ -800,23 +813,23 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axistream_spw_lite_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>3</xilinx:coreRevision>
+      <xilinx:coreRevision>4</xilinx:coreRevision>
       <xilinx:upgrades>
         <xilinx:canUpgradeFrom>gutelfuldead:user:axistream_spw_lite:1.0</xilinx:canUpgradeFrom>
       </xilinx:upgrades>
-      <xilinx:coreCreationDateTime>2018-05-19T00:19:17Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2021-04-27T16:57:34Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="gutelfuldead:user:axistream_spw_lite:1.0_ARCHIVE_LOCATION">/home_extended/gits/zynq_ip_repo/IP_LIBRARY/axistream_spw_lite_1.0</xilinx:tag>
-        <xilinx:tag xilinx:name="gutelfuldead:user:axistream_spw_lite:2.0_ARCHIVE_LOCATION">/home_extended/gits/zynq_ip_repo/IP_LIBRARY/axistream_spw_lite_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="gutelfuldead:user:axistream_spw_lite:2.0_ARCHIVE_LOCATION">/mnt/data/csp-fw/trunk/src/ip_catalog/axistream_spw_lite_1.0</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2015.4</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="0820eea9"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="21f2918c"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="f13d3c45"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="c3efc7a0"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="aa6ce542"/>
+      <xilinx:xilinxVersion>2018.2</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="0602cf5f"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="5b6a8587"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="73a31479"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="d14fc11b"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="8db7baa9"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>
