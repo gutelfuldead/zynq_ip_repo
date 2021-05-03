@@ -549,17 +549,17 @@
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>rxfifosize_bits</spirit:name>
         <spirit:displayName>Rxfifosize Bits</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.rxfifosize_bits" spirit:minimum="6" spirit:maximum="14" spirit:rangeType="long">11</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.rxfifosize_bits" spirit:minimum="6" spirit:maximum="14" spirit:rangeType="long">14</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>txfifosize_bits</spirit:name>
         <spirit:displayName>Txfifosize Bits</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txfifosize_bits" spirit:minimum="2" spirit:maximum="14" spirit:rangeType="long">11</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txfifosize_bits" spirit:minimum="2" spirit:maximum="14" spirit:rangeType="long">14</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="std_logic_vector(7 downto 0)">
         <spirit:name>txdivcnt</spirit:name>
         <spirit:displayName>Txdivcnt</spirit:displayName>
-        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txdivcnt" spirit:bitStringLength="8">&quot;00000100&quot;</spirit:value>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.txdivcnt" spirit:bitStringLength="8">&quot;00000001&quot;</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="boolean">
         <spirit:name>rximpl_fast</spirit:name>

@@ -14,9 +14,9 @@ package axistream_spw_lite_v1_0_pkg is
         rximpl_fast     : boolean                      := false; -- true to use rx_clk
         tximpl_fast     : boolean                      := false; -- true to use tx_clk
         rxchunk_fast    : integer range 1 to 4         := 1;
-        rxfifosize_bits : integer range 6 to 14        := 11; -- 11 (2 kByte)
-        txfifosize_bits : integer range 2 to 14        := 11; -- 11 (2 kByte)
-        txdivcnt        : std_logic_vector(7 downto 0) := x"04"
+        rxfifosize_bits : integer range 6 to 14        := 14; -- 14 (16 kByte)
+        txfifosize_bits : integer range 2 to 14        := 14; -- 14 (16 kByte)
+        txdivcnt        : std_logic_vector(7 downto 0) := x"01" -- spw rate will be sysfreq / 2
     );
     port (
         aclk          : in    std_logic;
